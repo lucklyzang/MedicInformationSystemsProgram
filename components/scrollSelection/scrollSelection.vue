@@ -4,9 +4,14 @@
 			<view class='date-gray-background' @click="hiddeDatePicker"></view>
 			<view class='date-container'>
 				<view class="transparent">
-					<view ref="chooseBox" class="title-box">
+					<view ref="chooseBox" class="title-box" v-if="buttonLocation == 'bottom'">
 					  {{ title }}
 					  <u-icon name="close" size="25" @click="close"></u-icon>
+					</view>
+					<view class="button-box-top" v-if="buttonLocation == 'top'">
+						<text class="cancel-text" @click="cancel" v-if="list.length > 0">取消</text>
+						<text class="title-text"> {{ title }}</text>
+						<text class="sure-text" @click="confirm" v-if="list.length > 0">确定</text>
 					</view>
 					<view class="search-box" v-if="isShowSearch" ref="searchBox">
 						<u-search
@@ -32,7 +37,7 @@
 							</view>
 						</picker-view-column>
 					</picker-view>
-					<view class="button-box" v-if="list.length > 0">
+					<view class="button-box" v-if="list.length > 0 && buttonLocation == 'bottom'">
 						<text @click="reset" v-if="isShowReset">重置</text>
 						<text @click="cancel" v-if="!isShowReset">取消</text>
 						<text @click="confirm">确认</text>
@@ -58,6 +63,11 @@
 			currentSelectData: {
 			  type: Array,
 			  default: []
+			},
+			// 按钮位置
+			buttonLocation: {
+				type: String,
+				default: 'bottom'
 			},
 			// 是否显示搜索框
 			isShowSearch: {
@@ -220,7 +230,7 @@
 		position: absolute;
 		border-top-left-radius: 20px;
 		border-top-right-radius: 20px;
-		padding: 20px 10px;
+		padding:  0px 0px 20px 0px;
 		box-sizing: border-box;
 		width: 100%;
 		height: 50%;
@@ -251,6 +261,25 @@
 					top: 50%;
 					transform: translateY(-50%);
 					right: 0
+				}
+			};
+			.button-box-top {
+				height: 44px;
+				background: #F7F7F9;
+				fonr-size: 16px;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 0 10px;
+				box-sizing: border-box;
+				.cancel-text {
+					color: #8F8F91;
+				};
+				.title-text {
+					color: #101010;
+				};
+				.sure-text {
+					color: #3370FF;
 				}
 			};
 			.search-box {

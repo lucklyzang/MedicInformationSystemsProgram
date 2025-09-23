@@ -1,48 +1,67 @@
 <template>
 	<view class="container">
-		<!-- <ourLoading isFullScreen :active="showLoadingHint"  :translateY="50" text="登录中,请稍候···" color="#fff" textColor="#fff" background-color="rgb(143 143 143)"/> -->
-		<u-modal v-model="modalShow" :content="modalContent"
-		 :show-cancel-button="true" @confirm="sureCancel" @cancel="cancelSure">
+		<u-modal :show="modalShow" :content="modalContent"
+		 :showCancelButton="true" @confirm="sureCancel" @cancel="cancelSure">
 		</u-modal>
+		<u-toast ref="uToast"></u-toast>
+		<!-- 院区 -->
+		<view class="transport-rice-box" v-if="showHospitalCampus">
+			<ScrollSelection buttonLocation='top' v-model="showHospitalCampus" :pickerValues="hospitalCampusDefaultIndex" :isShowSearch="false" :columns="hospitalCampusOption" @sure="hospitalCampusSureEvent" @cancel="hospitalCampusCancelEvent" @close="hospitalCampusCloseEvent" />
+		</view>
+		<view class="top-background-area">
+			<image src="/static/img/login-background-image.png" mode="widthFix"></image>
+			<view class="title-area">
+				<image src="/static/img/login-icon.png" mode="widthFix"></image>
+				<text>智 慧 后 勤 服 务 平 台</text>
+			</view>
+		</view>
 		<view class="container-content">
-			<view class="title">
-        <text>AI下单</text>
-      </view>
 			<view class="form-box">
-				<u-form :model="form" ref="uForm">
-					<u-form-item label="账号" right-icon="account-fill" :label-style="{'font-size':'15px'}" :right-icon-style="{'font-size':'20px'}">
-						<u-input v-model="form.username" placeholder="请输入账号"/>
-					</u-form-item>
-					<u-form-item label="密码" right-icon="lock-fill" :label-style="{'font-size':'15px'}" :right-icon-style="{'font-size':'20px'}">
-						<u-input v-model="form.password" placeholder="请输入密码" type="password"/>
-					</u-form-item>
-				</u-form>
+				<u--input
+					prefixIcon="account"
+					prefixIconStyle="font-size: 24px;color: #B6B6B6"
+					placeholderStyle="font-size: 16px;color: #B6B6B6"
+					placeholder="请输入账号"
+					v-model="form.username"
+					border="bottom"
+					type="text"
+					clearable
+				>
+				</u--input>
+				<u--input
+					prefixIcon="lock"
+					prefixIconStyle="font-size: 24px;color: #B6B6B6"
+					placeholderStyle="font-size: 16px;color: #B6B6B6"
+					placeholder="请输入密码"
+					v-model="form.password"
+					border="bottom"
+					type="password"
+					clearable
+				>
+				</u--input>
 			</view>
       <view class="remember-password">
         <view class="remember-password-content">
           <u-checkbox-group @change="checkboxGroupChange">
                 <u-checkbox 
-                  @change="checkboxChange"
                   shape="circle"
-                  active-color="#78d035"
-                  v-model="item.checked" 
-                  v-for="(item, index) in list" :key="index" 
-                  :name="item.name"
-                >{{item.name}}</u-checkbox>
+                  activeColor="#1864FF"
+									labelSize="14px"
+									labelColor="#565656"
+                  v-model="item.checked"
+                  v-for="(item, index) in list"
+                  :key="index"
+									:label="item.name"
+									:name="item.name"
+                ></u-checkbox>
             </u-checkbox-group>
          </view>
       </view>
 			<view class="form-btn">
 				<button type="primary" @click="sure">登 录</button>
 			</view>
-      <view class="weixin-login">
-        <u-divider border-color="#6d6d6d" color="#333">微信授权登陆</u-divider>
-        <view class="image-wrapper" @click="weixinLoginEvent">
-          <!-- <image src="/static/img/weixin.png"> -->
-        </view>
-      </view>
       <view class="bottom-character">
-        <text>内部系统,仅限医护进行下单使用</text>
+        <text>-内部系统，仅限医护下单使用-</text>
       </view>
 		</view>
 	</view>
@@ -53,9 +72,11 @@
 	import {logIn} from '@/api/login.js'
 	import Qs from 'qs'
 	import { setCache, getCache, removeCache } from '@/common/js/utils'
+	import ScrollSelection from "@/components/scrollSelection/scrollSelection";
 	export default {
 	components: {
-	 },
+		ScrollSelection,
+	},
 		data() {
 			return {
 				form: {
@@ -65,13 +86,28 @@
         list: [
           {
             name: '记住账户密码',
-            checked: false,
             disabled: false
           }
         ],
+				hospitalCampusDefaultIndex: [0],
+				hospitalCampusOption: [
+					{
+						text: '成都市妇女儿童医院',
+						value: 1,
+						id: 1
+					},
+					{
+						text: '都江堰人民医院',
+						value: 2,
+						id: 2
+					}
+				],
+				showHospitalCampus: false,
+				currentHospitalCampusSpaces: '请选择',
+				
+				rememberAccountMessage: false,
 				modalShow: false,
-				modalContent: '',
-				showLoadingHint: false
+				modalContent: ''
 			}
 		},
 		onReady () {
@@ -92,75 +128,98 @@
 				'changeToken',
 				'changeIsLogin'
 			]),
-			
-      
-      // 选中某个复选框时，由checkbox时触发
-      checkboxChange(e) {
-        console.log(this.list);
-      },
       
       // 选中任一checkbox时，由checkbox-group触发
       checkboxGroupChange(e) {
-        // console.log(e);
+				if (e[0] == '记住账户密码') {
+					this.rememberAccountMessage = true
+				} else {
+					this.rememberAccountMessage = false
+				}
       },
+			
+			// 院区下拉选择框确认事件
+			hospitalCampusSureEvent (val,value,id) {
+				if (val) {
+					this.hospitalCampusDefaultIndex = [id]
+					this.currentHospitalCampusSpaces =  val;
+				} else {
+					this.currentGoalSpaces = '请选择'
+				};
+				this.showHospitalCampus = false
+			},
+			
+			// 院区下拉选择框取消事件
+			hospitalCampusCancelEvent () {
+				this.showHospitalCampus = false
+			},
+			
+			// 院区下拉选择框关闭事件
+			hospitalCampusCloseEvent () {
+				this.showHospitalCampus = false
+			},
           
 			// 账号密码事件
 			sure () {
-				let loginMessage = Qs.stringify({
-				  username: this.form.username,
-				  password: this.form.password
-				});
-				this.showLoadingHint = true;
-				logIn(loginMessage).then((res) => {
-					if (res) {
-					  if (res.data.code == 200) {
-						   this.changeOverDueWay(false);
-						   setCache('storeOverDueWay',false); 
-							// 登录用户名密码及用户信息存入Locastorage
-              // 判断是否勾选记住用户名密码
-              if (this.list[0]['checked']) {
-                setCache('userName', this.form.username);
-                setCache('userPassword', this.form.password);
-              } else {
-                removeCache('userName', this.form.username);
-                removeCache('userPassword', this.form.password);
-              };
-							// 登录用户信息存入store
-							this.changeIsLogin(true);
-							this.storeUserInfo(res.data.data);
-							// 保存模板类型
-							if (res.data.data.mobile) {
-								this.changeTemplateType(res.data.data.mobile);
-							};
-							uni.redirectTo({
+				// this.showHospitalCampus = true;
+				// if (this.form.username === '' || this.form.password === '') {
+				// 	this.$refs.uToast.show({
+				// 		message: '账号或密码不能为空'
+				// 	});
+				// 	return;
+				// };
+				// let loginMessage = Qs.stringify({
+				//   username: this.form.username,
+				//   password: this.form.password
+				// });
+				// logIn(loginMessage).then((res) => {
+				// 	if (res) {
+				// 	  if (res.data.code == 200) {
+				// 		   this.changeOverDueWay(false);
+				// 		   setCache('storeOverDueWay',false); 
+				// 			// 登录用户名密码及用户信息存入Locastorage
+    //           // 判断是否勾选记住用户名密码
+    //           if (this.rememberAccountMessage) {
+    //             setCache('userName', this.form.username);
+    //             setCache('userPassword', this.form.password);
+    //           } else {
+    //             removeCache('userName', this.form.username);
+    //             removeCache('userPassword', this.form.password);
+    //           };
+				// 			// 登录用户信息存入store
+				// 			this.changeIsLogin(true);
+				// 			this.storeUserInfo(res.data.data);
+				// 			// 保存模板类型
+				// 			if (res.data.data.mobile) {
+				// 				this.changeTemplateType(res.data.data.mobile);
+				// 			};
+				// 			uni.switchTab({
+				// 				url: '/pages/index/index'
+				// 			})
+				// 	  } else {
+				// 		 this.modalShow = true;
+				// 		 this.modalContent = `${res.data.msg}`
+				// 	  }
+				// 	};
+				//   })
+				//   .catch((err) => {
+				// 	   this.modalShow = true;
+				// 	   this.modalContent = `${err}`
+				//   })
+				uni.switchTab({
 								url: '/pages/index/index'
 							})
-					  } else {
-						 this.modalShow = true;
-						 this.modalContent = `${res.data.msg}`
-					  }
-					};
-					this.showLoadingHint = false
-				  })
-				  .catch((err) => {
-					   this.showLoadingHint = false;
-					   this.modalShow = true;
-					   this.modalContent = `${err.message}`
-				  })
 			},
-      
-      // 微信授权登录事件
-      weixinLoginEvent () {
-        uni.redirectTo({
-            url: '/pages/weixinLogin/weixinLogin'
-        })
-      },
 			
 			// 弹框确定事件
-			sureCancel () {},
+			sureCancel () {
+				this.modalShow = false;
+			},
 			
 			// 弹框取消事件
-			cancelSure () {}
+			cancelSure () {
+				this.modalShow = false;
+			}
 		}
 	}
 </script>
@@ -170,45 +229,69 @@
 	.container {
 		@include content-wrapper;
 		font-size: 14px;
+		padding-top: 50vh;
+		box-sizing: border-box;
+		.top-background-area {
+			width: 100%;
+			height: 50vh;
+			position: absolute;
+			top: 0;
+			left: 0;
+			z-index: 10;
+			>image {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+			};
+			.title-area {
+				width: 100%;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%,-50%);
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				>image {
+					width: 64px;
+				};
+				>text {
+					margin-top: 22px;
+					font-size: 20px;
+					color: #fff
+				}
+			}
+		};
 		.container-content {
-			flex: 1;
+			height: 50vh;
 			background: #fff;
 			position: relative;
-			.title {
-				width: 100%;
-				height: 190px;
-				line-height: 190px;
-				text-align: center;
-				color: black;
-				font-size: 26px;
-        color: #2c9af1;
-        font-weight: bold;
-        font-size: 50px;
-          span {
-            box-shadow: 0 8px 6px -6px black
-          }
-			};
+			padding-top: 40px;
+			box-sizing: border-box;
 			.form-box {
-        width: 90%;
+        width: 80%;
         margin: 0 auto;
-				padding: 10px;
-				/deep/ .u-input {
-					background: #fff
-				};
-				text {
-					display: inline-block;
-					margin-bottom: 8px
-				};
-				.form-account {
-				};
-				.form-password {
-					margin-top: 20px
+				::v-deep {
+					.u-input {
+						height: 40px;
+						.u-input__content {
+							.u-input__content__prefix-icon {
+								margin-right: 12px;
+							}
+						};
+						&:first-child {
+							margin-bottom: 10px;
+						}
+					}
 				}
 			};
       .remember-password {
-        width: 100%;
+        width: 80%;
         margin: 0 auto;
-        height: 40px;
+        height: 20px;
+				margin-top: 20px;
         position: relative;
         .remember-password-content {
           position: absolute;
@@ -217,44 +300,28 @@
         }
       };
 			.form-btn {
-        width: 80%;
+        width: 75%;
         margin: 0 auto;
-        margin-top: 30px;
+        margin-top: 50px;
 				::after {
-					border-radius: 4px;
+					border-radius: 26px;
 					border: none;
 				};
 				button {
-          background-image: linear-gradient(to right, #37d5fc , #429afe);
-          border-radius: 20px;
+					height: 48px;
+          background-image: linear-gradient(to right, #6ED3F7,#218FFF);
+          border-radius: 26px;
 				}
-			}
-      .weixin-login {
-        width: 100%;
-        margin: 0 auto;
-        margin-top: 40px;
-        .image-wrapper {
-          width: 60px;
-          height: 50px;
-          margin: 0 auto;
-          image {
-            width: 100%;
-            height: 100%
-          }
-        }
-      }
+			};
       .bottom-character {
         width: 100%;
         text-align: center;
         position: absolute;
         left: 0;
-        bottom: 10px;
-        color: #333;
+        bottom: 40px;
+        color: #9C9C9C;
         text {
           font-size: 12px;
-          border-left: 1px solid #333;
-          border-right: 1px solid #333;
-          padding: 0 6px
         }
       }
 		}
