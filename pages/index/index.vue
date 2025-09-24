@@ -1,5 +1,5 @@
 <template>
-	<view class="content" :style="{ 'padding-top': statusBarHeight + 'px' }" @click="wrapperClickEvent">
+	<view class="content" :style="{ 'padding-top': statusBarHeight + 'px' }">
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 'px' }"></view>
 		<u-toast ref="uToast" />
     <!-- 顶部标题 -->
@@ -21,7 +21,7 @@
 					服务管理
 				</view>
 				<view class="service-management-content">
-					<view class="service-list" v-for="(item,index) in serviceList" :key="index">
+					<view class="service-list" v-for="(item,index) in serviceList" :key="index" @click="serviceManagementEvent(item,index)">
 						<view class="list-top">
 							<image :src="item.url" mode="widthFix"></image>
 						</view>
@@ -147,62 +147,6 @@
 				'storeLocationMessage'
 			]),
 			
-      goback() {
-        uni.navigateBack()
-      },
-			
-			focus(){
-				this.scrollToBottom()
-			},
-			
-			blur(){
-				this.scrollToBottom()
-			},
-			 
-			// 最外层盒子点击事件
-			wrapperClickEvent () {
-				this.triangleRectListInfoShow = false;
-			},
-			
-			// 创建工单列表显示事件
-			creatWorkOrderListShowEvent () {
-				this.triangleRectListInfoShow = !this.triangleRectListInfoShow;
-			},
-			
-			// 创建工单事件
-			creatWorkOrderEvent (item,index) {
-				this.triangleRectListInfoShow = false;
-				if (item == '运送') {
-					uni.navigateTo({
-						url: '/createWorkerOrderPackage/pages/createWorkerOrder/index/index'
-					})
-				} else if (item == '工程') {
-					uni.navigateTo({
-						url: '/createWorkerOrderPackage/pages/createWorkerOrder/createProjectWorkerOrder/createProjectWorkerOrder'
-					})
-				} else if (item == '事务') {
-					uni.navigateTo({
-						url: '/createWorkerOrderPackage/pages/createWorkerOrder/createAffairWorkerOrder/createAffairWorkerOrder'
-					})
-				} else if (item == '环境') {
-					this.storeLocationMessage({});
-					uni.navigateTo({
-						url: '/createWorkerOrderPackage/pages/createWorkerOrder/createEnvironmentWorkerOrder/createEnvironmentWorkerOrder'
-					})
-				}
-			}, 
-			
-			// 修改工单事件
-			modificationWorkOrderEvent () {
-				this.storeCurrentIndex(0);
-				if (this.triangleRectListInfoShow) {
-					this.triangleRectListInfoShow = false;
-				};
-				uni.navigateTo({
-					url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
-				})
-			},
-			
 			// 格式化时间
 			getNowFormatDate(currentDate,type) {
 				// type:1(只显示小时分钟秒),2(只显示年月日)3(只显示年月)4(显示年月日小时分钟秒)5(显示月日)
@@ -248,44 +192,24 @@
 				return currentdate
 			},
 			
-			// 查询要联系的患者信息(从订单界面进入此页面)
-			getTradeOrderUserCareInfoEvent (data) {
-				this.showLoadingHint = true;
-				getTradeOrderUserCareInfo(data).then((res) => {
-					if ( res && res.data.code == 0) {
-						this.fromName = res.data.data.userName;
-						this.fromId = res.data.data.userId;
-						this.userAvatar = res.data.data.userAvatar;
-						this.userPhone = res.data.data.userPhone;
-						this.queryChatPageList({
-							pageNo: this.currentPage,
-							pageSize: this.pageSize,
-							fromId: this.fromId
-						},true)
-					} else {
-						this.$refs.uToast.show({
-							message: res.data.msg,
-							type: 'error',
-							position: 'center'
-						})
-					};
-					this.showLoadingHint = false;
-				})
-				.catch((err) => {
-					this.showLoadingHint = false;
-					this.$refs.uToast.show({
-						message: err.message,
-						type: 'error',
-						position: 'center'
-					})
-				})
-			},
-			
 			// px转换成rpx
 			rpxTopx(px){
 				let deviceWidth = uni.getSystemInfoSync().windowWidth;
 				let rpx = ( 750 / deviceWidth ) * Number(px);
 				return Math.floor(rpx)
+			},
+			
+			// 服务管理项点击事件
+			serviceManagementEvent (item,index) {
+				if (item.text == '中央运送') {
+					uni.navigateTo({
+						url: '/transManagementPackage/pages/index/index'
+					})
+				} else if (item.text == '工程维修') {
+					
+				} else if (item.text == '保洁管理') {
+					
+				}
 			}
 		}
 	}

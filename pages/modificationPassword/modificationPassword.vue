@@ -8,48 +8,58 @@
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast" />
 		<view class="nav">
-			<nav-bar :home="false" backState='2000' fontColor="#FFF" bgColor="none" title="个人中心">
+			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="修改密码" @backClick="backTo">
 			</nav-bar> 
 		</view>
 		<view class="content">
-			<view class="content-top">
-				<view class="account-area account-area-bottom-border">
-					<view class="account-area-left">
-						账号
-					</view>
-					<view class="account-area-right">
-						LIJI
+			<view class="former-password-area">
+				<view class="former-password-left">
+					<text>*</text>
+					<text>请输入旧密码</text>
+				</view>
+				<view class="former-password-right">
+				 <u--input
+						border="surround"
+						type="password"
+						clearable
+						v-model="formerPasswordValue"
+					></u--input>
+				</view>
+			</view>
+			<view class="former-password-area new-password-area">
+				<view class="former-password-left">
+					<text>*</text>
+					<text>请输入新密码</text>
+				</view>
+				<view class="former-password-right">
+				 <u--input
+						border="surround"
+						type="password"
+						clearable
+						v-model="newPasswordValue"
+					></u--input>
+					<view class="password-explain">
+						密码至少8位，可以使用字母和数字。
 					</view>
 				</view>
-				<view class="account-area">
-					<view class="account-area-left">
-						姓名
-					</view>
-					<view class="account-area-right">
-						LIJI
-					</view>
+			</view>
+			<view class="former-password-area">
+				<view class="former-password-left">
+					<text>*</text>
+					<text>请确认新密码</text>
 				</view>
-				<view class="account-area">
-					<view class="account-area-left">
-						所属科室
-					</view>
-					<view class="account-area-right">
-						LIJI
-					</view>
-				</view>
-				<view class="account-area" @click="modificationPasswordEvent">
-					<view class="account-area-left">
-						修改密码
-					</view>
-					<view class="account-area-right">
-						<u-icon name="arrow-right" color="#101010" size="30"></u-icon>
-					</view>
+				<view class="former-password-right">
+				 <u--input
+						border="surround"
+						type="password"
+						clearable
+						v-model="surePasswordValue"
+					></u--input>
 				</view>
 			</view>
 		</view>
 		<view class="bottom-area">
 			<view class="quit-area">退出登录</view>
-			<view class="version-area">当前版本 1.0.13</view>
 		</view>
 	</view>
 </template>
@@ -76,6 +86,9 @@
 			return {
 				infoText: '开启中···',
 				showLoadingHint: false,
+				formerPasswordValue: '',
+				newPasswordValue: '',
+				surePasswordValue: ''
 			}
 		},
 		computed: {
@@ -107,51 +120,16 @@
 		},
 		methods: {
 			...mapMutations([
-				'changeUserBasicInfo'
 			]),
 			
-			// 修改密码事件
-			modificationPasswordEvent () {
-				uni.navigateTo({
-					url: '/pages/modificationPassword/modificationPassword'
-				})
+			// 顶部导航返回事件
+			backTo () {
+				uni.navigateBack()
 			},
 			
-			// 获取用户基本信息
-			queryUserBasicMessage (flag) {
-				if (flag) {
-					this.showLoadingHint = true;
-					this.infoText = '加载中...';
-				};
-				getUserMessage().then((res) => {
-					if ( res && res.data.code == 0) {
-						this.changeUserBasicInfo(res.data.data);
-						this.personPhotoSource = !this.userBasicInfo.avatar ? this.defaultPersonPhotoIconPng :  this.userBasicInfo.avatar;
-						this.niceNameValue = !this.userBasicInfo.nickname ? this.niceNameValue : this.userBasicInfo.nickname;
-						this.isSendOrdersValue = this.userBasicInfo.receive;
-						this.isAuth = this.userBasicInfo.auth;
-						this.cashOut = this.userBasicInfo.cashOut;
-					} else {
-						this.$refs.uToast.show({
-							message: res.data.msg,
-							type: 'error',
-							position: 'bottom'
-						})
-					};
-					if (flag) {
-						this.showLoadingHint = false
-					}
-				})
-				.catch((err) => {
-					if (flag) {
-						this.showLoadingHint = false
-					};
-					this.$refs.uToast.show({
-						message: err.message,
-						type: 'error',
-						position: 'bottom'
-					})
-				})
+			// 提交修改事件
+			submitModificationEvent () {
+				
 			}
 		}
 	}
@@ -195,29 +173,38 @@
 		.content {
 			 flex: 1;
 			 overflow: auto;
-			 padding: 6px 0;
+			 padding: 20px;
 			 box-sizing: border-box;
 			 position: relative;
 			 background: #F8F8F8;
-			 .content-top {
-				 background: #fff;
-				 .account-area-bottom-border {
-					 border-bottom: 1px solid #F8F8F8;
+			 .former-password-area {
+				 display: flex;
+				 justify-content: space-between;
+				 align-items: center;
+				 margin-bottom: 14px;
+				 .former-password-left {
+					 margin-right: 10px;
+					 >text {
+						 &:first-child {
+							 color: #DB4747;
+							 margin-right: 4px;
+						 };
+						 &:last-child {
+							 font-weight: bold;
+							 font-size: 14px;
+							 color: #000000;
+						 }
+					 }
 				 };
-				 .account-area {
-					 padding: 0 10px;
-					 box-sizing: border-box;
-					 height: 44px;
-					 display: flex;
-					 align-items: center;
-					 justify-content: space-between;
-					 .account-area-left {
-						 font-size: 14px;
-						 color: #9C9C9C;
-					 };
-					 .account-area-right {
-						 font-size: 14px;
-						 color: #000000;
+				 .former-password-right {
+					 flex: 1
+				 }
+			 };
+			 .new-password-area {
+				 .former-password-right {
+					 .password-explain {
+						 font-size: 12px;
+						 color: #DB4747;
 					 }
 				 }
 			 }
@@ -233,17 +220,13 @@
 			.quit-area {
 				display: block;
 				height: 44px;
-				background: #E86F50;
+				background: #3890EE;
 				border-radius: 4px;
 				font-size: 14px;
 				color: #fff;
 				line-height: 44px;
 				text-align: center;
 				width: 70%;
-			};
-			.version-area {
-				font-size: 14px;
-				color: #9C9C9C;
 			}
 		}
 	}

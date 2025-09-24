@@ -30,9 +30,44 @@
 				"navigationBarTextStyle": "black",
 				"navigationStyle" : "custom"
 			}
+		},
+		{
+			"path": "pages/modificationPassword/modificationPassword",
+			"style": { 
+				"navigationBarTitleText": "",
+				"navigationBarBackgroundColor": "#75b0f0",
+				"navigationBarTextStyle": "black",
+				"navigationStyle" : "custom"
+			}
 		}
 	],
 	"subPackages": [
+		{
+			"root": "transManagementPackage",
+			"name": "rootTransManagementPackage",
+			"pages": [
+				{
+					"path": "pages/index/index",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				},
+				{
+					"path": "pages/callTask/callTask",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				}
+			]
+		},
 		{
 			"root": "createWorkerOrderPackage",
 			"name": "rootCreateWorkerOrderPackage",
@@ -193,6 +228,10 @@
 		}
 	],
 	"preloadRule": {
+		"transManagementPackage/pages/index/index": {
+				"network": "all",
+				"packages": ["rootTransManagementPackage"]
+		},
 		"createWorkerOrderPackage/pages/createWorkerOrder/index/index": {
 				"network": "all",
 				"packages": ["rootCreateWorkerOrderPackage"]
