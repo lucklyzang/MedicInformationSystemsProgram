@@ -8,7 +8,7 @@
    <view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
    <u-toast ref="uToast" />
    <view class="nav">
-   	<nav-bar :home="false" backState='3000' fontColor="#FFF" bgColor="none" :title="titleText" @backClick="backTo">
+   	<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" :title="titleText" @backClick="backTo">
    	</nav-bar> 
    </view>
     <!-- 病人编辑弹框 -->

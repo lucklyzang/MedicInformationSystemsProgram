@@ -32,7 +32,7 @@
 			  :value="valueName"
 			  @change="tabBarEvent"
 			  :placeholder="false"
-				activeColor="#d81e06"
+				activeColor="#3890EE"
 				:fixed="true"
 			  :safeAreaInsetBottom="true"
 			>
@@ -41,13 +41,13 @@
 						style="width:15px"
 						mode="widthFix"
 			      slot="active-icon"
-			      src="/static/img/my-current.png"
+			      src="/static/img/call-active-icon.png"
 			    ></image>
 			    <image
 			      slot="inactive-icon"
 						style="width:15px"
 						mode="widthFix"
-			      src="/static/img/my-current.png"
+			      src="/static/img/call-inactive-icon.png"
 			    ></image>
 			  </u-tabbar-item>
 				<u-tabbar-item text="实时任务">
@@ -55,13 +55,13 @@
 						style="width:15px"
 						mode="widthFix"
 				    slot="active-icon"
-				    src="/static/img/my-current.png"
+				    src="/static/img/real-timetask-active-icon.png"
 				  ></image>
 				  <image
 						style="width:15px"
 						mode="widthFix"
 				    slot="inactive-icon"
-				    src="/static/img/my-current.png"
+				    src="/static/img/real-timetask-inactive-icon.png"
 				  ></image>
 				</u-tabbar-item>
 				<u-tabbar-item text="历史任务">
@@ -69,13 +69,13 @@
 						style="width:15px"
 						mode="widthFix"
 				    slot="active-icon"
-				    src="/static/img/my-current.png"
+				    src="/static/img/historical-task-active-icon.png"
 				  ></image>
 				  <image
 						style="width:15px"
 						mode="widthFix"
 				    slot="inactive-icon"
-				    src="/static/img/my-current.png"
+				    src="/static/img/historical-task-inactive-icon.png"
 				  ></image>
 				</u-tabbar-item>
 			</u-tabbar>
