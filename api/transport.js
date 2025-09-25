@@ -140,3 +140,11 @@ export function editDispatchTaskManyNew(data) {
       data
   })
 };
+
+// 调度任务催单
+export function taskReminder(proId,taskId) {
+  return request({
+    url: store.getters.templateType == 'template_one' ? `trans/task/reminder/${proId}/${taskId}` : `trans/dispatch/reminder/${proId}/${taskId}`,
+    method: 'get'
+  })
+};

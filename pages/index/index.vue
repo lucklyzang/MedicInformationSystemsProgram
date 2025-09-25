@@ -206,7 +206,9 @@
 						url: '/transManagementPackage/pages/index/index'
 					})
 				} else if (item.text == '工程维修') {
-					
+					uni.navigateTo({
+						url: '/projectManagementPackage/pages/callTask/callTask'
+					})
 				} else if (item.text == '保洁管理') {
 					
 				}

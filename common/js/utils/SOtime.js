@@ -138,6 +138,21 @@ const time3 = (timer) => {
 
 	return Eyear + "-" + Emonth + "-" + Edate + " " + Ehour + ":" + Eminute
 }
+const time8 = (timer) => {
+	var arrTimestamp = (timer + '').split('');
+	for (var start = 0; start < 13; start++) {
+		if (!arrTimestamp[start]) {
+			arrTimestamp[start] = '0';
+		}
+	}
+	var Etime = arrTimestamp.join('') * 1; //参数时间
+	var Etimer = new Date(Etime)
+
+	var Eyear = Etimer.getFullYear(); //取得4位数的年份
+	var Emonth = Etimer.getMonth() + 1 < 10 ? '0' + (Etimer.getMonth() + 1) : Etimer.getMonth() + 1; //取得日期中的月份，其中0表示1月，11表示12月
+	var Edate = Etimer.getDate()< 10 ? '0' + Etimer.getDate() : Etimer.getDate(); //返回日期月份中的天数（1到31）
+	return Eyear + "-" + Emonth + "-" + Edate
+}
 const time4 = (timer) => {
 	var date = timer.replace(/\//g, '-')
 	date = timer.replace(/：/g, ':')
@@ -195,5 +210,6 @@ module.exports = {
 	time3,
 	time4,
 	time5,
-	time6
+	time6,
+	time8
 }

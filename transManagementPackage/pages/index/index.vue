@@ -114,6 +114,7 @@ export default {
   },
 
   onShow() {
+		this.valueName = 0;
 		const pages = getCurrentPages(); //获取当前页面栈的实例数组
 		if (pages.length == 1) {
 			this.tierNum = 1
@@ -165,8 +166,21 @@ export default {
 		 
 		 // tabBar点击事件
 		 tabBarEvent (index) {
-			 this.valueName = index
-		 }
+			 this.valueName = index;
+			 if (this.valueName == 0) {
+				 uni.navigateTo({
+				 	url: '/transManagementPackage/pages/index/index'
+				 })
+			 } else if (this.valueName == 1) {
+				 uni.navigateTo({
+				 	url: '/transManagementPackage/pages/realtimeTask/realtimeTask'
+				 })
+			 } else if (this.valueName == 2) {
+				 uni.navigateTo({
+				 	url: '/transManagementPackage/pages/historicalTask/historicalTask'
+				 })
+			 }
+		 } 
   }
 };
 </script>

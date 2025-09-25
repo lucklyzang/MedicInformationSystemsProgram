@@ -65,6 +65,42 @@
 						"backgroundColorBottom": "#fff",
 						"navigationStyle" : "custom"
 					}
+				},
+				{
+					"path": "pages/realtimeTask/realtimeTask",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				},
+				{
+					"path": "pages/historicalTask/historicalTask",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
+				}
+			]
+		},
+		{
+			"root": "projectManagementPackage",
+			"name": "rootProjectManagementPackage",
+			"pages": [
+				{
+					"path": "pages/callTask/callTask",
+					"style": {
+						"navigationBarTitleText": "",
+						"navigationBarBackgroundColor": "#ffffff",
+						"backgroundColorTop": "#fff,",
+						"backgroundColorBottom": "#fff",
+						"navigationStyle" : "custom"
+					}
 				}
 			]
 		},
@@ -231,6 +267,10 @@
 		"transManagementPackage/pages/index/index": {
 				"network": "all",
 				"packages": ["rootTransManagementPackage"]
+		},
+		"projectManagementPackage/pages/callTask/callTask": {
+				"network": "all",
+				"packages": ["rootProjectManagementPackage"]
 		},
 		"createWorkerOrderPackage/pages/createWorkerOrder/index/index": {
 				"network": "all",
