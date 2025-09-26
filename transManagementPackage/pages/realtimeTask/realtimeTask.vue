@@ -15,7 +15,7 @@
 			<ScrollSelection buttonLocation='top' v-model="showCancelReason" :pickerValues="canCelReasonDefaultIndex" :isShowSearch="false" :columns="CancelReasonOption" @sure="cancelReasonSureEvent" @cancel="cancelReasonCancelEvent" @close="cancelReasonCloseEvent" />
 		</view>
 		<view class="nav">
-			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="实时任务" @backClick="backTo">
+			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="运送" @backClick="backTo">
 			</nav-bar> 
 		</view>
 		<view class="content">
@@ -34,7 +34,18 @@
 								<image :src="contactIsolationPng" v-if="templateType == 'template_one' && item.quarantine == 1"></image>
 								<image :src="contactIsolationPng" v-if="templateType == 'template_two' && item['patientInfoList'].some((el) => { return el.quarantine == 1})"></image>
 							</view>
-						  <view class="priority">
+						  <view class="priority"
+								:class="{
+										'noAllocation' : item.state == 0,
+										'noLookupStyle' : item.state == 1,
+										'noStartStyle' : item.state == 2,
+										'underwayStyle' : item.state == 3,
+										'noEndStyle' : item.state == 4,
+										'delayStyle' : item.state == 5,
+										'cancelStyle' : item.state == 6,
+										'completeStyle' : item.state == 7
+									}"
+							>
 						  	<text>{{stateTransfer(item.state)}}</text>
 						  </view>
 						</view>
@@ -113,7 +124,18 @@
 								<image :src="contactIsolationPng" v-if="templateType == 'template_one' && item.quarantine == 1"></image>
 								<image :src="contactIsolationPng" v-if="templateType == 'template_two' && item['patientInfoList'].some((el) => { return el.quarantine == 1})"></image>
 							</view>
-						  <view class="priority">
+						  <view class="priority"
+								:class="{
+										'noAllocation' : item.state == 0,
+										'noLookupStyle' : item.state == 1,
+										'noStartStyle' : item.state == 2,
+										'underwayStyle' : item.state == 3,
+										'noEndStyle' : item.state == 4,
+										'delayStyle' : item.state == 5,
+										'cancelStyle' : item.state == 6,
+										'completeStyle' : item.state == 7
+									}"
+							>
 						  	<text>{{stateTransfer(item.state)}}</text>
 						  </view>
 						</view>
@@ -360,6 +382,11 @@
 				if (val) {
 					this.cancelReasonDefaultIndex = [id]
 					this.currentCancelReason=  val;
+					this.cancelDispatchTask({
+						proId: this.proId,	//当前项目ID
+						taskId: this.taskId, //当前任务ID
+						reason: this.currentCancelReason //取消原因
+					})
 				} else {
 					this.currentCancelReason = '请选择'
 				};
@@ -724,7 +751,31 @@
 										font-size: 14px;
 									}
 						    }
-						  }
+						  };
+							.noAllocation {
+								background: #E86F50 !important;
+							};
+							.noLookupStyle {
+								background: #E8CB51 !important
+							};
+							.noStartStyle {
+								background: #174E97 !important
+							};
+							.underwayStyle {
+								background: #289E8E !important
+							};
+							.noEndStyle {
+								background: #F2A15F !important
+							};
+							.delayStyle {
+								background: #be4330 !important;
+							};
+							.cancelStyle {
+								background: #E8CB51 !important;
+							};
+							.completeStyle {
+								background: #101010 !important
+							}
 						}
 					};
 			 		.item-top {

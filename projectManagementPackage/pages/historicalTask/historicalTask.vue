@@ -18,7 +18,7 @@
 			<u-empty text="数据为空" mode="list"></u-empty>
 		</view>
 		<view class="nav">
-			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="运送" @backClick="backTo">
+			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="工程维修" @backClick="backTo">
 			</nav-bar> 
 		</view>
 		<view class="content">
@@ -64,21 +64,18 @@
 								<text>编号: {{item.number}}</text>
 								<text>{{item.createTime}}</text>
 							</view>
-							<view class="contact-isolation">
-								<image :src="contactIsolationPng" v-if="templateType == 'template_one' && item.quarantine == 1"></image>
-								<image :src="contactIsolationPng" v-if="templateType == 'template_two' && item['patientInfoList'].some((el) => { return el.quarantine == 1})"></image>
-							</view>
 						  <view class="priority"
 								:class="{
-										'noAllocation' : item.state == 0,
-										'noLookupStyle' : item.state == 1,
-										'noStartStyle' : item.state == 2,
-										'underwayStyle' : item.state == 3,
-										'noEndStyle' : item.state == 4,
-										'delayStyle' : item.state == 5,
-										'cancelStyle' : item.state == 6,
-										'completeStyle' : item.state == 7
-									}"
+									'noAllocation':item.state == 0,
+									'waitSureStyle':item.state == 1,
+									'waitFinishStyle': item.state == 2,
+									'underwayStyle':item.state == 3,
+									'waitSignatureStyle':item.state == 4,
+									'completeStyle':item.state == 5,
+									'cancelStyle':item.state == 6,
+									'delayStyle':item.state == 7,
+									'waitCheckStyle':item.state == 8
+								}"
 							>
 						  	<text>{{stateTransfer(item.state)}}</text>
 						  </view>
@@ -90,47 +87,39 @@
 								<text>优先级:</text>
 						  	<text>{{priorityTransfer(item.priority)}}</text>
 						  </view>
-							<view class="destination-point" v-if="templateType == 'template_one'">
-								<text>运送类型:</text>
+							<view class="destination-point">
+								<text>任务类型:</text>
 								<text>{{item.taskTypeName}}</text>
-							</view>
-							<view class="destination-point" v-else-if="templateType === 'template_two'">
-								<text>运送类型:</text>
-								<text>{{item.patientInfoList[0].typeList.length > 0 ? item.patientInfoList[0].typeList[0].parentTypeName : '无'}}</text>
 							</view>
 						</view>
 						<view class="item-top-three">
 							<view class="transport-type">
-								<text>转运工具:</text>
-								<text>{{!item.toolName ? '无' : item.toolName}}</text>
+								<text>目的地:</text>
+								<text>{{!item.destinationName ? '无' : item.destinationName}}</text>
 							</view>
-						  <view class="transport-people">
-								<text>运送人:</text>
-						  	<text>{{!item.workerName ? '无' : item.workerName}}</text>
-						  </view>
+							<view class="transport-people">
+								<text>维修员:</text>
+								<text>{{!item.workerName ? '无' : item.workerName}}</text>
+							</view>
 						</view>
 						<view class="item-top-three">
 							<view class="start-point">
-								<text>出发地:</text>
-								<text>{{item.setOutPlaceName}}</text>
+								<text>任务描述:</text>
+								<text>{{item.taskDesc}}</text>
 							</view>
-							<view class="bed-number" v-if="templateType === 'template_one'">
-								<text>床号:</text>
-								<text>{{item.bedNumber}}</text>
-							</view>
-							<view class="bed-number" v-else-if="templateType === 'template_two'">
-								<text>床号:</text>
-								<text>{{ extractBedNumber(item.patientInfoList) }}</text>
+							<view class="bed-number">
+								<text>耗时:</text>
+								<text>{{consueTime(item.createTime,item.finalFinishTime)}}</text>
 							</view>
 						</view>
 						<view class="item-top-four">
-						  <view class="bed-number" v-if="templateType === 'template_one'">
-						  	<text>目的地: </text>
-						  	<text class="destina-list">{{ !item.destinationName  ? '无' : item.destinationName }}</text>
+						  <view class="bed-number">
+						  	<text>开始时间: </text>
+						  	<text class="destina-list">{{ item.createTime }}</text>
 						  </view>
-						  <view class="bed-number" v-if="templateType === 'template_two'">
-						  	<text>目的地: </text>
-						  	<text class="destina-list" v-for="(innerItem,innerIndex) in item.destinations" :key="innerIndex">{{ item.destinations.length > 0 ? innerItem.destinationName : '无' }}</text>
+						  <view class="bed-number">
+						  	<text>完成时间: </text>
+						  	<text class="destina-list">{{ item.finishTime }}</text>
 						  </view>
 						</view>
 					</view>
@@ -144,21 +133,18 @@
 								<text>编号: {{item.number}}</text>
 								<text>{{item.createTime}}</text>
 							</view>
-							<view class="contact-isolation">
-								<image :src="contactIsolationPng" v-if="templateType == 'template_one' && item.quarantine == 1"></image>
-								<image :src="contactIsolationPng" v-if="templateType == 'template_two' && item['patientInfoList'].some((el) => { return el.quarantine == 1})"></image>
-							</view>
 						  <view class="priority"
 								:class="{
-										'noAllocation' : item.state == 0,
-										'noLookupStyle' : item.state == 1,
-										'noStartStyle' : item.state == 2,
-										'underwayStyle' : item.state == 3,
-										'noEndStyle' : item.state == 4,
-										'delayStyle' : item.state == 5,
-										'cancelStyle' : item.state == 6,
-										'completeStyle' : item.state == 7
-									}"
+									'noAllocation':item.state == 0,
+									'waitSureStyle':item.state == 1,
+									'waitFinishStyle': item.state == 2,
+									'underwayStyle':item.state == 3,
+									'waitSignatureStyle':item.state == 4,
+									'completeStyle':item.state == 5,
+									'cancelStyle':item.state == 6,
+									'delayStyle':item.state == 7,
+									'waitCheckStyle':item.state == 8
+								}"
 							>
 						  	<text>{{stateTransfer(item.state)}}</text>
 						  </view>
@@ -170,48 +156,30 @@
 								<text>优先级:</text>
 						  	<text>{{priorityTransfer(item.priority)}}</text>
 						  </view>
-							<view class="destination-point" v-if="templateType == 'template_one'">
-								<text>运送类型:</text>
+							<view class="destination-point">
+								<text>任务类型:</text>
 								<text>{{item.taskTypeName}}</text>
-							</view>
-							<view class="destination-point" v-else-if="templateType === 'template_two'">
-								<text>运送类型:</text>
-								<text>{{item.patientInfoList[0].typeList.length > 0 ? item.patientInfoList[0].typeList[0].parentTypeName : '无'}}</text>
 							</view>
 						</view>
 						<view class="item-top-three">
 							<view class="transport-type">
-								<text>转运工具:</text>
-								<text>{{!item.toolName ? '无' : item.toolName}}</text>
+								<text>目的地:</text>
+								<text>{{!item.destinationName ? '无' : item.destinationName}}</text>
 							</view>
-						  <view class="transport-people">
-								<text>运送人:</text>
-						  	<text>{{!item.workerName ? '无' : item.workerName}}</text>
-						  </view>
+							<view class="transport-people">
+								<text>维修员:</text>
+								<text>{{!item.workerName ? '无' : item.workerName}}</text>
+							</view>
 						</view>
 						<view class="item-top-three">
 							<view class="start-point">
-								<text>出发地:</text>
-								<text>{{item.setOutPlaceName}}</text>
+								<text>任务描述:</text>
+								<text>{{item.taskDesc}}</text>
 							</view>
-							<view class="bed-number" v-if="templateType === 'template_one'">
-								<text>床号: </text>
-								<text>{{item.bedNumber}}</text>
+							<view class="bed-number">
+								<text>取消原因:</text>
+								<text>{{ item.taskDesc }}</text>
 							</view>
-							<view class="bed-number" v-else-if="templateType === 'template_two'">
-								<text>床号:</text>
-								<text>{{ extractBedNumber(item.patientInfoList) }}</text>
-							</view>
-						</view>
-						<view class="item-top-four">
-						  <view class="bed-number" v-if="templateType === 'template_one'">
-						  	<text>目的地: </text>
-						  	<text class="destina-list">{{ !item.destinationName  ? '无' : item.destinationName }}</text>
-						  </view>
-						  <view class="bed-number" v-if="templateType === 'template_two'">
-						  	<text>目的地: </text>
-						  	<text class="destina-list" v-for="(innerItem,innerIndex) in item.destinations" :key="innerIndex">{{ item.destinations.length > 0 ? innerItem.destinationName : '无' }}</text>
-						  </view>
 						</view>
 					</view>
 				</view>
@@ -284,7 +252,7 @@
 		removeAllLocalStorage,
 		fenToYuan
 	} from '@/common/js/utils'
-	import {getDispatchTaskComplete} from '@/api/transport.js'
+	import {getMaintainTask} from '@/api/project.js'
 	import navBar from "@/components/zhouWei-navBar"
 	import SOtime from '@/common/js/utils/SOtime.js'
 	export default {
@@ -309,8 +277,8 @@
 				stateCompleteList: [
 					{
 						createTime: '2025-05-15　22：11',
-						planUseTime: '2025-05-15　22：11',
-						planStartTime: '2025-05-15　22：11',
+						finishTime: '2025-05-15　22：11',
+						finalFinishTime: '2025-05-15　22：11',
 						patientInfoList: [],
 						state: 2,
 						setOutPlaceName: 'hi的撒旦',
@@ -379,23 +347,28 @@
 				this.dateStartShow = true
 			},
 			
+			// 耗时
+			consueTime (t1,t2) {
+			  if (t1 && t2) {
+			    return SOtime.time5(t1,t2)
+			  }
+			},
+			
 			// tab切换改变事件
 			tabChange (index) {
 				this.current = index;
 				if (index == 0) {
 				  this.queryCompleteDispatchTask(
 					{
-					   proId:this.proId, workerId:'',state: 7,
+					   proId:this.proId, createId:this.workerId,state:5,
 						 startDate: this.dateStart, endDate: this.dateEnd,
-					   departmentId: this.userInfo.depId
 					}
 				  )
 				} else {
 				  this.queryCompleteDispatchTask(
 					{
-					   proId:this.proId, workerId:'',state: 6,
-						 startDate: this.dateStart, endDate: this.dateEnd,
-					   departmentId: this.userInfo.depId
+					   proId:this.proId, createId:this.workerId,state:6,
+						 startDate: this.dateStart, endDate: this.dateEnd
 					}
 				  )
 				}
@@ -447,32 +420,35 @@
 			
 			// 任务状态转换
 			stateTransfer (index) {
-				switch(index) {
-				  case 0 :
-					return '未分配'
-					break;
-				  case 1 :
-					return '未查阅'
-					break;
-				  case 2 :
-					return '未开始'
-					break;
-				  case 3 :
-					return '进行中'
-					break;
-				  case 4 :
-					return '未结束'
-					break;
-				  case 5 :
-					return '已延迟'
-					break;
-				  case 6 :
-					return '已取消'
-					break;
-				  case 7 :
-					return '已完成'
-					break;
-				}
+				switch(state) {
+					case 0 :
+						return '未分配'
+						break;
+					case 1 :
+						return '待确认'
+						break;
+					case 2 :
+						return '待完成'
+						break;
+					case 3 :
+						return '进行中'
+						break;
+					case 4 :
+						return '待签字'
+						break;
+					case 5 :
+						return '已完成'
+						break;
+					case 6 :
+						return '已取消'
+						break;
+					case 7 :
+						return '已延迟'
+						break;
+					 case 8 :
+						return '待审核'
+						break;
+				}	
 			},
 			
 			// 筛选事件
@@ -480,30 +456,18 @@
 				if (this.current == 0) {
 				  this.queryCompleteDispatchTask(
 						{
-							 proId:this.proId, workerId:'',state: 7,
-							 startDate: this.dateStart, endDate: this.dateEnd,
-							 departmentId: this.userInfo.depId
+							 proId:this.proId, createId:this.workerId,state:5,
+							 startDate: this.dateStart, endDate: this.dateEnd
 						}
 				  )
 				} else {
 				  this.queryCompleteDispatchTask(
 						{
-							 proId:this.proId, workerId:'',state: 6,
-							 startDate: this.dateStart, endDate: this.dateEnd,
-							 departmentId: this.userInfo.depId
+							 proId:this.proId, createId:this.workerId,state:6,
+							 startDate: this.dateStart, endDate: this.dateEnd
 						}
 				  )
 				}
-			},
-			
-			// 提取床号
-			extractBedNumber (patientInfoList) {
-				if (patientInfoList.length == 0) { return "无"};
-				let temporaryArr = [];
-				for (let item of patientInfoList) {
-					temporaryArr.push(item.bedNumber)
-				};
-				return temporaryArr.join("、")
 			},
 			
 			// 查询运送任务
@@ -529,26 +493,17 @@
 						for (let item of temporaryDataList) {
 							this.stateCompleteList.push({
 								createTime: item.createTime,
-								planUseTime: item.planUseTime,
+								startTime: item.startTime,
 								planStartTime: item.planStartTime,
-								patientInfoList: item.patientInfoList,
+								finalFinishTime: item.finalFinishTime,
+								finishTime: item.finishTime,
 								state: item.state,
-								setOutPlaceName: item.setOutPlaceName,
-								destinationName: item.destinationName,
-								taskTypeName: item.taskTypeName,
-								toolName: item.toolName,
+								destinationName: item.depName,
+								taskTypeName: item.typeName,
 								priority: item.priority,
 								number: item.taskNumber,
 								id: item.id,
-								quarantine: item.quarantine,
-								distName: item.distName,
-								destinations: item.destinations,
-								patientName: item.patientName,
-								bedNumber: item.bedNumber,
-								startPhoto: item.startPhoto,
-								endPhoto: item.endPhoto,
-								isBack: item.isBack,
-								isSign: item.isSign,
+								taskDesc: item.taskDesc,
 								workerName: item.workerName
 							})
 						}
@@ -573,20 +528,20 @@
 			
 			// tabBar点击事件
 			tabBarEvent (index) {
-			 this.valueName = index;
-			 if (this.valueName == 0) {
-				 uni.navigateTo({
-					url: '/transManagementPackage/pages/index/index'
-				 })
-			 } else if (this.valueName == 1) {
-				 uni.navigateTo({
-					url: '/transManagementPackage/pages/realtimeTask/realtimeTask'
-				 })
-			 } else if (this.valueName == 2) {
-				 uni.navigateTo({
-					url: '/transManagementPackage/pages/historicalTask/historicalTask'
-				 })
-			 }
+				this.valueName = index;
+				if (this.valueName == 0) {
+					 uni.navigateTo({
+						url: '/projectManagementPackage/pages/callTask/callTask'
+					 })
+				} else if (this.valueName == 1) {
+					 uni.navigateTo({
+						url: '/projectManagementPackage/pages/realtimeTask/realtimeTask'
+					 })
+				} else if (this.valueName == 2) {
+					 uni.navigateTo({
+						url: '/projectManagementPackage/pages/historicalTask/historicalTask'
+					 })
+				}
 			} 
 		}
 	}
@@ -746,17 +701,20 @@
 							.noAllocation {
 								background: #E86F50 !important;
 							};
-							.noLookupStyle {
-								background: #E8CB51 !important
-							};
-							.noStartStyle {
-								background: #174E97 !important
+							.waitSureStyle {
+								background: #FF0000 !important;
 							};
 							.underwayStyle {
-								background: #289E8E !important
+								background: #289E8E !important;
 							};
-							.noEndStyle {
-								background: #F2A15F !important
+							.waitFinishStyle {
+								background: #298CF8 !important;
+							};
+							.waitSignatureStyle {
+								background: #06e606 !important;
+							};
+							.waitCheckStyle {
+								background: #F2A15F !important;
 							};
 							.delayStyle {
 								background: #be4330 !important;

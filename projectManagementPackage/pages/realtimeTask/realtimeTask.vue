@@ -7,54 +7,20 @@
 		</u-transition>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast" />
-		<!-- 日期选择弹框 -->
-		<view>
-			<u-datetime-picker mode="date" :show="dateStartShow" v-model="dateStartValue" @cancel="dateStartShow = false" @confirm="startDateSure"></u-datetime-picker>
-		</view>
-		<view>
-			<u-datetime-picker mode="date" :show="dateEndShow" v-model="dateEndValue" @cancel="dateEndShow = false" @confirm="endDateSure"></u-datetime-picker>
-		</view>
 		<view class="empty-info" v-show="noDataShow">
 			<u-empty text="数据为空" mode="list"></u-empty>
 		</view>
+		<!-- 取消订单原因弹框 -->
+		<view class="transport-rice-box" v-if="showCancelReason">
+			<ScrollSelection buttonLocation='top' v-model="showCancelReason" :pickerValues="canCelReasonDefaultIndex" :isShowSearch="false" :columns="CancelReasonOption" @sure="cancelReasonSureEvent" @cancel="cancelReasonCancelEvent" @close="cancelReasonCloseEvent" />
+		</view>
 		<view class="nav">
-			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="运送" @backClick="backTo">
+			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="工程维修" @backClick="backTo">
 			</nav-bar> 
 		</view>
 		<view class="content">
 			<view class="task-tail-title">
 				<u-tabs :list="list" :scrollable="false" lineColor="#2c9af1" activeStyle="{color: '#2c9af1'}" inactiveStyle="{color:#7d7d7d}" lineWidth="50" :current="current" @change="tabChange"></u-tabs>
-			</view>
-			<view class="filtrate-area">
-				<view class="calendar-box">
-					<u-icon name="calendar" color="#101010" size="30"></u-icon>
-				</view>
-				<view class="date-input-box">
-					<view @click="dateStartShow = true">
-						<u--input
-							:readonly="true"
-							type="number"
-							color="#101010"
-							fontSize="12px"
-							border="surround"
-							v-model="dateStart"
-						></u--input>
-					</view>
-					<view>至</view>
-					<view @click="dateEndShow = true">
-						<u--input
-						  :readonly="true"
-							type="number"
-							color="#101010"
-							fontSize="12px"
-							border="surround"
-							v-model="dateEnd"
-						></u--input>
-					</view>
-				</view>
-				<view class="filtrate-btn" @click="filtrateEvent">
-					<text>筛选</text>
-				</view>
 			</view>
 			<view class="task-tail-content" v-show="current == 0">
 				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" :key="index">
@@ -64,21 +30,18 @@
 								<text>编号: {{item.number}}</text>
 								<text>{{item.createTime}}</text>
 							</view>
-							<view class="contact-isolation">
-								<image :src="contactIsolationPng" v-if="templateType == 'template_one' && item.quarantine == 1"></image>
-								<image :src="contactIsolationPng" v-if="templateType == 'template_two' && item['patientInfoList'].some((el) => { return el.quarantine == 1})"></image>
-							</view>
 						  <view class="priority"
 								:class="{
-										'noAllocation' : item.state == 0,
-										'noLookupStyle' : item.state == 1,
-										'noStartStyle' : item.state == 2,
-										'underwayStyle' : item.state == 3,
-										'noEndStyle' : item.state == 4,
-										'delayStyle' : item.state == 5,
-										'cancelStyle' : item.state == 6,
-										'completeStyle' : item.state == 7
-									}"
+									'noAllocation':item.state == 0,
+									'waitSureStyle':item.state == 1,
+									'waitFinishStyle': item.state == 2,
+									'underwayStyle':item.state == 3,
+									'waitSignatureStyle':item.state == 4,
+									'completeStyle':item.state == 5,
+									'cancelStyle':item.state == 6,
+									'delayStyle':item.state == 7,
+									'waitCheckStyle':item.state == 8
+								}"
 							>
 						  	<text>{{stateTransfer(item.state)}}</text>
 						  </view>
@@ -90,48 +53,34 @@
 								<text>优先级:</text>
 						  	<text>{{priorityTransfer(item.priority)}}</text>
 						  </view>
-							<view class="destination-point" v-if="templateType == 'template_one'">
-								<text>运送类型:</text>
+							<view class="destination-point">
+								<text>任务类型:</text>
 								<text>{{item.taskTypeName}}</text>
-							</view>
-							<view class="destination-point" v-else-if="templateType === 'template_two'">
-								<text>运送类型:</text>
-								<text>{{item.patientInfoList[0].typeList.length > 0 ? item.patientInfoList[0].typeList[0].parentTypeName : '无'}}</text>
 							</view>
 						</view>
 						<view class="item-top-three">
 							<view class="transport-type">
-								<text>转运工具:</text>
-								<text>{{!item.toolName ? '无' : item.toolName}}</text>
+								<text>目的地:</text>
+								<text>{{!item.destinationName ? '无' : item.destinationName}}</text>
 							</view>
 						  <view class="transport-people">
-								<text>运送人:</text>
+								<text>维修员:</text>
 						  	<text>{{!item.workerName ? '无' : item.workerName}}</text>
 						  </view>
 						</view>
-						<view class="item-top-three">
-							<view class="start-point">
-								<text>出发地:</text>
-								<text>{{item.setOutPlaceName}}</text>
-							</view>
-							<view class="bed-number" v-if="templateType === 'template_one'">
-								<text>床号:</text>
-								<text>{{item.bedNumber}}</text>
-							</view>
-							<view class="bed-number" v-else-if="templateType === 'template_two'">
-								<text>床号:</text>
-								<text>{{ extractBedNumber(item.patientInfoList) }}</text>
-							</view>
-						</view>
 						<view class="item-top-four">
-						  <view class="bed-number" v-if="templateType === 'template_one'">
-						  	<text>目的地: </text>
-						  	<text class="destina-list">{{ !item.destinationName  ? '无' : item.destinationName }}</text>
-						  </view>
-						  <view class="bed-number" v-if="templateType === 'template_two'">
-						  	<text>目的地: </text>
-						  	<text class="destina-list" v-for="(innerItem,innerIndex) in item.destinations" :key="innerIndex">{{ item.destinations.length > 0 ? innerItem.destinationName : '无' }}</text>
-						  </view>
+						 <text>任务描述:</text>
+						 <text>{{!item.taskDesc ? '无' : item.taskDesc}}</text>
+						</view>
+					</view>
+					<view class="item-bottom">
+						<view class="item-bottom-right">
+							<view class="left">
+								<text @click="reminder(item)">催单</text>
+							</view>
+							<view class="right" v-show="item.state !== 3">
+								<text @click="cancel(item)">取消订单</text>
+							</view>
 						</view>
 					</view>
 				</view>
@@ -144,21 +93,18 @@
 								<text>编号: {{item.number}}</text>
 								<text>{{item.createTime}}</text>
 							</view>
-							<view class="contact-isolation">
-								<image :src="contactIsolationPng" v-if="templateType == 'template_one' && item.quarantine == 1"></image>
-								<image :src="contactIsolationPng" v-if="templateType == 'template_two' && item['patientInfoList'].some((el) => { return el.quarantine == 1})"></image>
-							</view>
 						  <view class="priority"
 								:class="{
-										'noAllocation' : item.state == 0,
-										'noLookupStyle' : item.state == 1,
-										'noStartStyle' : item.state == 2,
-										'underwayStyle' : item.state == 3,
-										'noEndStyle' : item.state == 4,
-										'delayStyle' : item.state == 5,
-										'cancelStyle' : item.state == 6,
-										'completeStyle' : item.state == 7
-									}"
+									'noAllocation':item.state == 0,
+									'waitSureStyle':item.state == 1,
+									'waitFinishStyle': item.state == 2,
+									'underwayStyle':item.state == 3,
+									'waitSignatureStyle':item.state == 4,
+									'completeStyle':item.state == 5,
+									'cancelStyle':item.state == 6,
+									'delayStyle':item.state == 7,
+									'waitCheckStyle':item.state == 8
+								}"
 							>
 						  	<text>{{stateTransfer(item.state)}}</text>
 						  </view>
@@ -170,48 +116,34 @@
 								<text>优先级:</text>
 						  	<text>{{priorityTransfer(item.priority)}}</text>
 						  </view>
-							<view class="destination-point" v-if="templateType == 'template_one'">
-								<text>运送类型:</text>
+							<view class="destination-point">
+								<text>任务类型:</text>
 								<text>{{item.taskTypeName}}</text>
-							</view>
-							<view class="destination-point" v-else-if="templateType === 'template_two'">
-								<text>运送类型:</text>
-								<text>{{item.patientInfoList[0].typeList.length > 0 ? item.patientInfoList[0].typeList[0].parentTypeName : '无'}}</text>
 							</view>
 						</view>
 						<view class="item-top-three">
 							<view class="transport-type">
-								<text>转运工具:</text>
-								<text>{{!item.toolName ? '无' : item.toolName}}</text>
+								<text>目的地:</text>
+								<text>{{!item.destinationName ? '无' : item.destinationName}}</text>
 							</view>
 						  <view class="transport-people">
-								<text>运送人:</text>
+								<text>维修员:</text>
 						  	<text>{{!item.workerName ? '无' : item.workerName}}</text>
 						  </view>
 						</view>
-						<view class="item-top-three">
-							<view class="start-point">
-								<text>出发地:</text>
-								<text>{{item.setOutPlaceName}}</text>
-							</view>
-							<view class="bed-number" v-if="templateType === 'template_one'">
-								<text>床号: </text>
-								<text>{{item.bedNumber}}</text>
-							</view>
-							<view class="bed-number" v-else-if="templateType === 'template_two'">
-								<text>床号:</text>
-								<text>{{ extractBedNumber(item.patientInfoList) }}</text>
-							</view>
-						</view>
 						<view class="item-top-four">
-						  <view class="bed-number" v-if="templateType === 'template_one'">
-						  	<text>目的地: </text>
-						  	<text class="destina-list">{{ !item.destinationName  ? '无' : item.destinationName }}</text>
-						  </view>
-						  <view class="bed-number" v-if="templateType === 'template_two'">
-						  	<text>目的地: </text>
-						  	<text class="destina-list" v-for="(innerItem,innerIndex) in item.destinations" :key="innerIndex">{{ item.destinations.length > 0 ? innerItem.destinationName : '无' }}</text>
-						  </view>
+						 <text>任务描述:</text>
+						 <text>{{!item.taskDesc ? '无' : item.taskDesc}}</text>
+						</view>
+					</view>
+					<view class="item-bottom">
+						<view class="item-bottom-right">
+							<view class="left">
+								<text @click="reminder(item)">催单</text>
+							</view>
+							<view class="right" v-show="item.state !== 3">
+								<text @click="cancel(item)">取消订单</text>
+							</view>
 						</view>
 					</view>
 				</view>
@@ -281,31 +213,28 @@
 	import _ from 'lodash'
 	import {
 		setCache,
-		removeAllLocalStorage,
-		fenToYuan
+		removeAllLocalStorage
 	} from '@/common/js/utils'
-	import {getDispatchTaskComplete} from '@/api/transport.js'
+	import { projectTaskCancel, projectTaskCancelReason, getMaintainTask, projectTaskReminder} from '@/api/project.js'
 	import navBar from "@/components/zhouWei-navBar"
-	import SOtime from '@/common/js/utils/SOtime.js'
+	import ScrollSelection from "@/components/scrollSelection/scrollSelection";
 	export default {
 		components: {
-			navBar
+			navBar,
+			ScrollSelection
 		},
 		data() {
 			return {
 				infoText: '开启中···',
 				showLoadingHint: false,
-				valueName: 2,
-				noDataShow: false,
-				list: [{name: '已完成'}, {name: '已取消'}],
+				valueName: 1,
+				list: [{name: '待办任务'}, {name: '进行中'}],
 				current: 0,
-				dateStart: SOtime.time8(new Date().getTime()),
-				dateEnd: SOtime.time8(new Date().getTime()),
-				dateStartValue: new Date().getTime(),
-				dateEndValue: new Date().getTime(),
-				dateEndShow: false,
-				dateStartShow: false,
 				contactIsolationPng: require("@/static/img/contact-isolation.png"),
+				cancelReasonDefaultIndex: [0],
+				cancelReasonOption: [],
+				showCancelReason: false,
+				currentCancelReason: '请选择',
 				stateCompleteList: [
 					{
 						createTime: '2025-05-15　22：11',
@@ -358,10 +287,9 @@
 		mounted() {
 			// this.queryCompleteDispatchTask(
 			// 	{
-			// 	   proId:this.proId, workerId:'',state: 7,
-			//		 startDate: this.dateStart, endDate: this.dateEnd,
-			// 	   departmentId: this.userInfo.depId
-			// 	}
+			// 	   proId:this.proId, createId:this.workerId,state: -5,
+			//			 startDate: '', endDate: ''
+			// 	},'待办'
 			// )
 		},
 		methods: {
@@ -373,128 +301,102 @@
 				uni.navigateBack()
 			},
 			
-			// 开始日期弹框显示事件
-			showActionStart () {
-				console.log(1);
-				this.dateStartShow = true
-			},
-			
 			// tab切换改变事件
 			tabChange (index) {
 				this.current = index;
 				if (index == 0) {
 				  this.queryCompleteDispatchTask(
 					{
-					   proId:this.proId, workerId:'',state: 7,
-						 startDate: this.dateStart, endDate: this.dateEnd,
-					   departmentId: this.userInfo.depId
-					}
+					   proId:this.proId, createId:this.workerId,state: -5,
+					   startDate: '', endDate: ''
+					},'待办'
 				  )
 				} else {
 				  this.queryCompleteDispatchTask(
 					{
-					   proId:this.proId, workerId:'',state: 6,
-						 startDate: this.dateStart, endDate: this.dateEnd,
-					   departmentId: this.userInfo.depId
-					}
+					   proId:this.proId, createId:this.workerId,state: 3,
+					   startDate: '', endDate: ''
+					},'进行中'
 				  )
 				}
 			},
 			
-			// 开始时间确定
-			startDateSure(e) {
-				this.dateStartShow = false;
-				this.dateStart = SOtime.time8(e.value);
-				if (this.dateEndValue < this.dateStartValue){
-					this.$refs.uToast.show({
-					  message: `结束日期不能小于开始日期`,
-					  type: 'warning'
-					});
-					return
-				}
+			// 取消原因下拉选择框确认事件
+			cancelReasonSureEvent (val,value,id) {
+				if (val) {
+					this.cancelReasonDefaultIndex = [id]
+					this.currentCancelReason=  val;
+					this.cancelProjectTask({
+						proId: this.proId,	//当前项目ID
+						taskId: this.taskId, //当前任务ID
+						reason: this.currentCancelReason //取消原因
+					})
+				} else {
+					this.currentCancelReason = '请选择'
+				};
+				this.showCancelReason = false
 			},
 			
-			// 结束日期确定
-			endDateSure(e) {
-				this.dateEndShow = false;
-				this.dateEnd = SOtime.time8(e.value);
-				if (this.dateEndValue < this.dateStartValue) {
-					this.$refs.uToast.show({
-					  message: `结束日期不能小于开始日期`,
-					  type: 'warning'
-					});
-					return
-				}
+			// 取消原因下拉选择框取消事件
+			cancelReasonCancelEvent () {
+				this.showCancelReason = false
 			},
-				
+			
+			// 取消原因下拉选择框关闭事件
+			cancelReasonCloseEvent () {
+				this.showCancelReason = false
+			},
+			
 			// 任务优先级转换
 			  priorityTransfer (index) {
-				switch(index) {
-				  case 1 :
-					return '正常'
-					break;
-				  case 2 :
-					return '重要'
-					break;
-				  case 3 :
-					return '紧急'
-					break;
-				  case 4 :
-					return '紧急重要'
-					break;
-				}
+					switch(index) {
+						case 1 :
+						return '正常'
+						break;
+						case 2 :
+						return '重要'
+						break;
+						case 3 :
+						return '紧急'
+						break;
+						case 4 :
+						return '紧急重要'
+						break;
+					}
 			  },
-			
+				
 			// 任务状态转换
 			stateTransfer (index) {
-				switch(index) {
-				  case 0 :
-					return '未分配'
-					break;
-				  case 1 :
-					return '未查阅'
-					break;
-				  case 2 :
-					return '未开始'
-					break;
-				  case 3 :
-					return '进行中'
-					break;
-				  case 4 :
-					return '未结束'
-					break;
-				  case 5 :
-					return '已延迟'
-					break;
-				  case 6 :
-					return '已取消'
-					break;
-				  case 7 :
-					return '已完成'
-					break;
-				}
-			},
-			
-			// 筛选事件
-			filtrateEvent () {
-				if (this.current == 0) {
-				  this.queryCompleteDispatchTask(
-						{
-							 proId:this.proId, workerId:'',state: 7,
-							 startDate: this.dateStart, endDate: this.dateEnd,
-							 departmentId: this.userInfo.depId
-						}
-				  )
-				} else {
-				  this.queryCompleteDispatchTask(
-						{
-							 proId:this.proId, workerId:'',state: 6,
-							 startDate: this.dateStart, endDate: this.dateEnd,
-							 departmentId: this.userInfo.depId
-						}
-				  )
-				}
-			},
+				switch(state) {
+					case 0 :
+						return '未分配'
+						break;
+					case 1 :
+						return '待确认'
+						break;
+					case 2 :
+						return '待完成'
+						break;
+					case 3 :
+						return '进行中'
+						break;
+					case 4 :
+						return '待签字'
+						break;
+					case 5 :
+						return '已完成'
+						break;
+					case 6 :
+						return '已取消'
+						break;
+					case 7 :
+						return '已延迟'
+						break;
+					 case 8 :
+						return '待审核'
+						break;
+				}	
+			},	
 			
 			// 提取床号
 			extractBedNumber (patientInfoList) {
@@ -506,11 +408,11 @@
 				return temporaryArr.join("、")
 			},
 			
-			// 查询运送任务
-			queryCompleteDispatchTask (data) {
+			// 查询调度任务
+			queryCompleteDispatchTask (data,text) {
 			  this.noDataShow = false;
 			  this.showLoadingHint = true;
-			  getDispatchTaskComplete(data).then((res) => {
+			  getMaintainTask(data).then((res) => {
 				this.showLoadingHint = false;
 				if (this.isFresh) {
 					uni.stopPullDownRefresh();
@@ -520,7 +422,11 @@
 				  this.stateCompleteList = [];
 					let temporaryDataList = [];
 				  if (res.data.data.length > 0) {
-						this.temporaryDataList = res.data.data;
+						if (text == '待办') {
+							temporaryDataList = res.data.data.filter((item) => { return item.state == 0 || item.state == 1 || item.state == 2});
+						} else {
+							temporaryDataList = res.data.data
+						};
 						if (temporaryDataList.length > 0) {
 							this.noDataShow = false;
 						} else {
@@ -529,26 +435,16 @@
 						for (let item of temporaryDataList) {
 							this.stateCompleteList.push({
 								createTime: item.createTime,
-								planUseTime: item.planUseTime,
-								planStartTime: item.planStartTime,
-								patientInfoList: item.patientInfoList,
+								startTime: item.startTime,
+								finalFinishTime: item.finalFinishTime,
+								finishTime: item.finishTime,
 								state: item.state,
-								setOutPlaceName: item.setOutPlaceName,
-								destinationName: item.destinationName,
-								taskTypeName: item.taskTypeName,
-								toolName: item.toolName,
+								destinationName: item.depName,
+								taskTypeName: item.typeName,
 								priority: item.priority,
 								number: item.taskNumber,
 								id: item.id,
-								quarantine: item.quarantine,
-								distName: item.distName,
-								destinations: item.destinations,
-								patientName: item.patientName,
-								bedNumber: item.bedNumber,
-								startPhoto: item.startPhoto,
-								endPhoto: item.endPhoto,
-								isBack: item.isBack,
-								isSign: item.isSign,
+								taskDesc: item.taskDesc,
 								workerName: item.workerName
 							})
 						}
@@ -559,7 +455,7 @@
 			  })
 			  .catch((err) => {
 				this.$refs.uToast.show({
-					message: `${err.message}`,
+					title: `${err.message}`,
 					type: 'error'
 				});
 				this.showLoadingHint = false;
@@ -571,22 +467,99 @@
 			  })
 			},
 			
+			// 获取取消原因列表
+			getDispatchTaskCancelReason (data) {
+				projectTaskCancelReason(data).then((res) => {
+					if (res && res.data.code == 200) {
+						this.cancelReasonLlist = [];
+						for (let item of res.data.data) {
+						   this.cancelReasonLlist.push({text: item.cancelName, value: item.id})
+						}
+					}
+				})
+				.catch((err) => {
+					console.log(err)
+				})
+			},
+			
+			// 取消事件
+			cancel (item) {
+				this.sureCancelShow = true;
+				this.cancelIndex = null;
+				this.taskCancelReason = '';
+				this.getDispatchTaskCancelReason({proId: this.proId, state: 0});
+				this.taskId = item.id
+			},
+			
+			// 工程任务取消
+			cancelDispatchTask (data) {
+			  projectTaskCancel(data)
+			  .then((res) => {
+				if (res && res.data.code == 200) {
+				  this.$refs.uToast.show({
+				  	title: `${res.data.msg}`,
+				  	type: 'success'
+				  });
+				  this.queryCompleteDispatchTask(
+					{
+					   proId:this.proId, createId:this.workerId,state: -5,
+					   startDate: '', endDate: ''
+					},'待办'
+				  )
+				} else {
+				 this.$refs.uToast.show({
+				 	title: `${res.data.msg}`,
+				 	type: 'success'
+				 })
+				}
+			  })
+			  .catch((err) => {
+				this.$refs.uToast.show({
+					title: `${err.message}`,
+					type: 'success'
+				})
+			  })
+			},
+			  
+			// 工程任务催单
+			reminder(item) {
+			  projectTaskReminder(this.proId,item.id).then((res) => {
+			    if (res && res.data.code == 200) {
+			      this.$refs.uToast.show({
+			        title: `${res.data.data}`,
+			        type: 'success'
+			      })
+			    } else {
+			      this.$refs.uToast.show({
+			        title: `${res.data.msg}`,
+			        type: 'warning'
+			      })
+			    }
+			  })
+			  .catch((err) => {
+			    this.$refs.uToast.show({
+			      title: `${err.message}`,
+			      type: 'error'
+			    })
+			  })
+			},
+			
 			// tabBar点击事件
 			tabBarEvent (index) {
-			 this.valueName = index;
-			 if (this.valueName == 0) {
-				 uni.navigateTo({
-					url: '/transManagementPackage/pages/index/index'
-				 })
-			 } else if (this.valueName == 1) {
-				 uni.navigateTo({
-					url: '/transManagementPackage/pages/realtimeTask/realtimeTask'
-				 })
-			 } else if (this.valueName == 2) {
-				 uni.navigateTo({
-					url: '/transManagementPackage/pages/historicalTask/historicalTask'
-				 })
-			 }
+			  this.valueName = index;
+			  if (this.valueName == 0) {
+					 uni.navigateTo({
+						url: '/projectManagementPackage/pages/callTask/callTask'
+					 })
+			  } else if (this.valueName == 1) {
+					 uni.navigateTo({
+						url: '/projectManagementPackage/pages/realtimeTask/realtimeTask'
+					 })
+			  } else if (this.valueName == 2) {
+					 uni.navigateTo({
+						url: '/projectManagementPackage/pages/historicalTask/historicalTask'
+					 })
+			  }
 			} 
 		}
 	}
@@ -643,42 +616,6 @@
 				right: 0;
 				margin: auto
 			 };
-			 .filtrate-area {
-				 display: flex;
-				 align-items: center;
-				 width: 90%;
-				 margin: 10px 0;
-				 margin-left: 5%;
-				 .calendar-box {
-					 margin-right: 4px;
-				 };
-				 .date-input-box {
-					 width: 70%;
-					 display: flex;
-					 align-items: center;
-					 >view {
-						 &:nth-child(2) {
-							margin: 0 8px;
-							color: #101010;
-							font-size: 12px;
-						 }
-					 }
-				 };
-				 .filtrate-btn {
-					 margin-left: 8px;
-					 width: 54px;
-					 height: 21px;
-					 display: flex;
-					 align-items: center;
-					 justify-content: center;
-					 border-radius: 6px;
-					 background: linear-gradient(to right, #6ED3F7, #218FFF);
-					 >text {
-						 color: #fff;
-						 font-size: 12px;
-					 }
-				 }
-			 };
 			 .task-tail-content {
 			 	flex: 1;
 			 	overflow: auto;
@@ -709,15 +646,15 @@
 						    };
 						    &:first-child {
 						      flex: 1;
-									display: flex;
-									align-items: center;
-									>text {
-										display: inline-block;
-										&:last-child {
-											margin-left: 4px;
-											flex: 1
-										}
-									}
+						      display: flex;
+						      align-items: center;
+						      >text {
+						      	display: inline-block;
+						      	&:last-child {
+						      		margin-left: 4px;
+						      		flex: 1
+						      	}
+						      }
 						    };
 								&:nth-child(2) {
 									width: 60px;
@@ -746,17 +683,20 @@
 							.noAllocation {
 								background: #E86F50 !important;
 							};
-							.noLookupStyle {
-								background: #E8CB51 !important
-							};
-							.noStartStyle {
-								background: #174E97 !important
+							.waitSureStyle {
+								background: #FF0000 !important;
 							};
 							.underwayStyle {
-								background: #289E8E !important
+								background: #289E8E !important;
 							};
-							.noEndStyle {
-								background: #F2A15F !important
+							.waitFinishStyle {
+								background: #298CF8 !important;
+							};
+							.waitSignatureStyle {
+								background: #06e606 !important;
+							};
+							.waitCheckStyle {
+								background: #F2A15F !important;
 							};
 							.delayStyle {
 								background: #be4330 !important;
@@ -885,6 +825,39 @@
 			 					}
 			 				}
 			 		  }
+			 		};
+			 		.item-bottom {
+			 			width: 100%;
+						display: flex;
+						align-items: center;
+						justify-content: flex-end;
+			 			.item-bottom-right {
+			 				width: 55%;
+			 				height: 60px;
+			 				display: flex;
+			 				align-items: center;
+			 				justify-content: space-between;
+			 				> view {
+								width: 45%;
+								height: 30px;
+								border-radius: 4px;
+								text-align: center;
+								line-height: 30px;
+								>text {
+									font-size: 14px;
+								}
+			 				};
+			 				.left  {
+			 					background: #E8CB51;
+								color: #fff;
+			 				};
+			 				.right  {
+								color: #E86F50;
+								background: #fff;
+								border: 1px solid #E86F50;
+								box-sizing: border-box;
+			 				}
+			 			}
 			 		}
 			 	}
 			 }

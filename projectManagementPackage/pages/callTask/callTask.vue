@@ -55,7 +55,7 @@
 						<text>目的房间</text>
 					</view>
 					<view class="select-box-right" @click="goalSpacesClickEvent">
-						<text>{{ disposeTaskPresent(currentGoalSpaces) }}</text>
+						<text>{{ currentGoalSpaces }}</text>
 						<u-icon name="arrow-right" color="#989999" size="20" /></u-icon>
 					</view>
 				</view>
@@ -158,7 +158,13 @@
 		mapGetters,
 		mapMutations
 	} from 'vuex'
-	import { createRepairsTask, querySpace, queryDepartment, getRepairsTaskType } from '@/api/project.js'
+	import {
+		queryTaskType,
+		queryAllDestination,
+		departmentRoom,
+		reportProblem,
+		getRemarks
+	} from '@/api/project.js'
 	import navBar from "@/components/zhouWei-navBar"
 	import { setCache,removeAllLocalStorage } from '@/common/js/utils'
 	import _ from 'lodash'
@@ -231,6 +237,9 @@
 			// userName() {
 			// 	return this.userInfo.worker.name
 			// },
+			// depName() {
+			// 	return this.userInfo.depName
+			// },
 			// userAccount() {
 			// 	return this.userInfo.username
 			// },
@@ -243,6 +252,19 @@
 		},
 		onLoad() {
 			// this.parallelFunction();
+		},
+		mounted () {
+			// this.startPointId = this.depId;
+			// this.startPointName = this.depName;
+			// this.parallelFunction();
+			// // 登陆人员为医务人员时，根据默认科室id查询母的房间列表
+			// if (this.isMedicalMan) {
+			// 	this.queryRoomByDepartment({
+			// 		proId: this.proId, //项目ID 必输
+			// 		state: 0, // 状态默认传 0 即可
+			// 		depId: this.depId //科室ID
+			// 	})
+			// }
 		},
 		methods: {
 			...mapMutations([
@@ -295,17 +317,45 @@
 					}
 				});
 			},
-
-				// 处理维修任务参与者
-				disposeTaskPresent (item) {
-				if (!item) { return '请选择'};
-				if (item.length == 0) { return '请选择'};
-				let temporaryArray = [];
-				for (let innerItem of item) {
-					temporaryArray.push(innerItem.text)
-				};
-				return temporaryArray.join('、')
-				},
+			
+			// 查询科室
+			getAllDestination() {
+				return new Promise((resolve, reject) => {
+					queryAllDestination(this.proId).then((res) => {
+							if (res && res.data.code == 200) {
+								resolve(res.data.data)
+							} else {
+								this.$refs.uToast.show({
+									title: `${res.data.data.msg}`,
+									type: 'warning'
+								})
+							}
+						})
+						.catch((err) => {
+							reject(err.message)
+						})
+				})
+			},
+			
+			// 查询运送类型
+			getTaskType(data) {
+				return new Promise((resolve, reject) => {
+					queryTaskType(data)
+						.then((res) => {
+							if (res && res.data.code == 200) {
+								resolve(res.data.data)
+							} else {
+								this.$refs.uToast.show({
+									title: `${res.data.data.msg}`,
+									type: 'warning'
+								})
+							}
+						})
+						.catch((err) => {
+							reject(err.message)
+						})
+				})
+			},
 			
 				// 格式化时间
 				getNowFormatDate(currentDate) {
@@ -332,90 +382,68 @@
 				return currentdate
 				},
 
-				// 根据建筑查询科室信息
-				getDepartmentByStructureId (structureId,flag,isInitial) {
-				this.loadingText = '查询中...';
-				this.loadingShow = true;
-				this.overlayShow = true;
-				this.goalDepartmentOption = [];
-				queryDepartment(this.proId,structureId)
-				.then((res) => {
-					this.loadingText = '';
-					this.loadingShow = false;
-					this.overlayShow = false;
-					if (res && res.data.code == 200) {
-						if (res.data.data.length > 0) {
-							for (let i = 0, len = res.data.data.length; i < len; i++) {
-								this.goalDepartmentOption.push({
-									text: res.data.data[i].departmentName,
-									value: res.data.data[i].id,
-									id: i
-								})
-							};
-							if (isInitial) {
-								if (this.currentGoalDepartment != '请选择') {
-									this.getSpacesByDepartmentId(this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'],false)
-								}
-							}  
-						};
-						if (flag) {
-							this.showGoalDepartment = true
-						}
-					}
-				})
-				.catch((err) => {
-					this.showLoadingHint = false;
-					this.$refs.uToast.show({
-						message: `${err}`,
-						type: 'error'
-					})
-				})
-				},
-
-				// 根据科室查询空间间信息
+				// 根据科室查询房间信息
 				getSpacesByDepartmentId (depId,flag) {
-				this.showLoadingHint = true;
-				this.goalSpacesOption = [];
-				querySpace(this.proId,depId)
-				.then((res) => {
-					this.showLoadingHint = false;
-					if (res && res.data.code == 200) {
-						if (res.data.data.length > 0) {
-							for (let i = 0, len = res.data.data.length; i < len; i++) {
-								this.goalSpacesOption.push({
-									text: res.data.data[i].spaceName,
-									value: res.data.data[i].id,
-									selected: false
-								})
-							}
-						};
-						if (flag) {this.showGoalSpaces = true}
-					} else {
-						this.$refs.uToast.show({
-							message: res.data.msg,
-							type: 'error',
-						})
-					}
-				})
-				.catch((err) => {
-					this.showLoadingHint = false;
-					this.$refs.uToast.show({
-						message: `${err}`,
-						type: 'error'
+					this.showLoadingHint = true;
+					this.goalSpacesOption = [];
+					querySpace(this.proId,depId)
+					.then((res) => {
+						this.showLoadingHint = false;
+						if (res && res.data.code == 200) {
+							if (res.data.data.length > 0) {
+								for (let i = 0, len = res.data.data.length; i < len; i++) {
+									this.goalSpacesOption.push({
+										text: res.data.data[i].spaceName,
+										value: res.data.data[i].id,
+										id: i
+									})
+								}
+							};
+							if (flag) {this.showGoalSpaces = true}
+						} else {
+							this.$refs.uToast.show({
+								message: res.data.msg,
+								type: 'error',
+							})
+						}
 					})
-				})
+					.catch((err) => {
+						this.showLoadingHint = false;
+						this.$refs.uToast.show({
+							message: `${err}`,
+							type: 'error'
+						})
+					})
 				},
 
-				// 并行查询任务类型
+				// 并行查询科室、任务类型
 				parallelFunction (type) {
 					this.showLoadingHint = true;
-					Promise.all([this.getTaskType()])
+					Promise.all([this.getAllDestination(),this.getTaskType(
+					{
+							proId: this.proId,
+							state: 0,
+							parentId: this.titleText.id
+						}
+					)
+					])
 					.then((res) => {
 						this.showLoadingHint = false;
 						if (res && res.length > 0) {
 							this.taskTypeOption = [];
-							let [item1] = res;
+							this.goalDepartmentOption = [];
+							let [item1,item2] = res;
 							if (item1) {
+								// 科室
+								Object.keys(item1).forEach((item) => {
+									this.goalDepartmentOption.push({
+										text: item1[item],
+										value: item,
+										id: item
+									})
+								})
+							};
+							if (item2) {
 								// 任务类型
 								for (let i = 0, len = item1.length; i < len; i++) {
 									this.taskTypeOption.push({
@@ -432,28 +460,6 @@
 						this.$refs.uToast.show({
 							message: `${err.message}`,
 							type: 'error'
-						})
-					})
-				},
-
-				// 查询任务类型
-				getTaskType () {
-					return new Promise((resolve,reject) => {
-						getRepairsTaskType(this.proId, this.workerId)
-						.then((res) => {
-							if (res && res.data.code == 200) {
-								resolve(res.data.data)
-							} else {
-								reject({message:res.data.msg});
-								this.showLoadingHint = false;
-								this.$refs.uToast.show({
-									message: res.data.msg,
-									type: 'error',
-								})
-							}
-						})
-						.catch((err) => {
-							reject({message:err})
 						})
 					})
 				},
@@ -546,7 +552,7 @@
 				this.showGoalSpaces = false
 				},
 				
-				// 确认事件(创建维保任务)
+				// 确认事件
 				sureEvent () {
 				// 任务类型不能为空
 				if (this.currentTaskType == '请选择') {
@@ -556,23 +562,21 @@
 					});
 					return
 				};
-				// 创建工程任务
+				// 创建工程维保任务
 				let temporaryMessage = {
-					typeId: this.taskTypeOption.filter((item) => { return item['text'] == this.currentTaskType})[0]['value'], // 任务类型
-					destinationId: '', // 目的地id
+					typeId: this.taskTypeOption.filter((item) => { return item['text'] == this.currentTaskType})[0]['value'], // 任务类型id
+					typeName: this.currentTaskType, // 任务类型名称
+					depName: this.currentGoalDepartment == '请选择' ? '' : this.currentGoalDepartment, //科室名称
 					depId: this.currentGoalDepartment == '请选择' ? '' : this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'], // 目的科室id
+					spaceId: this.goalSpacesOption == '请选择' ? '' : this.goalSpacesOption.filter((item) => { return item['text'] == this.currentGoalSpaces})[0]['value'], //目的房间id
+					space: this.currentGoalSpaces == '请选择' ? '' : this.currentGoalSpaces, //目的房间名称
 					priority: this.priorityRadioValue,
 					taskRemark: this.taskDescribe, //任务描述
 					proId: this.proId,
-					proName: this.proName,
-					createId: this.workerId,
-					createName: this.userName,
-					createType: 0, // 创建类型 0-调度员 2-医务人员 3-巡检人员
 					workerId: this.currentTransporter == '请选择' ? '' : this.getCurrentTransporterIdByName(this.currentTransporter),
 					workerName: this.currentTransporter == '请选择' ? '' : this.currentTransporter,
-					spaces: [], //空间信息
-					depName: `${this.currentStructure == '请选择' ? '' : this.currentStructure}/${this.currentGoalDepartment == '请选择' ? '' : this.currentGoalDepartment}`, //出发地名称
-					typeName: this.currentTaskType, // 类型名称
+					images: this.imgArr, // 问题图片信息 非必输
+					flag: this.isMedicalMan ? 1 : 0 // 上报人类型，0-维修人员，1-医护人员
 				};
 				this.postGenerateRepairsTask(temporaryMessage)
 				},
@@ -581,7 +585,7 @@
 				postGenerateRepairsTask (data) {
 				this.infoText = '创建中···';
 				this.showLoadingHint = true;
-				createRepairsTask(data).then((res) => {
+				reportProblem(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
 						this.$refs.uToast.show({
@@ -590,9 +594,9 @@
 							position: 'center'
 						});
 						this.storeCurrentIndex(2);
-						uni.redirectTo({
-							url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
-						});
+						uni.navigateTo({
+							url: '/projectManagementPackage/pages/realtimeTask/realtimeTask'
+						})
 					} else {
 						this.$refs.uToast.show({
 							message: res.data.msg,
@@ -619,18 +623,18 @@
 				 this.valueName = index;
 				 if (this.valueName == 0) {
 					 uni.navigateTo({
-						url: '/transManagementPackage/pages/index/index'
+						url: '/projectManagementPackage/pages/callTask/callTask'
 					 })
 				 } else if (this.valueName == 1) {
 					 uni.navigateTo({
-						url: '/transManagementPackage/pages/realtimeTask/realtimeTask'
+						url: '/projectManagementPackage/pages/realtimeTask/realtimeTask'
 					 })
 				 } else if (this.valueName == 2) {
 					 uni.navigateTo({
-						url: '/transManagementPackage/pages/historicalTask/historicalTask'
+						url: '/projectManagementPackage/pages/historicalTask/historicalTask'
 					 })
 				 }
-				} 
+			} 
 		}
 	}
 </script>
@@ -662,7 +666,7 @@
 		};
 		.top-background-area {
 			width: 100%;
-			background: #4873C0;
+			background: #3890EE;
 			position: absolute;
 			top: 0;
 			left: 0;
@@ -860,8 +864,8 @@
 				}
 		};
 		.btn-box {
-			width: 90%;
-			margin: 0 auto;
+			width: 100%;
+			background: #F8F8F8;
 			height: 100px;
 			display: flex;
 			align-items: center;

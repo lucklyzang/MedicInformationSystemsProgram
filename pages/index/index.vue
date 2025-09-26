@@ -210,7 +210,9 @@
 						url: '/projectManagementPackage/pages/callTask/callTask'
 					})
 				} else if (item.text == '保洁管理') {
-					
+					uni.navigateTo({
+						url: '/cleanManagementPackage/pages/callTask/callTask'
+					})
 				}
 			}
 		}

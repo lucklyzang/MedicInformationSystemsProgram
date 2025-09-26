@@ -59,7 +59,7 @@
 			</view>
 		</view>
 		<view class="bottom-area">
-			<view class="quit-area">退出登录</view>
+			<view class="quit-area">提交修改</view>
 		</view>
 	</view>
 </template>
@@ -70,13 +70,12 @@
 		mapMutations
 	} from 'vuex'
 	import _ from 'lodash'
-	
 	import {
 		setCache,
 		removeAllLocalStorage,
-		fenToYuan
 	} from '@/common/js/utils'
-	import { } from '@/api/user.js'
+	import store from '@/store'
+	import { modificationPassword } from '@/api/login.js'
 	import navBar from "@/components/zhouWei-navBar"
 	export default {
 		components: {
@@ -129,7 +128,59 @@
 			
 			// 提交修改事件
 			submitModificationEvent () {
-				
+				// 旧密码不能为空
+				if (this.formerPasswordValue == '') {
+					this.$refs.uToast.show({
+						message: '请输入旧密码',
+						position: 'center'
+					});
+					return
+				};
+				// 新密码不能为空
+				if (this.newPasswordValue == '') {
+					this.$refs.uToast.show({
+						message: '请输入新密码',
+						position: 'center'
+					});
+					return
+				};
+				// 两次密码输入不一致
+				if (this.newPasswordValue != this.surePasswordValue) {
+					this.$refs.uToast.show({
+						message: '两次密码输入不一致',
+						position: 'center'
+					});
+					return
+				};
+				modificationPassword({
+					username: this.userName,
+					password: this.formerPasswordValue,
+					newPassword: this.newPasswordValue
+				}).then((res) => {
+				  if (res && res.data.code == 200) {
+						uni.redirectTo({
+							url: '/pages/login/login'
+						});
+						// 清空store和localStorage
+						removeAllLocalStorage();
+						store.dispatch('resetLoginState');
+				    this.$refs.uToast.show({
+				      title: `${res.data.data}`,
+				      type: 'success'
+				    })
+				  } else {
+				    this.$refs.uToast.show({
+				      title: `${res.data.msg}`,
+				      type: 'warning'
+				    })
+				  }
+				})
+				.catch((err) => {
+				  this.$refs.uToast.show({
+				    title: `${err.message}`,
+				    type: 'error'
+				  })
+				})
 			}
 		}
 	}

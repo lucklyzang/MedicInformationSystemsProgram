@@ -1449,9 +1449,9 @@ export default {
 						position: 'center'
 					});
 					this.storeCurrentIndex(0);
-					uni.redirectTo({
-						url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
-					});
+					uni.navigateTo({
+						url: '/transManagementPackage/pages/realtimeTask/realtimeTask'
+					})
         } else {
           this.$refs.uToast.show({
           	message: res.data.msg,
