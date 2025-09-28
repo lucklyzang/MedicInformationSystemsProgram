@@ -20,7 +20,25 @@
 		</view>
 		<view class="content">
 			<view class="task-tail-title">
-				<u-tabs :list="list" :scrollable="false" lineColor="#2c9af1" activeStyle="{color: '#2c9af1'}" inactiveStyle="{color:#7d7d7d}" lineWidth="50" :current="current" @change="tabChange"></u-tabs>
+				<u-tabs 
+				  :list="list"
+					:scrollable="false" 
+					lineColor="#fff"
+					:activeStyle="{
+						color: '#2c9af1',
+						fontSize: '14px'
+					}"
+				 :inactiveStyle="{
+						color: '#606060',
+						fontSize: '14px'
+				 }"
+					lineWidth="0" 
+					lineHeight="0"
+					:current="current" 
+					@change="tabChange"
+				>
+				</u-tabs>
+				<view class="tab-line" :class="{'tab-left':current == 0,'tab-right':current == 1}"></view>
 			</view>
 			<view class="task-tail-content" v-show="current == 0">
 				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" :key="index">
@@ -340,7 +358,7 @@
 			accountName() {
 			}
 		},
-		mounted() {
+		mounted() {  
 			// this.queryCompleteDispatchTask(
 			// 	{
 			// 	   proId:this.proId, workerId:'',state: -1,
@@ -359,8 +377,8 @@
 			
 			// tab切换改变事件
 			tabChange (index) {
-				this.current = index;
-				if (index == 0) {
+				this.current = index['index'];
+				if (this.current == 0) {
 				  this.queryCompleteDispatchTask(
 					{
 					   proId:this.proId, workerId:'',state: -1,
@@ -688,11 +706,50 @@
 				right: 0;
 				margin: auto
 			 };
+			 .task-tail-title {
+				 width: 80%;
+				 margin: 0 auto;
+				 position: relative;
+				 .tab-line {
+					 width: 96px;
+					 height: 2px;
+					 background: #2c9af1;
+					 position: absolute;
+					 bottom: -2px;
+				 };
+				 .tab-left {
+				 		left: 0
+				 };
+				 .tab-right {
+				 	 right: 0
+				 };
+				 border-bottom: 1px solid #bbbbbb;
+				 ::v-deep .u-tabs {
+					 .u-tabs__wrapper {
+						 .u-tabs__wrapper__nav {
+								.u-tabs__wrapper__nav__item {
+									padding: 0 20px;
+									box-sizing: border-box;
+								 &:nth-child(1) {
+										justify-content: flex-start !important;
+								 };
+								 &:nth-child(2) {
+										justify-content: flex-end !important;
+								 }
+								};
+								.u-tabs__wrapper__nav__line {
+									margin-bottom: -3px;
+								}
+						 }
+					 }
+				 }
+			 };
 			 .task-tail-content {
 			 	flex: 1;
 			 	overflow: auto;
 			 	-webkit-overflow-scrolling: touch;
 			 	background: #f7f7f7;
+				margin-top: 10px;
 			 	.task-tail-content-item {
 			 		width: 98%;
 			 		margin: 0 auto;

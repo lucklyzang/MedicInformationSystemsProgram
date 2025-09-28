@@ -6,6 +6,7 @@
 			</view>
 		</u-transition>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
+		<light-hint type="success" :isShow="showLightHint" :type="hintType" @hide="hideEvent" :message="hintMsg"></light-hint>
 		<u-toast ref="uToast" />
 		<view class="nav">
 			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="修改密码" @backClick="backTo">
@@ -77,13 +78,18 @@
 	import store from '@/store'
 	import { modificationPassword } from '@/api/login.js'
 	import navBar from "@/components/zhouWei-navBar"
+	import LightHint from "@/components/light-hint/light-hint.vue"
 	export default {
 		components: {
-			navBar
+			navBar,
+			LightHint
 		},
 		data() {
 			return {
 				infoText: '开启中···',
+				hintMsg: '',
+				hintType: '',
+				showLightHint: false,
 				showLoadingHint: false,
 				formerPasswordValue: '',
 				newPasswordValue: '',
@@ -126,56 +132,74 @@
 				uni.navigateBack()
 			},
 			
+			// 隐藏事件
+			hideEvent () {
+				this.showLightHint = false
+			},
+			
 			// 提交修改事件
 			submitModificationEvent () {
+				this.showLightHint = true;
 				// 旧密码不能为空
 				if (this.formerPasswordValue == '') {
 					this.$refs.uToast.show({
-						message: '请输入旧密码',
-						position: 'center'
+						title: '请输入旧密码',
+						position: 'center',
+						type: 'warning'
 					});
 					return
 				};
 				// 新密码不能为空
 				if (this.newPasswordValue == '') {
 					this.$refs.uToast.show({
-						message: '请输入新密码',
-						position: 'center'
+						title: '请输入新密码',
+						position: 'center',
+						type: 'warning'
+					});
+					return
+				};
+				// 确认新密码不能为空
+				if (this.surePasswordValue == '') {
+					this.$refs.uToast.show({
+						title: '请确认新密码',
+						position: 'center',
+						type: 'warning'
 					});
 					return
 				};
 				// 两次密码输入不一致
 				if (this.newPasswordValue != this.surePasswordValue) {
 					this.$refs.uToast.show({
-						message: '两次密码输入不一致',
-						position: 'center'
+						title: '两次密码输入不一致',
+						position: 'center',
+						type: 'warning'
 					});
 					return
 				};
+				this.showLoadingHint = true;
 				modificationPassword({
 					username: this.userName,
 					password: this.formerPasswordValue,
 					newPassword: this.newPasswordValue
 				}).then((res) => {
+					this.showLoadingHint = false;
 				  if (res && res.data.code == 200) {
 						uni.redirectTo({
 							url: '/pages/login/login'
 						});
 						// 清空store和localStorage
 						removeAllLocalStorage();
-						store.dispatch('resetLoginState');
-				    this.$refs.uToast.show({
-				      title: `${res.data.data}`,
-				      type: 'success'
-				    })
+						this.hintType = 'success';
+						this.showLightHint = true;
+						this.hintMsg = '修改成功!';
 				  } else {
-				    this.$refs.uToast.show({
-				      title: `${res.data.msg}`,
-				      type: 'warning'
-				    })
+						this.hintType = 'error';
+						this.showLightHint = true;
+						this.hintMsg = '修改失败!';
 				  }
 				})
 				.catch((err) => {
+					this.showLoadingHint = false;
 				  this.$refs.uToast.show({
 				    title: `${err.message}`,
 				    type: 'error'

@@ -85,6 +85,7 @@
 <script>
 import { mapGetters, mapMutations } from "vuex";
 import { setCache, removeAllLocalStorage } from '@/common/js/utils'
+import {queryTransportTypeClass} from '@/api/transport.js'
 import navBar from "@/components/zhouWei-navBar"
 export default {
   components: {
@@ -95,6 +96,7 @@ export default {
 			infoText: '加载中···',
 			tierNum: 0,
 			valueName: 0,
+			transTypeList: [],
 			showLoadingHint: false,
 			transList: [
 				{
@@ -162,6 +164,51 @@ export default {
 			uni.navigateTo({
 				url: `/transManagementPackage/pages/callTask/callTask?msg=${item.text}`
 			})
+		 },
+		 
+		 //运送类型
+		 parallelFunctionTwo() {
+		 	this.showLoadingHint = true;
+		 	Promise.all([this.getTransportsType()])
+		 		.then((res) => {
+		 			this.showLoadingHint = false;
+		 			if (res && res[0] && res[0].length > 0) {
+		 				let [item1] = res;
+		 				if (item1) {
+		 					this.transTypeList = [];
+		 					for (let item of item1) {
+		 						this.transTypeList.push({
+		 							id: item.id,
+		 							value: item.typeName
+		 						})
+		 					}
+		 				}
+		 			}
+		 		})
+		 		.catch((err) => {
+		 			this.showLoadingHint = false;
+		 			this.$refs.uToast.show({
+		 				title: `${err}`,
+		 				type: 'warning'
+		 			})
+		 		})
+		 },
+		 
+		 // 查询运送类型分类
+		 getTransportsType() {
+		 	return new Promise((resolve, reject) => {
+		 		queryTransportTypeClass({
+		 				proId: this.proId,
+		 				state: 0
+		 			}).then((res) => {
+		 				if (res && res.data.code == 200) {
+		 					resolve(res.data.data)
+		 				}
+		 			})
+		 			.catch((err) => {
+		 				reject(err.message)
+		 			})
+		 	})
 		 },
 		 
 		 // tabBar点击事件
