@@ -14,16 +14,34 @@
 		<view>
 			<u-datetime-picker mode="date" :show="dateEndShow" v-model="dateEndValue" @cancel="dateEndShow = false" @confirm="endDateSure"></u-datetime-picker>
 		</view>
-		<view class="empty-info" v-show="noDataShow">
-			<u-empty text="数据为空" mode="list"></u-empty>
-		</view>
 		<view class="nav">
 			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="运送" @backClick="backTo">
 			</nav-bar> 
 		</view>
 		<view class="content">
+			<view class="empty-info" v-if="noDataShow">
+				<u-empty text="数据为空" mode="list"></u-empty>
+			</view>
 			<view class="task-tail-title">
-				<u-tabs :list="list" :scrollable="false" lineColor="#2c9af1" activeStyle="{color: '#2c9af1'}" inactiveStyle="{color:#7d7d7d}" lineWidth="50" :current="current" @change="tabChange"></u-tabs>
+				<u-tabs
+				  :list="list"
+					:scrollable="false" 
+					lineColor="#fff"
+					:activeStyle="{
+						color: '#2c9af1',
+						fontSize: '14px'
+					}"
+				 :inactiveStyle="{
+						color: '#606060',
+						fontSize: '14px'
+				 }"
+					lineWidth="0" 
+					lineHeight="0"
+					:current="current" 
+					@change="tabChange"
+				>
+				</u-tabs>
+				<view class="tab-line" :class="{'tab-left':current == 0,'tab-right':current == 1}"></view>
 			</view>
 			<view class="filtrate-area">
 				<view class="calendar-box">
@@ -228,42 +246,42 @@
 			>
 			  <u-tabbar-item text="呼叫">
 			    <image
-						style="width:15px"
-						mode="widthFix"
+					  class="u-page__item__slot-icon"
+						style="width:19px;height:18px"
 			      slot="active-icon"
 			      src="/static/img/call-active-icon.png"
 			    ></image>
 			    <image
+					  class="u-page__item__slot-icon"
 			      slot="inactive-icon"
-						style="width:15px"
-						mode="widthFix"
+						style="width:19px;height:18px"
 			      src="/static/img/call-inactive-icon.png"
 			    ></image>
 			  </u-tabbar-item>
 				<u-tabbar-item text="实时任务">
 				  <image
-						style="width:15px"
-						mode="widthFix"
+					  class="u-page__item__slot-icon"
+						style="width:19px;height:18px"
 				    slot="active-icon"
 				    src="/static/img/real-timetask-active-icon.png"
 				  ></image>
 				  <image
-						style="width:15px"
-						mode="widthFix"
+					  class="u-page__item__slot-icon"
+						style="width:19px;height:18px"
 				    slot="inactive-icon"
 				    src="/static/img/real-timetask-inactive-icon.png"
 				  ></image>
 				</u-tabbar-item>
 				<u-tabbar-item text="历史任务">
 				  <image
-						style="width:15px"
-						mode="widthFix"
+					  class="u-page__item__slot-icon"
+						style="width:19px;height:18px"
 				    slot="active-icon"
 				    src="/static/img/historical-task-active-icon.png"
 				  ></image>
 				  <image
-						style="width:15px"
-						mode="widthFix"
+					  class="u-page__item__slot-icon"
+						style="width:19px;height:18px"
 				    slot="inactive-icon"
 				    src="/static/img/historical-task-inactive-icon.png"
 				  ></image>
@@ -370,7 +388,9 @@
 			
 			// 顶部导航返回事件
 			backTo () {
-				uni.navigateBack()
+				uni.redirectTo({
+					url: '/transManagementPackage/pages/index/index'
+				})
 			},
 			
 			// 开始日期弹框显示事件
@@ -381,8 +401,8 @@
 			
 			// tab切换改变事件
 			tabChange (index) {
-				this.current = index;
-				if (index == 0) {
+				this.current = index['index'];
+				if (this.current == 0) {
 				  this.queryCompleteDispatchTask(
 					{
 					   proId:this.proId, workerId:'',state: 7,
@@ -575,15 +595,15 @@
 			tabBarEvent (index) {
 			 this.valueName = index;
 			 if (this.valueName == 0) {
-				 uni.navigateTo({
+				 uni.redirectTo({
 					url: '/transManagementPackage/pages/index/index'
 				 })
 			 } else if (this.valueName == 1) {
-				 uni.navigateTo({
+				 uni.redirectTo({
 					url: '/transManagementPackage/pages/realtimeTask/realtimeTask'
 				 })
 			 } else if (this.valueName == 2) {
-				 uni.navigateTo({
+				 uni.redirectTo({
 					url: '/transManagementPackage/pages/historicalTask/historicalTask'
 				 })
 			 }
@@ -627,6 +647,17 @@
 		.nav {
 			width: 100%;
 		};
+		.tab-bar {
+			height: 85px;
+			::v-deep {
+				.u-tabbar {
+					height: 100%;
+					.u-tabbar__content {
+						background: #F8F8F8;
+					}
+				}
+			}
+		};
 		.content {
 			 flex: 1;
 			 padding: 6px 4px;
@@ -642,6 +673,44 @@
 				bottom: 0;
 				right: 0;
 				margin: auto
+			 };
+			 .task-tail-title {
+				 width: 80%;
+				 margin: 0 auto;
+				 position: relative;
+				 .tab-line {
+					 width: 96px;
+					 height: 2px;
+					 background: #2c9af1;
+					 position: absolute;
+					 bottom: -2px;
+				 };
+				 .tab-left {
+						left: 0
+				 };
+				 .tab-right {
+					 right: 0
+				 };
+				 border-bottom: 1px solid #bbbbbb;
+				 ::v-deep .u-tabs {
+					 .u-tabs__wrapper {
+						 .u-tabs__wrapper__nav {
+								.u-tabs__wrapper__nav__item {
+									padding: 0 20px;
+									box-sizing: border-box;
+								 &:nth-child(1) {
+										justify-content: flex-start !important;
+								 };
+								 &:nth-child(2) {
+										justify-content: flex-end !important;
+								 }
+								};
+								.u-tabs__wrapper__nav__line {
+									margin-bottom: -3px;
+								}
+						 }
+					 }
+				 }
 			 };
 			 .filtrate-area {
 				 display: flex;
@@ -684,6 +753,7 @@
 			 	overflow: auto;
 			 	-webkit-overflow-scrolling: touch;
 			 	background: #f7f7f7;
+				margin-top: 10px;
 			 	.task-tail-content-item {
 			 		width: 98%;
 			 		margin: 0 auto;

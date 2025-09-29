@@ -5,7 +5,6 @@ import common from './common.js';
 import createProject from './createProject.js';
 import createTrans from './createTrans.js';
 import createEnvironment from './createEnvironment.js';
-import createAffair from './createAffair.js';
 Vue.use(Vuex);
 export default new Vuex.Store({
   modules:{
@@ -13,7 +12,6 @@ export default new Vuex.Store({
 		common,
 		createProject,
 		createTrans,
-		createEnvironment,
-		createAffair
+		createEnvironment
   }
 });

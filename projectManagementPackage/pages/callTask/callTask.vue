@@ -108,46 +108,46 @@
 			>
 			  <u-tabbar-item text="呼叫">
 			    <image
-						style="width:15px"
-						mode="widthFix"
+			  	  class="u-page__item__slot-icon"
+			  		style="width:19px;height:18px"
 			      slot="active-icon"
 			      src="/static/img/call-active-icon.png"
 			    ></image>
 			    <image
+			  	  class="u-page__item__slot-icon"
 			      slot="inactive-icon"
-						style="width:15px"
-						mode="widthFix"
+			  		style="width:19px;height:18px"
 			      src="/static/img/call-inactive-icon.png"
 			    ></image>
 			  </u-tabbar-item>
-				<u-tabbar-item text="实时任务">
-				  <image
-						style="width:15px"
-						mode="widthFix"
-				    slot="active-icon"
-				    src="/static/img/real-timetask-active-icon.png"
-				  ></image>
-				  <image
-						style="width:15px"
-						mode="widthFix"
-				    slot="inactive-icon"
-				    src="/static/img/real-timetask-inactive-icon.png"
-				  ></image>
-				</u-tabbar-item>
-				<u-tabbar-item text="历史任务">
-				  <image
-						style="width:15px"
-						mode="widthFix"
-				    slot="active-icon"
-				    src="/static/img/historical-task-active-icon.png"
-				  ></image>
-				  <image
-						style="width:15px"
-						mode="widthFix"
-				    slot="inactive-icon"
-				    src="/static/img/historical-task-inactive-icon.png"
-				  ></image>
-				</u-tabbar-item>
+			  <u-tabbar-item text="实时任务">
+			    <image
+			  	  class="u-page__item__slot-icon"
+			  		style="width:19px;height:18px"
+			      slot="active-icon"
+			      src="/static/img/real-timetask-active-icon.png"
+			    ></image>
+			    <image
+			  	  class="u-page__item__slot-icon"
+			  		style="width:19px;height:18px"
+			      slot="inactive-icon"
+			      src="/static/img/real-timetask-inactive-icon.png"
+			    ></image>
+			  </u-tabbar-item>
+			  <u-tabbar-item text="历史任务">
+			    <image
+			  	  class="u-page__item__slot-icon"
+			  		style="width:19px;height:18px"
+			      slot="active-icon"
+			      src="/static/img/historical-task-active-icon.png"
+			    ></image>
+			    <image
+			  	  class="u-page__item__slot-icon"
+			  		style="width:19px;height:18px"
+			      slot="inactive-icon"
+			      src="/static/img/historical-task-inactive-icon.png"
+			    ></image>
+			  </u-tabbar-item>
 			</u-tabbar>
 		</view>
 	</view>
@@ -622,15 +622,15 @@
 				tabBarEvent (index) {
 				 this.valueName = index;
 				 if (this.valueName == 0) {
-					 uni.navigateTo({
+					 uni.redirectTo({
 						url: '/projectManagementPackage/pages/callTask/callTask'
 					 })
 				 } else if (this.valueName == 1) {
-					 uni.navigateTo({
+					 uni.redirectTo({
 						url: '/projectManagementPackage/pages/realtimeTask/realtimeTask'
 					 })
 				 } else if (this.valueName == 2) {
-					 uni.navigateTo({
+					 uni.redirectTo({
 						url: '/projectManagementPackage/pages/historicalTask/historicalTask'
 					 })
 				 }
@@ -650,7 +650,6 @@
 		height: 100vh !important;
 		box-sizing: border-box;
 		background: #fff;
-		padding-bottom: 100px;
 		::v-deep .u-popup {
 			flex: none !important
 		};
@@ -674,6 +673,17 @@
 		};
 		.nav {
 			width: 100%;
+		};
+		.tab-bar {
+			height: 85px;
+			::v-deep {
+				.u-tabbar {
+					height: 100%;
+					.u-tabbar__content {
+						background: #F8F8F8;
+					}
+				}
+			}
 		};
 		.content-box-inner {
 				width: 100%;

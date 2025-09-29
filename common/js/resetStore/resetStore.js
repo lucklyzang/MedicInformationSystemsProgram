@@ -57,11 +57,3 @@ export function getDefaultEnvironmentState() {
 		environmentTaskMessage: {}
 	}	
 }
-
-// 事务订单信息store的初始值
-export function getDefaultAffairState() {
-	return {
-		// 事务订单详情
-		affairTaskMessage: {}
-	}	
-}

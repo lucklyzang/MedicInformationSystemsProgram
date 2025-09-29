@@ -42,7 +42,7 @@
 						修改密码
 					</view>
 					<view class="account-area-right">
-						<u-icon name="arrow-right" color="#101010" size="30"></u-icon>
+						<u-icon name="arrow-right" color="#101010" size="24"></u-icon>
 					</view>
 				</view>
 			</view>

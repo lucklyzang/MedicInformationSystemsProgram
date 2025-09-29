@@ -8,7 +8,7 @@
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast"></u-toast>
 		<view class="nav">
-			<nav-bar :home="false" backState='3000' fontColor="#FFF" bgColor="none" title="选择位置" @backClick="backTo">
+			<nav-bar :home="false" backState='3000' :isShowBackText="true" fontColor="#FFF" bgColor="none" title="选择位置" @backClick="backTo">
 			</nav-bar> 
 		</view>
 	 <view class="content">
@@ -115,27 +115,27 @@
 				'navigationBarHeight',
 				'locationMessage'
 			]),
-			userName() {
-				return this.userInfo.worker.name
-			},
-			userAccount() {
-				return this.userInfo.username
-			},
-			proName () {
-			  return this.userInfo.worker['hospitalList'][0]['hospitalName']
-			},
-			proId() {
-				return this.userInfo.worker['hospitalList'][0]['hospitalId']
-			},
-			workerId() {
-				return this.userInfo.worker.id
-			},
-			depId() {
-				return this.userInfo.worker['departments'][0]['id']
-			}
+			// userName() {
+			// 	return this.userInfo.worker.name
+			// },
+			// userAccount() {
+			// 	return this.userInfo.username
+			// },
+			// proName () {
+			//   return this.userInfo.worker['hospitalList'][0]['hospitalName']
+			// },
+			// proId() {
+			// 	return this.userInfo.worker['hospitalList'][0]['hospitalId']
+			// },
+			// workerId() {
+			// 	return this.userInfo.worker.id
+			// },
+			// depId() {
+			// 	return this.userInfo.worker['departments'][0]['id']
+			// }
 		},
 		onLoad() {
-			this.getArchitecture()
+			// this.getArchitecture()
 		},
 		methods: {
 			...mapMutations([

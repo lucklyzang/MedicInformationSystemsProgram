@@ -7,9 +7,6 @@
 		</u-transition>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast" />
-		<view class="empty-info" v-show="noDataShow">
-			<u-empty text="数据为空" mode="list"></u-empty>
-		</view>
 		<!-- 取消订单原因弹框 -->
 		<view class="transport-rice-box" v-if="showCancelReason">
 			<ScrollSelection buttonLocation='top' v-model="showCancelReason" :pickerValues="canCelReasonDefaultIndex" :isShowSearch="false" :columns="CancelReasonOption" @sure="cancelReasonSureEvent" @cancel="cancelReasonCancelEvent" @close="cancelReasonCloseEvent" />
@@ -19,8 +16,29 @@
 			</nav-bar> 
 		</view>
 		<view class="content">
+			<view class="empty-info" v-show="noDataShow">
+				<u-empty text="数据为空" mode="list"></u-empty>
+			</view>
 			<view class="task-tail-title">
-				<u-tabs :list="list" :scrollable="false" lineColor="#2c9af1" activeStyle="{color: '#2c9af1'}" inactiveStyle="{color:#7d7d7d}" lineWidth="50" :current="current" @change="tabChange"></u-tabs>
+				<u-tabs
+				  :list="list"
+					:scrollable="false" 
+					lineColor="#fff"
+					:activeStyle="{
+						color: '#2c9af1',
+						fontSize: '14px'
+					}"
+				 :inactiveStyle="{
+						color: '#606060',
+						fontSize: '14px'
+				 }"
+					lineWidth="0" 
+					lineHeight="0"
+					:current="current" 
+					@change="tabChange"
+				>
+				</u-tabs>
+				<view class="tab-line" :class="{'tab-left':current == 0,'tab-right':current == 1}"></view>
 			</view>
 			<view class="task-tail-content" v-show="current == 0">
 				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" :key="index">
@@ -160,46 +178,46 @@
 			>
 			  <u-tabbar-item text="呼叫">
 			    <image
-						style="width:15px"
-						mode="widthFix"
+			  	  class="u-page__item__slot-icon"
+			  		style="width:19px;height:18px"
 			      slot="active-icon"
 			      src="/static/img/call-active-icon.png"
 			    ></image>
 			    <image
+			  	  class="u-page__item__slot-icon"
 			      slot="inactive-icon"
-						style="width:15px"
-						mode="widthFix"
+			  		style="width:19px;height:18px"
 			      src="/static/img/call-inactive-icon.png"
 			    ></image>
 			  </u-tabbar-item>
-				<u-tabbar-item text="实时任务">
-				  <image
-						style="width:15px"
-						mode="widthFix"
-				    slot="active-icon"
-				    src="/static/img/real-timetask-active-icon.png"
-				  ></image>
-				  <image
-						style="width:15px"
-						mode="widthFix"
-				    slot="inactive-icon"
-				    src="/static/img/real-timetask-inactive-icon.png"
-				  ></image>
-				</u-tabbar-item>
-				<u-tabbar-item text="历史任务">
-				  <image
-						style="width:15px"
-						mode="widthFix"
-				    slot="active-icon"
-				    src="/static/img/historical-task-active-icon.png"
-				  ></image>
-				  <image
-						style="width:15px"
-						mode="widthFix"
-				    slot="inactive-icon"
-				    src="/static/img/historical-task-inactive-icon.png"
-				  ></image>
-				</u-tabbar-item>
+			  <u-tabbar-item text="实时任务">
+			    <image
+			  	  class="u-page__item__slot-icon"
+			  		style="width:19px;height:18px"
+			      slot="active-icon"
+			      src="/static/img/real-timetask-active-icon.png"
+			    ></image>
+			    <image
+			  	  class="u-page__item__slot-icon"
+			  		style="width:19px;height:18px"
+			      slot="inactive-icon"
+			      src="/static/img/real-timetask-inactive-icon.png"
+			    ></image>
+			  </u-tabbar-item>
+			  <u-tabbar-item text="历史任务">
+			    <image
+			  	  class="u-page__item__slot-icon"
+			  		style="width:19px;height:18px"
+			      slot="active-icon"
+			      src="/static/img/historical-task-active-icon.png"
+			    ></image>
+			    <image
+			  	  class="u-page__item__slot-icon"
+			  		style="width:19px;height:18px"
+			      slot="inactive-icon"
+			      src="/static/img/historical-task-inactive-icon.png"
+			    ></image>
+			  </u-tabbar-item>
 			</u-tabbar>
 		</view>
 	</view>
@@ -298,13 +316,15 @@
 			
 			// 顶部导航返回事件
 			backTo () {
-				uni.navigateBack()
+				uni.redirectTo({
+					url: '/cleanManagementPackage/pages/callTask/callTask'
+				})
 			},
 			
 			// tab切换改变事件
 			tabChange (index) {
-				this.current = index;
-				if (index == 0) {
+				this.current = index['index'];
+				if (this.current == 0) {
 				  this.queryCompleteDispatchTask(
 					{
 					   proId:this.proId, createId:this.workerId,state: -5,
@@ -366,7 +386,7 @@
 			  },
 				
 			// 任务状态转换
-			stateTransfer (index) {
+			stateTransfer (state) {
 				switch(state) {
 					case 0 :
 						return '未分配'
@@ -548,15 +568,15 @@
 			tabBarEvent (index) {
 			  this.valueName = index;
 			  if (this.valueName == 0) {
-					 uni.navigateTo({
+					 uni.redirectTo({
 						url: '/projectManagementPackage/pages/callTask/callTask'
 					 })
 			  } else if (this.valueName == 1) {
-					 uni.navigateTo({
+					 uni.redirectTo({
 						url: '/projectManagementPackage/pages/realtimeTask/realtimeTask'
 					 })
 			  } else if (this.valueName == 2) {
-					 uni.navigateTo({
+					 uni.redirectTo({
 						url: '/projectManagementPackage/pages/historicalTask/historicalTask'
 					 })
 			  }
@@ -600,6 +620,17 @@
 		.nav {
 			width: 100%;
 		};
+		.tab-bar {
+			height: 85px;
+			::v-deep {
+				.u-tabbar {
+					height: 100%;
+					.u-tabbar__content {
+						background: #F8F8F8;
+					}
+				}
+			}
+		};
 		.content {
 			 flex: 1;
 			 padding: 6px 4px;
@@ -609,18 +640,57 @@
 			 display: flex;
 			 flex-direction: column;
 			 .empty-info {
-				position: absolute;
-				top: 0;
-				left: 0;
-				bottom: 0;
-				right: 0;
-				margin: auto
+					position: absolute;
+					top: 0;
+					left: 0;
+					bottom: 0;
+					right: 0;
+					margin: auto
+			 };
+			 .task-tail-title {
+				 width: 80%;
+				 margin: 0 auto;
+				 position: relative;
+				 .tab-line {
+					 width: 96px;
+					 height: 2px;
+					 background: #2c9af1;
+					 position: absolute;
+					 bottom: -2px;
+				 };
+				 .tab-left {
+						left: 0
+				 };
+				 .tab-right {
+					 right: 0
+				 };
+				 border-bottom: 1px solid #bbbbbb;
+				 ::v-deep .u-tabs {
+					 .u-tabs__wrapper {
+						 .u-tabs__wrapper__nav {
+								.u-tabs__wrapper__nav__item {
+									padding: 0 20px;
+									box-sizing: border-box;
+								 &:nth-child(1) {
+										justify-content: flex-start !important;
+								 };
+								 &:nth-child(2) {
+										justify-content: flex-end !important;
+								 }
+								};
+								.u-tabs__wrapper__nav__line {
+									margin-bottom: -3px;
+								}
+						 }
+					 }
+				 }
 			 };
 			 .task-tail-content {
 			 	flex: 1;
 			 	overflow: auto;
 			 	-webkit-overflow-scrolling: touch;
 			 	background: #f7f7f7;
+				margin-top: 10px;
 			 	.task-tail-content-item {
 			 		width: 98%;
 			 		margin: 0 auto;
