@@ -694,12 +694,9 @@
 			 	.task-tail-content-item {
 			 		width: 98%;
 			 		margin: 0 auto;
-			 		margin-top: 6px;
+			 		margin-bottom: 6px;
 			 		border-radius: 4px;
 			 		background: #FFFFFF;
-			 		&:last-child {
-			 			margin-bottom: 6px
-			 		};
 					.item-title {
 						box-sizing: border-box;
 						padding: 0 12px;
