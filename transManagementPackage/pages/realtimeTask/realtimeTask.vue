@@ -7,9 +7,6 @@
 		</u-transition>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast" />
-		<view class="empty-info" v-show="noDataShow">
-			<u-empty text="数据为空" mode="list"></u-empty>
-		</view>
 		<!-- 取消订单原因弹框 -->
 		<view class="transport-rice-box" v-if="showCancelReason">
 			<ScrollSelection buttonLocation='top' v-model="showCancelReason" :pickerValues="canCelReasonDefaultIndex" :isShowSearch="false" :columns="CancelReasonOption" @sure="cancelReasonSureEvent" @cancel="cancelReasonCancelEvent" @close="cancelReasonCloseEvent" />
@@ -39,6 +36,9 @@
 				>
 				</u-tabs>
 				<view class="tab-line" :class="{'tab-left':current == 0,'tab-right':current == 1}"></view>
+			</view>
+			<view class="empty-info" v-show="noDataShow">
+				<u-empty text="数据为空" mode="list"></u-empty>
 			</view>
 			<view class="task-tail-content" v-show="current == 0">
 				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" :key="index">
@@ -303,6 +303,7 @@
 				valueName: 1,
 				list: [{name: '待办任务'}, {name: '进行中'}],
 				current: 0,
+				noDataShow: false,
 				contactIsolationPng: require("@/static/img/contact-isolation.png"),
 				cancelReasonDefaultIndex: [0],
 				cancelReasonOption: [],
@@ -711,15 +712,17 @@
 			 display: flex;
 			 flex-direction: column;
 			 .empty-info {
-				position: absolute;
-				top: 0;
-				left: 0;
-				bottom: 0;
-				right: 0;
-				margin: auto
+					width: 100px;
+					height: 120px;
+					position: absolute;
+					top: 0;
+					left: 0;
+					bottom: 0;
+					right: 0;
+					margin: auto
 			 };
 			 .task-tail-title {
-				 width: 80%;
+				 width: 85%;
 				 margin: 0 auto;
 				 position: relative;
 				 .tab-line {
@@ -727,7 +730,7 @@
 					 height: 2px;
 					 background: #2c9af1;
 					 position: absolute;
-					 bottom: -2px;
+					 bottom: -1px;
 				 };
 				 .tab-left {
 				 		left: 0

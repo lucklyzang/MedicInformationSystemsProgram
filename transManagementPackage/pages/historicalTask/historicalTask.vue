@@ -19,9 +19,6 @@
 			</nav-bar> 
 		</view>
 		<view class="content">
-			<view class="empty-info" v-if="noDataShow">
-				<u-empty text="数据为空" mode="list"></u-empty>
-			</view>
 			<view class="task-tail-title">
 				<u-tabs
 				  :list="list"
@@ -73,6 +70,9 @@
 				<view class="filtrate-btn" @click="filtrateEvent">
 					<text>筛选</text>
 				</view>
+			</view>
+			<view class="empty-info" v-if="noDataShow">
+				<u-empty text="数据为空" mode="list"></u-empty>
 			</view>
 			<view class="task-tail-content" v-show="current == 0">
 				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" :key="index">
@@ -667,15 +667,17 @@
 			 display: flex;
 			 flex-direction: column;
 			 .empty-info {
-				position: absolute;
-				top: 0;
-				left: 0;
-				bottom: 0;
-				right: 0;
-				margin: auto
+					width: 100px;
+					height: 120px;
+					position: absolute;
+					top: 0;
+					left: 0;
+					bottom: 0;
+					right: 0;
+					margin: auto
 			 };
 			 .task-tail-title {
-				 width: 80%;
+				 width: 85%;
 				 margin: 0 auto;
 				 position: relative;
 				 .tab-line {
@@ -683,7 +685,7 @@
 					 height: 2px;
 					 background: #2c9af1;
 					 position: absolute;
-					 bottom: -2px;
+					 bottom: -1px;
 				 };
 				 .tab-left {
 						left: 0
@@ -715,16 +717,24 @@
 			 .filtrate-area {
 				 display: flex;
 				 align-items: center;
-				 width: 90%;
+				 width: 85%;
 				 margin: 10px 0;
-				 margin-left: 5%;
+				 margin-left: 6%;
 				 .calendar-box {
 					 margin-right: 4px;
 				 };
 				 .date-input-box {
-					 width: 70%;
 					 display: flex;
 					 align-items: center;
+					 ::v-deep .u-input {
+						 padding: 0 9px !important;
+						 width: 73px;
+						 height: 22px;
+						 border-radius: 0 !important;
+					 };
+					 ::v-deep .u-border {
+						 border-color: #bbbbbb !important;
+					 };
 					 >view {
 						 &:nth-child(2) {
 							margin: 0 8px;
@@ -734,9 +744,9 @@
 					 }
 				 };
 				 .filtrate-btn {
-					 margin-left: 8px;
+					 margin-left: 10px;
 					 width: 54px;
-					 height: 21px;
+					 height: 22px;
 					 display: flex;
 					 align-items: center;
 					 justify-content: center;

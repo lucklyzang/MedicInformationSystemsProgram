@@ -21,6 +21,8 @@
 					prefixIcon="account"
 					prefixIconStyle="font-size: 24px;color: #B6B6B6"
 					placeholderStyle="font-size: 16px;color: #B6B6B6"
+					fontSize="16px"
+					color="#B6B6B6"
 					placeholder="请输入账号"
 					v-model="form.username"
 					border="bottom"
@@ -32,6 +34,8 @@
 					prefixIcon="lock"
 					prefixIconStyle="font-size: 24px;color: #B6B6B6"
 					placeholderStyle="font-size: 16px;color: #B6B6B6"
+					fontSize="16px"
+					color="#B6B6B6"
 					placeholder="请输入密码"
 					v-model="form.password"
 					border="bottom"
@@ -276,13 +280,14 @@
 				::v-deep {
 					.u-input {
 						height: 40px;
+						border-color: #B6B6B6 !important;
 						.u-input__content {
 							.u-input__content__prefix-icon {
 								margin-right: 12px;
 							}
 						};
 						&:first-child {
-							margin-bottom: 10px;
+							margin-bottom: 14px;
 						}
 					}
 				}
@@ -309,8 +314,11 @@
 				};
 				button {
 					height: 48px;
+					line-height: 48px;
+					font-size: 16px;
           background-image: linear-gradient(to right, #6ED3F7,#218FFF);
           border-radius: 26px;
+					box-shadow: 0pt 2pt 6pt 0pt rgba(36,149,213,1);
 				}
 			};
       .bottom-character {

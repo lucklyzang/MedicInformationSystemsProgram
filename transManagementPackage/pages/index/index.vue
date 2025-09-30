@@ -17,10 +17,12 @@
 					运送类型
 				</view>
 				<view class="trans-type-content">
-					<view class="trans-list" v-for="(item,index) in transList" :key="index" @click="transTypeEvent(item,index)">
+					<view class="trans-list" v-for="(item,index) in transTypeList" :key="item.value" @click="transTypeEvent(item,index)">
 						<view class="list-top">
-							<image src="/static/img/circle-background.png" mode="widthFix"></image>
-							<image :src="item.url" mode="widthFix"></image>
+							<image src="/static/img/circle-background.png"></image>
+							<image v-if="item.text == '标本'" src="/static/img/sample-icon.png"></image>
+							<image v-if="item.text == '检查'" src="/static/img/examine-icon.png"></image>
+							<image v-if="item.text == '药物文书'" src="/static/img/medicine-icon.png"></image>
 						</view>
 						<view class="list-bottom">{{ item.text }}</view>
 					</view>
@@ -96,22 +98,21 @@ export default {
 			infoText: '加载中···',
 			tierNum: 0,
 			valueName: 0,
-			transTypeList: [],
-			showLoadingHint: false,
-			transList: [
+			transTypeList: [
 				{
-					text: '标本',
-					url: '/static/img/sample-icon.png'
+					value: 1,
+					text: '标本'
 				},
 				{
-					text: '检查',
-					url: '/static/img/examine-icon.png'
+					value: 2,
+					text: '检查'
 				},
 				{
-					text: '药物文书',
-					url: '/static/img/medicine-icon.png'
+					value: 3,
+					text: '药物文书'
 				}
-			]
+			],
+			showLoadingHint: false
     }
   },
 
@@ -161,8 +162,9 @@ export default {
 		 
 		 // 运送类型点击事件
 		 transTypeEvent (item,index) {
+			const transmitMsg = JSON.stringify(item);
 			uni.navigateTo({
-				url: `/transManagementPackage/pages/callTask/callTask?msg=${item.text}`
+				url: `/transManagementPackage/pages/callTask/callTask?msg=${transmitMsg}`
 			})
 		 },
 		 
@@ -177,10 +179,12 @@ export default {
 		 				if (item1) {
 		 					this.transTypeList = [];
 		 					for (let item of item1) {
-		 						this.transTypeList.push({
-		 							id: item.id,
-		 							value: item.typeName
-		 						})
+								if (item.typeName == '标本' || item.typeName == '检查' || item.typeName == '药物文书') {
+									this.transTypeList.push({
+										value: item.id,
+										text: item.typeName
+									})
+								}	
 		 					}
 		 				}
 		 			}
@@ -311,12 +315,14 @@ page {
 		 				>image {
 							&:nth-child(1) {
 								width: 50px;
+								height: 50px;
 								position: absolute;
 								top: 0;
 								left: 0
 							};
 							&:nth-child(2) {
 								width: 24px;
+								height: 24px;
 								position: absolute;
 								top: 50%;
 								left: 50%;

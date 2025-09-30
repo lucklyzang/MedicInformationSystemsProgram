@@ -103,10 +103,6 @@
 				</scroll-view>
 			</u-modal>
 		</view>
-    <!-- 运送大类 -->
-    <view class="transport-rice-box" v-if="showTransportRice">
-      <ScrollSelection v-model="showTransportRice" :pickerValues="transportDefaultIndex" :columns="transportRiceList" title="运送大类" @sure="transportRiceSureEvent" @cancel="transportRiceCancelEvent" @close="transportRiceCloseEvent" />
-    </view>
     <!-- 起点科室 -->
     <view class="transport-rice-box" v-if="showStartDepartment">
       <ScrollSelection v-model="showStartDepartment" :pickerValues="startDepartmentDefaultIndex" :columns="startDepartmentList" title="起点科室" @sure="startDepartmentSureEvent" @cancel="startDepartmentCancelEvent" @close="startDepartmentCloseEvent" :isShowSearch="true"/>
@@ -143,16 +139,6 @@
 					<u-radio name="3" activeColor="#F2A15F" labelColor="#F2A15F" label="重要"></u-radio>
 					<u-radio name="4" activeColor="#E86F50" labelColor="#E86F50" label="紧急重要"></u-radio>
 				</u-radio-group>
-			</view>
-		</view>
-		<view class="select-box">
-			<view class="select-box-left">
-				<text>*</text>
-				<text>运送大类</text>
-			</view>
-			<view class="select-box-right" @click="transportPartentClickEvent">
-				<text :class="{'selectBoxRightStyle': !transportPartentSelected}">{{ currentTransportRice }}</text>
-				<u-icon name="arrow-right" :color="transportPartentSelected ? '#989999' : '#d6d6d6'" size="20"></u-icon>
 			</view>
 		</view>
 		<view class="transport-type" v-if="templateType === 'template_one'">
@@ -432,12 +418,8 @@ export default {
         	text: '女'
         }
       ],
-      showTransportRice: false,
       currentTransportRice: '请选择',
       currentTransportRiceValue: '',
-			transportDefaultIndex: [2],
-      transportRiceList: [],
-			transportDefaultIndex: [0],
       transportTypeIndex: null,
       currentTransportType: '',
       transportTypeList: [],
@@ -492,7 +474,11 @@ export default {
   },
 	
 	onLoad: function (option) {
-		this.titleText = option.msg;
+		this.currentTransportRice = JSON.parse(option.msg)['text'];
+		this.currentTransportRiceValue = JSON.parse(option.msg)['value'];
+		this.titleText =this.currentTransportRice;
+		// 根据运送大类查询运送类型小类
+		this.querytransportChildByTransportParent('',this.currentTransportRiceValue,this.templateType);
 	},
 
   mounted() {
@@ -604,7 +590,7 @@ export default {
       if (!this.templatelistTwo[index]['sampleValue']) {
         this.patienModalMessage['sampleList']  = this.transportTypeParent; //病人信息模态框中运送大类列表 
         this.patienModalMessage['sampleValue'] = this.currentTransportRice; //病人信息模态框中选中的运送大类名称
-        this.patienModalMessage['sampleId'] = this.transportRiceList.filter((item) => { return item.text ==  this.currentTransportRice })[0]['value'] //病人信息模态框中选中的运送大类id
+        this.patienModalMessage['sampleId'] = this.transportRiceList.filter((item) => { return item.text ==  this.currentTransportRice })[0]['value']; //病人信息模态框中选中的运送大类id
         this.patienModalMessage['transportList'] = _.cloneDeep(this.commonTransportList) //病人信息模态框中根据运送大类查询出的运送小类列表
       };
       if (this.templatelistTwo[index].actualData == 0) {
@@ -696,7 +682,7 @@ export default {
     },
     
     // 根据运送类型大类查询运送类型小类
-    querytransportChildByTransportParent (index,id, flag) {
+    querytransportChildByTransportParent (index,id,flag) {
       this.infoText = '加载中...';
       this.showLoadingHint = true;
       this.commonTransportList = [];
@@ -731,7 +717,7 @@ export default {
                 value: item.id
               })
             };
-            // 如果有暂存信息，怎回显选中的运送类型
+            // 如果有暂存信息，则回显选中的运送类型
             // if (this.temporaryStorageCreateDispathTaskMessage['isTemporaryStorage']) {
             //   this.transportTypeIndex = this.transportTypeList.findIndex((innerItem) => { return innerItem.value == this.temporaryStorageCreateDispathTaskMessage['currentTransportType']['value']});
             // }
@@ -982,48 +968,6 @@ export default {
           reject({message:err})
         })
       })
-    },
-
-    // 运送大类点击显示下拉框事件
-    transportPartentClickEvent () {
-      if (this.transportPartentSelected) {
-        this.showTransportRice = true
-      }
-    },
-
-    // 运送大类下拉选择框确认事件
-    transportRiceSureEvent (val,value,id) {
-      if (val) {
-				this.transportDefaultIndex = [id];
-        this.currentTransportRice = val;
-        this.currentTransportRiceValue = value;
-        this.synchronizationPatientTransportType(val);
-        // 根据运送大类查询运送小类
-        this.querytransportChildByTransportParent(0,this.currentTransportRiceValue,this.templateType);
-      } else {
-        this.currentTransportRice = '请选择';
-        this.currentTransportRiceValue = ''
-      };
-      this.showTransportRice = false
-    },
-
-    // 同步病人运送类型
-    synchronizationPatientTransportType (value) {
-      this.templatelistTwo.forEach((item) => {
-        if (item['sampleValue']) {
-          item['sampleValue'] = value
-        }
-      })
-    },
-
-    // 运送大类下拉选择框取消事件
-    transportRiceCancelEvent () {
-      this.showTransportRice = false
-    },
-
-    // 运送大类下拉选择框关闭事件
-    transportRiceCloseEvent () {
-      this.showTransportRice = false
     },
 
     // 起点科室下拉选择框确认事件
