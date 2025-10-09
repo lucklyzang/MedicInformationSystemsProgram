@@ -482,7 +482,7 @@ export default {
 	},
 
   mounted() {
-    // this.parallelFunction();
+    this.parallelFunction();
   },
 
   watch: {
@@ -507,26 +507,30 @@ export default {
 			"userInfo",
 			"templateType",
 			'statusBarHeight',
-			'navigationBarHeight'
+			'navigationBarHeight',
+			'chooseHospitalArea'
 		]),
-  //   proName () {
-  //     return this.userInfo.worker['hospitalList'][0]['hospitalName']
-  //   },
-		// proId() {
-		// 	return this.userInfo.worker['hospitalList'][0]['hospitalId']
-		// },
-		// userName() {
-		// 	return this.userInfo.worker.name
-		// },
-		// userAccount() {
-		// 	return this.userInfo.username
-		// },
-		// workerId() {
-		// 	return this.userInfo.worker.id
-		// },
-		// depId() {
-		// 	return this.userInfo.worker['departments'][0]['id']
-		// }
+		userName() {
+			return this.userInfo['name']
+		},
+		proName () {
+		  return this.userInfo['proName']
+		},
+		proId() {
+			return this.userInfo['proId']
+		},
+		workerId() {
+			return this.userInfo['user']['id']
+		},
+		depId() {
+			return this.userInfo['depId'] === null ? '' : this.userInfo['depId']
+		},
+		depName() {
+			return this.userInfo['depName'] === null ? '' : this.userInfo['depName']
+		},
+		userAccount() {
+			return this.userInfo['userName']
+		}
   },
 
   methods: {
@@ -716,11 +720,7 @@ export default {
                 text: item.typeName,
                 value: item.id
               })
-            };
-            // 如果有暂存信息，则回显选中的运送类型
-            // if (this.temporaryStorageCreateDispathTaskMessage['isTemporaryStorage']) {
-            //   this.transportTypeIndex = this.transportTypeList.findIndex((innerItem) => { return innerItem.value == this.temporaryStorageCreateDispathTaskMessage['currentTransportType']['value']});
-            // }
+            }
           }
         } else {
 					this.$refs.uToast.show({
@@ -813,7 +813,7 @@ export default {
     },
 
     // 并行查询目的地、转运工具、运送类型大类、运送员
-    parallelFunction (type) {
+    parallelFunction () {
        this.infoText = '加载中...';
        this.showLoadingHint = true;
         Promise.all([this.getAllDestination(),this.getTransportTools(),this.getTransportsTypeParent(),this.queryTransporter()])
@@ -1270,20 +1270,14 @@ export default {
           taskRemark: this.taskDescribe, //备注
           parentTypeId:  this.currentTransportRiceValue, //运送父类型Id
           parentTypeName: this.currentTransportRice,//运送父类型名称
-          taskTypeId: '',
-          taskTypeName: '',
           createId: this.workerId,   //创建者ID  当前登录者
           createName: this.userName,   //创建者名称  当前登陆者
-          modifyId: '', //修改者id
-          modifyName: '', //修改者姓名
-          originalWorkerId: '', // 原始运送员id
-          id: '', // 任务id
           workerId: this.currentTransporter == '请选择' ? '' : this.currentTransporterValue, // 运送员id
           workerName: this.currentTransporter == '请选择' ? '' : this.currentTransporter, // 运送员姓名
           proId: this.proId, //项目ID
           proName: this.proName, //项目名称
           isBack: this.isBackRadioValue, //是否返回出发地  0-不返回，1-返回
-          createType: 3 //创建类型   0-web端,1-手机端(医护),3-手机端(任务调度)
+          createType: 1 //创建类型   0-web端,1-手机端(医护),3-手机端(任务调度)
         };
         // 处理多个终点科室信息
         if (this.currentGoalSpaces.length > 0) {

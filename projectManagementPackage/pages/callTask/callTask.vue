@@ -5,6 +5,7 @@
 				<u-loading-icon :show="showLoadingHint" :text="infoText" size="18" textSize="16"></u-loading-icon>
 			</view>
 		</u-transition>
+		<light-hint ref="alertToast"></light-hint>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-modal :show="sureCancelShow" :content="content" title="确定删除此图片?" :show-cancel-button="true" @confirm="sureCancel"
 		 @cancel="cancelSure">
@@ -23,7 +24,7 @@
 			<ScrollSelection v-model="showTaskType" :pickerValues="taskTypeDefaultIndex" :isShowSearch="true" :columns="taskTypeOption" title="任务类型" @sure="taskTypeSureEvent" @cancel="taskTypeCancelEvent" @close="taskTypeCloseEvent" />
 		</view>
 		<view class="nav">
-			<nav-bar :home="false" :isShowBackText="true" :isHomeText="true" backState='3000' fontColor="#FFF" bgColor="none" title="创建订单" @backClick="backTo">
+			<nav-bar :home="false" :isShowBackText="true" :isHomeText="true" backState='3000' fontColor="#FFF" bgColor="none" title="任务呼叫" @backClick="backTo">
 			</nav-bar>
 		</view>
 		<view class="content-box-inner">
@@ -163,7 +164,8 @@
 		queryAllDestination,
 		departmentRoom,
 		reportProblem,
-		getRemarks
+		getRemarks,
+		querySpace
 	} from '@/api/project.js'
 	import navBar from "@/components/zhouWei-navBar"
 	import { setCache,removeAllLocalStorage } from '@/common/js/utils'
@@ -191,15 +193,6 @@
 				problemOverview: '',
 				taskDescribe: '',
 				transportNumberValue: '',
-				totalPage: '',
-				pageSize: 6,
-				currentPage: 1,
-				inventoryMsgList: [],
-				echoInventoryMsgList: [],
-				temporaryInventoryMsgList: [],
-				consumableMsgList: [],
-				storeId: '',
-				systemId: '',
 				imgArr: [],
 				imgIndex: '',
 				sureCancelShow: false,
@@ -226,45 +219,42 @@
 				'userInfo',
 				'statusBarHeight',
 				'navigationBarHeight',
-				"templateType"
+				"templateType",
+				'chooseHospitalArea',
+				'isMedicalMan'
 			]),
-			// proName () {
-			//   return this.userInfo.worker['hospitalList'][0]['hospitalName']
-			// },
-			// proId() {
-			// 	return this.userInfo.worker['hospitalList'][0]['hospitalId']
-			// },
-			// userName() {
-			// 	return this.userInfo.worker.name
-			// },
-			// depName() {
-			// 	return this.userInfo.depName
-			// },
-			// userAccount() {
-			// 	return this.userInfo.username
-			// },
-			// workerId() {
-			// 	return this.userInfo.worker.id
-			// },
-			// depId() {
-			// 	return this.userInfo.worker['departments'][0]['id']
-			// }
+			userName() {
+				return this.userInfo['name']
+			},
+			proName () {
+			  return this.userInfo['proName']
+			},
+			proId() {
+				return this.userInfo['proId']
+			},
+			workerId() {
+				return this.userInfo['user']['id']
+			},
+			depId() {
+				return this.userInfo['depId'] === null ? '' : this.userInfo['depId']
+			},
+			depName() {
+				return this.userInfo['depName'] === null ? '' : this.userInfo['depName']
+			},
+			userAccount() {
+				return this.userInfo['userName']
+			}
 		},
 		onLoad() {
-			// this.parallelFunction();
+			this.parallelFunction();
 		},
 		mounted () {
-			// this.startPointId = this.depId;
-			// this.startPointName = this.depName;
-			// this.parallelFunction();
-			// // 登陆人员为医务人员时，根据默认科室id查询母的房间列表
-			// if (this.isMedicalMan) {
-			// 	this.queryRoomByDepartment({
-			// 		proId: this.proId, //项目ID 必输
-			// 		state: 0, // 状态默认传 0 即可
-			// 		depId: this.depId //科室ID
-			// 	})
-			// }
+			this.goalDepartmentDefaultIndex = [this.goalDepartmentOption.findIndex((item) => { return item.text == this.depName })];
+			this.currentGoalDepartment = this.depName;
+			// 登陆人员为医务人员时，根据默认科室id查询目的房间列表
+			if (this.isMedicalMan) {
+				this.getSpacesByDepartmentId(this.depId);
+			}
 		},
 		methods: {
 			...mapMutations([
@@ -417,13 +407,13 @@
 				},
 
 				// 并行查询科室、任务类型
-				parallelFunction (type) {
+				parallelFunction () {
 					this.showLoadingHint = true;
 					Promise.all([this.getAllDestination(),this.getTaskType(
 					{
 							proId: this.proId,
 							state: 0,
-							parentId: this.titleText.id
+							parentId: ''
 						}
 					)
 					])
@@ -445,10 +435,10 @@
 							};
 							if (item2) {
 								// 任务类型
-								for (let i = 0, len = item1.length; i < len; i++) {
+								for (let i = 0, len = item2.length; i < len; i++) {
 									this.taskTypeOption.push({
-										text: item1[i].typeName,
-										value: item1[i].id,
+										text: item2[i].typeName,
+										value: item2[i].id,
 										id: i
 									})
 								}
@@ -500,29 +490,22 @@
 
 				// 目的科室列点击事件
 				goalDepartmentClickEvent () {
-				if (this.currentStructure == '请选择') {
-					this.$refs.uToast.show({
-						message: '请选择建筑',
-						position: 'center'
-					})
-				} else {
-					this.getDepartmentByStructureId(this.structureOption.filter((item) => { return item['text'] == this.currentStructure})[0]['value'],true,false)
-				}
+				 this.showGoalDepartment = true
 				},
 
 				// 目的科室下拉选择框取消事件
 				goalDepartmentCancelEvent () {
-				this.showGoalDepartment = false
+				 this.showGoalDepartment = false
 				},
 
 				// 目的科室下拉选择框关闭事件
-				goalDepartmentCloseEvent () {
+				 goalDepartmentCloseEvent () {
 				this.showGoalDepartment = false
 				},
 
 				// 目的房间下拉选择框关闭事件
 				goalSpacesCloseEvent () {
-				this.showGoalSpaces = false
+				 this.showGoalSpaces = false
 				},
 
 				// 目的房间列点击事件
@@ -588,34 +571,43 @@
 				reportProblem(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
-						this.$refs.uToast.show({
-							message: '任务创建成功',
+						this.$refs.alertToast.show({
 							type: 'success',
-							position: 'center'
+							message: '提交成功!',
+							isShow: true
 						});
 						this.storeCurrentIndex(2);
 						uni.navigateTo({
 							url: '/projectManagementPackage/pages/realtimeTask/realtimeTask'
 						})
 					} else {
-						this.$refs.uToast.show({
-							message: res.data.msg,
+						this.$refs.alertToast.show({
 							type: 'error',
+							message: `${res.data.msg}!`,
+							isShow: true
 						})
-					};
+					}
 				})
 				.catch((err) => {
 					this.showLoadingHint = false;
-					this.$refs.uToast.show({
-						message: `${err}`,
-						type: 'error'
+					this.$refs.alertToast.show({
+						type: 'error',
+						message: `${err}!`,
+						isShow: true
 					})
 				})
 				},
 				
 				// 重置事件
 				resetEvent () {
-					
+					this.priorityRadioValue = '1';
+					this.goalDepartmentDefaultIndex = [0];
+					this.currentGoalDepartment = '请选择';
+					this.currentGoalSpaces = [];
+					this.taskTypeDefaultIndex = [0];
+					this.currentTaskType = '请选择';
+					this.imgArr = [];
+					this.taskDescribe = []
 				},
 				
 				// tabBar点击事件
@@ -718,7 +710,7 @@
 						margin-top: 6px;
 						.message-one-left {
 							width: 20%;
-							color: #101010
+							color: #9E9E9A;
 						};
 						.message-one-right {
 							flex: 1;

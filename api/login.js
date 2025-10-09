@@ -3,7 +3,7 @@ import request from '@/api/request';
 // 账号密码登录
 export function logIn(data) {
 	return request({
-	    url: 'nblink/auth/login',
+	    url: 'trans/login/login',
 	    method: 'post',
 	    data
 	  })
@@ -49,5 +49,13 @@ export function modificationPassword(data) {
     url: 'project/user/update-password',
     method: 'put',
     data
+  })
+};
+
+// 查询模板
+export function getTemplateType(proId) {
+  return request({
+    url: `trans/project/template/${proId}`,
+    method: 'get'
   })
 };

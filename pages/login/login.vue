@@ -1,6 +1,11 @@
 <template>
 	<view class="container">
-		<u-modal :show="modalShow" :content="modalContent"
+		<u-transition :show="showLoadingHint" mode="fade-down">
+			<view class="loading-box" v-if="showLoadingHint">
+				<u-loading-icon :show="showLoadingHint" :text="infoText" size="18" textSize="16"></u-loading-icon>
+			</view>
+		</u-transition>
+		<u-modal :show="modalShow" :title="modalContent"
 		 :showCancelButton="true" @confirm="sureCancel" @cancel="cancelSure">
 		</u-modal>
 		<u-toast ref="uToast"></u-toast>
@@ -73,7 +78,7 @@
 
 <script>
 	import { mapGetters, mapMutations } from 'vuex'
-	import {logIn} from '@/api/login.js'
+	import { logIn, getTemplateType } from '@/api/login.js'
 	import Qs from 'qs'
 	import { setCache, getCache, removeCache } from '@/common/js/utils'
 	import ScrollSelection from "@/components/scrollSelection/scrollSelection";
@@ -83,6 +88,8 @@
 	},
 		data() {
 			return {
+				showLoadingHint: false,
+				infoText: '登录中···',
 				form: {
 					username: '',
 					password: ''
@@ -94,18 +101,7 @@
           }
         ],
 				hospitalCampusDefaultIndex: [0],
-				hospitalCampusOption: [
-					{
-						text: '成都市妇女儿童医院',
-						value: 1,
-						id: 1
-					},
-					{
-						text: '都江堰人民医院',
-						value: 2,
-						id: 2
-					}
-				],
+				hospitalCampusOption: [],
 				showHospitalCampus: false,
 				currentHospitalCampusSpaces: '请选择',
 				
@@ -118,6 +114,7 @@
 		},
 		computed: {
 			...mapGetters([
+				'chooseHospitalArea'
 			])
 		},
 		mounted () {
@@ -130,7 +127,9 @@
 				'changeOverDueWay',
 				'changeTemplateType',
 				'changeToken',
-				'changeIsLogin'
+				'changeIsLogin',
+				'storeChooseHospitalArea',
+				'changeIsMedicalMan'
 			]),
       
       // 选中任一checkbox时，由checkbox-group触发
@@ -147,6 +146,12 @@
 				if (val) {
 					this.hospitalCampusDefaultIndex = [id]
 					this.currentHospitalCampusSpaces =  val;
+					this.storeChooseHospitalArea({
+						text: val,
+						value,
+						id
+					});
+					this.queryTemplateType(this.chooseHospitalArea['value'])
 				} else {
 					this.currentGoalSpaces = '请选择'
 				};
@@ -165,54 +170,85 @@
           
 			// 账号密码事件
 			sure () {
-				// this.showHospitalCampus = true;
-				// if (this.form.username === '' || this.form.password === '') {
-				// 	this.$refs.uToast.show({
-				// 		message: '账号或密码不能为空'
-				// 	});
-				// 	return;
-				// };
-				// let loginMessage = Qs.stringify({
-				//   username: this.form.username,
-				//   password: this.form.password
-				// });
-				// logIn(loginMessage).then((res) => {
-				// 	if (res) {
-				// 	  if (res.data.code == 200) {
-				// 		   this.changeOverDueWay(false);
-				// 		   setCache('storeOverDueWay',false); 
-				// 			// 登录用户名密码及用户信息存入Locastorage
-    //           // 判断是否勾选记住用户名密码
-    //           if (this.rememberAccountMessage) {
-    //             setCache('userName', this.form.username);
-    //             setCache('userPassword', this.form.password);
-    //           } else {
-    //             removeCache('userName', this.form.username);
-    //             removeCache('userPassword', this.form.password);
-    //           };
-				// 			// 登录用户信息存入store
-				// 			this.changeIsLogin(true);
-				// 			this.storeUserInfo(res.data.data);
-				// 			// 保存模板类型
-				// 			if (res.data.data.mobile) {
-				// 				this.changeTemplateType(res.data.data.mobile);
-				// 			};
-				// 			uni.switchTab({
-				// 				url: '/pages/index/index'
-				// 			})
-				// 	  } else {
-				// 		 this.modalShow = true;
-				// 		 this.modalContent = `${res.data.msg}`
-				// 	  }
-				// 	};
-				//   })
-				//   .catch((err) => {
-				// 	   this.modalShow = true;
-				// 	   this.modalContent = `${err}`
-				//   })
-				uni.switchTab({
+				if (this.form.username === '' || this.form.password === '') {
+					this.$refs.uToast.show({
+						message: '账号或密码不能为空'
+					});
+					return;
+				};
+				let loginMessage = {
+				  username: this.form.username,
+				  password: this.form.password,
+					logType: 1
+				};
+				this.showLoadingHint = true;
+				logIn(loginMessage).then((res) => {
+					this.showLoadingHint = false;
+					if (res) {
+					  if (res.data.code == 200) {
+						   this.changeOverDueWay(false);
+						   setCache('storeOverDueWay',false); 
+							// 登录用户名密码及用户信息存入Locastorage
+              // 判断是否勾选记住用户名密码
+              if (this.rememberAccountMessage) {
+                setCache('userName', this.form.username);
+                setCache('userPassword', this.form.password);
+              } else {
+                removeCache('userName', this.form.username);
+                removeCache('userPassword', this.form.password);
+              };
+							// 登录用户信息存入store
+							this.changeIsLogin(true);
+							this.storeUserInfo(res.data.data);
+							if (res.data.data['extendData']['user_type_id'] == 1) {
+							  this.changeIsMedicalMan(true)
+							} else {
+							  this.changeIsMedicalMan(false)
+							};
+							// 保存模板类型
+							if (res.data.data.mobile) {
+								this.changeTemplateType(res.data.data.mobile);
+							};
+							uni.switchTab({
 								url: '/pages/index/index'
 							})
+					  } else {
+						 this.modalShow = true;
+						 this.modalContent = `${res.data.msg}`
+					  }
+					};
+				  })
+				  .catch((err) => {
+						this.showLoadingHint = false;
+					  this.modalShow = true;
+					  this.modalContent = err;
+				  })
+			},
+			
+			// 查询模板类型
+			queryTemplateType (data) {
+			  this.showLoadingHint = true;
+				this.infoText = '查询中···';
+			  getTemplateType(data).then((res) => {
+				this.showLoadingHint = false;
+					if (res && res.data.code == 200) {
+						// 保存模板类型
+						if (res.data.data) {
+							this.changeTemplateType(res.data.data);
+						};
+						uni.switchTab({
+							url: '/pages/index/index'
+						})
+					} else {
+						this.modalShow = true;
+						this.modalContent = `${res.data.msg}`
+					}
+			  })
+			  .catch((err) => {
+					this.showLoadingHint = false;
+					this.modalShow = true;
+					this.modalContent = err.message;
+			  })
 			},
 			
 			// 弹框确定事件

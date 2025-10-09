@@ -87,7 +87,7 @@
 <script>
 import { mapGetters, mapMutations } from "vuex";
 import { setCache, removeAllLocalStorage } from '@/common/js/utils'
-import {queryTransportTypeClass} from '@/api/transport.js'
+import { queryTransportTypeClass } from '@/api/transport.js'
 import navBar from "@/components/zhouWei-navBar"
 export default {
   components: {
@@ -98,20 +98,7 @@ export default {
 			infoText: '加载中···',
 			tierNum: 0,
 			valueName: 0,
-			transTypeList: [
-				{
-					value: 1,
-					text: '标本'
-				},
-				{
-					value: 2,
-					text: '检查'
-				},
-				{
-					value: 3,
-					text: '药物文书'
-				}
-			],
+			transTypeList: [],
 			showLoadingHint: false
     }
   },
@@ -125,29 +112,41 @@ export default {
 			this.tierNum = pages.length;
 		}
   },
+	
+	onLoad() {
+		this.parallelFunctionTwo()
+	},
 
   watch: {},
 
   computed: {
-    ...mapGetters(["userInfo",'statusBarHeight','navigationBarHeight']),
-		// userName() {
-		// 	return this.userInfo.worker.name
-		// },
-		// userAccount() {
-		// 	return this.userInfo.username
-		// },
-		// proName () {
-		// 	return this.userInfo.worker['hospitalList'][0]['hospitalName']
-		// },
-		// proId() {
-		// 	return this.userInfo.worker['hospitalList'][0]['hospitalId']
-		// },
-		// workerId() {
-		// 	return this.userInfo.worker.id
-		// },
-		// depId() {
-		// 	return this.userInfo.worker['departments'][0]['id']
-		// }
+    ...mapGetters([
+			"userInfo",
+			'statusBarHeight',
+			'navigationBarHeight',
+			'chooseHospitalArea'
+		]),
+		userName() {
+			return this.userInfo['name']
+		},
+		proName () {
+		  return this.userInfo['proName']
+		},
+		proId() {
+			return this.userInfo['proId']
+		},
+		workerId() {
+			return this.userInfo['user']['id']
+		},
+		depId() {
+			return this.userInfo['depId'] === null ? '' : this.userInfo['depId']
+		},
+		depName() {
+			return this.userInfo['depName'] === null ? '' : this.userInfo['depName']
+		},
+		userAccount() {
+			return this.userInfo['userName']
+		}
   },
 
   methods: {

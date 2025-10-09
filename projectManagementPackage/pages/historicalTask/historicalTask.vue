@@ -321,24 +321,29 @@
 				'userBasicInfo',
 				'statusBarHeight',
 				'navigationBarHeight',
-				'templateType'
+				'templateType',
+				'chooseHospitalArea'
 			]),
-			// userName() {
-			// 	return this.userInfo.userName
-			// },
-			// proName () {
-			//   return this.userInfo.worker['hospitalList'][0]['hospitalName']
-			// },
-			// proId() {
-			// 	return this.userInfo.worker['hospitalList'][0]['hospitalId']
-			// },
-			// workerId() {
-			// 	return this.userInfo.worker.id
-			// },
-			// depId() {
-			// 	return this.userInfo.worker['departments'][0]['id']
-			// },
-			accountName() {
+			userName() {
+				return this.userInfo['name']
+			},
+			proName () {
+			  return this.userInfo['proName']
+			},
+			proId() {
+				return this.userInfo['proId']
+			},
+			workerId() {
+				return this.userInfo['user']['id']
+			},
+			depId() {
+				return this.userInfo['depId'] === null ? '' : this.userInfo['depId']
+			},
+			depName() {
+				return this.userInfo['depName'] === null ? '' : this.userInfo['depName']
+			},
+			userAccount() {
+				return this.userInfo['userName']
 			}
 		},
 		mounted() {

@@ -163,13 +163,13 @@ export function projectTaskCancelReason(data) {
 //   })
 // };
 
-// // 查询空间信息
-// export function querySpace(proId,depId) {
-//   return request({
-//     url: `project/bxSpace/queryAll?proId=${proId}&depId=${depId}`,
-//     method: 'get'
-//   })
-// };
+// 查询空间信息
+export function querySpace(proId,depId) {
+  return request({
+    url: `project/bxSpace/queryAll?proId=${proId}&depId=${depId}`,
+    method: 'get'
+  })
+};
 
 // // 查询维修员
 // export function getTransporter(proId) {

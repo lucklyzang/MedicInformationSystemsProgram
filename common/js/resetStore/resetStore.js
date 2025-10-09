@@ -6,8 +6,10 @@ export function getDefaultLoginState() {
 		affairToken: null, //事务订单专用token
 		isLogin: false,
 		overDueWay: false,
+		isMedicalMan: true,
 		templateType: '',
-		socketOpen: false
+		socketOpen: false,
+		chooseHospitalArea: {}
 	}	
 }
 

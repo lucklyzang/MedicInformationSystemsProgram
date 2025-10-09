@@ -30,7 +30,7 @@
 				</view>
 			</view>
 			<view class="department-box">
-				急症科-JZK
+				{{ depName }} - {{ depNum }}
 			</view>
 		</view>
 		<u-transition :show="showLoadingHint" mode="fade-down">
@@ -45,8 +45,6 @@
 		mapGetters,
 		mapMutations
 	} from 'vuex'
-	// import { getUserChatPage, getUserMessage, chatMessageRead } from '@/api/user.js'
-	// import { getTradeOrderUserCareInfo } from '@/api/orderForm.js'
 	import store from '@/store'
 	export default{
 		data() {
@@ -78,53 +76,37 @@
 				'socketOpen',
 				'statusBarHeight',
 				'navigationBarHeight',
-				'capsuleMessage'
+				'capsuleMessage',
+				'chooseHospitalArea'
 			]),
 			userName() {
-				return this.userInfo.userName
+				return this.userInfo['name']
 			},
-			// proName () {
-			//   return this.userInfo.worker['hospitalList'][0]['hospitalName']
-			// },
-			// proId() {
-			// 	return this.userInfo.worker['hospitalList'][0]['hospitalId']
-			// },
-			// workerId() {
-			// 	return this.userInfo.worker.id
-			// },
-			// depId() {
-			// 	return this.userInfo.worker['departments'][0]['id']
-			// },
-			// windowHeight() {
-			//   return this.rpxTopx(uni.getSystemInfoSync().windowHeight)
-			// },
-			// 键盘弹起来的高度+发送框高度
-			inputHeight(){
-				return this.bottomHeight+this.keyboardHeight
+			proName () {
+			  return this.userInfo['proName']
+			},
+			proId() {
+				return this.userInfo['proId']
+			},
+			workerId() {
+				return this.userInfo['user']['id']
+			},
+			depId() {
+				return this.userInfo['depId'] === null ? '' : this.userInfo['depId']
+			},
+			depName() {
+				return this.userInfo['depName'] === null ? '' : this.userInfo['depName']
+			},
+			depNum() {
+				if (this.userInfo.hasOwnProperty('depNum')) {
+					return this.userInfo['depNum'] === null ? '' : this.userInfo['depNum']
+				} else {
+					return ''
+				}
 			}
 		},
 		
 		onShow() {
-			// 获取用户基本信息
-			// getUserMessage().then((res) => {
-			// 	if ( res && res.data.code == 0) {
-			// 		this.changeUserBasicInfo(res.data.data);
-			// 		this.personPhotoSource = !this.userBasicInfo.avatar ? this.defaultPersonPhotoIconPng :  this.userBasicInfo.avatar;
-			// 	} else {
-			// 		this.$refs.uToast.show({
-			// 			title: res.data.msg,
-			// 			type: 'error',
-			// 			position: 'bottom'
-			// 		})
-			// 	}
-			// })
-			// .catch((err) => {
-			// 	this.$refs.uToast.show({
-			// 		title: err.message,
-			// 		type: 'error',
-			// 		position: 'bottom'
-			// 	})
-			// })
 		},
 		
 		onLoad(options) {

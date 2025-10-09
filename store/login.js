@@ -3,9 +3,17 @@ import { getDefaultLoginState } from '@/common/js/resetStore/resetStore.js'
 export default {	
 	state: getDefaultLoginState(),
 	getters: {
-		 userInfo:(state) => {
+		userInfo:(state) => {
 			state.userInfo = getCache('userInfo') ? getCache('userInfo') : {};
 			return state.userInfo
+		},
+		isMedicalMan:(state) => {
+			state.userInfo = getCache('isMedicalMan') ? getCache('isMedicalMan') === 'false' ? false : true : false;
+			return state.isMedicalMan
+		},
+		chooseHospitalArea:(state) => {
+			state.userInfo = getCache('chooseHospitalArea') ? getCache('chooseHospitalArea') : {};
+			return state.chooseHospitalArea
 		},
 		isLogin: (state) => {
 			state.isLogin = getCache('isLogin') ? getCache('isLogin') === 'false' ? false : true : false;
@@ -30,10 +38,19 @@ export default {
 		overDueWay: state => state.overDueWay
 	},
 	mutations: {
+		changeIsMedicalMan (state, playLoad) {
+		  state.isMedicalMan = playLoad
+		},
 		storeUserInfo(state, playLoad) {
 			if (playLoad && playLoad != 'null') {
 				setCache('userInfo', playLoad);
 				state.userInfo = playLoad
+			}
+		},
+		storeChooseHospitalArea(state, playLoad) {
+			if (playLoad && playLoad != 'null') {
+				setCache('chooseHospitalArea', playLoad);
+				state.chooseHospitalArea = playLoad
 			}
 		},
 		// 修改模板状态

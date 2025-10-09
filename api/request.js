@@ -12,12 +12,12 @@ const instance = axios.create({
 	retryDelay: 1000, // 每次重试间隔时间
 	timeout: 30000,
   headers: {
-    // common: {
-    //   'Accept': 'application/json, test/plain,'
-    // }
-    // post: {
-    //   'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
-    // }
+    common: {
+      'Accept': 'application/json, test/plain,'
+    },
+    post: {
+      'Content-Type': 'application/json; charset=utf-8'
+    }
   }
 });
 
@@ -54,10 +54,7 @@ function addSubscriber(callback) {
 // 添加请求拦截器
 instance.interceptors.request.use(function (config) {
 	config.headers['tenant-id'] = 1;
-	if (config['url'] == 'nblink/auth/login') {
-		config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-	};
-	if (config['url'].indexOf('nblink') == -1 && config['url'] != 'nblink/auth/login') {
+	if (config['url'].indexOf('nblink') == -1 && config['url'] != 'login/login') {
 		config.headers['Http_request_type'] = 'new';
 	};
 	if (store.getters.token) {
