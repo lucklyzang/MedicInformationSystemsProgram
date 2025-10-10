@@ -53,9 +53,10 @@ function addSubscriber(callback) {
 
 // 添加请求拦截器
 instance.interceptors.request.use(function (config) {
+	console.log('config',config['url']);
 	config.headers['tenant-id'] = 1;
-	if (config['url'].indexOf('nblink') == -1 && config['url'] != 'login/login') {
-		config.headers['Http_request_type'] = 'new';
+	if (config['url'].indexOf('nblink') == -1 && config['url'] != 'trans/login/login') {
+		// config.headers['Http_request_type'] = 'new';
 	};
 	if (store.getters.token) {
 	  config.headers['Authorization'] = `${store.getters.token}`
@@ -68,7 +69,7 @@ instance.interceptors.request.use(function (config) {
 				headers: {
 					'tenant-id': 1
 				},
-				baseURL: 'https://blink.blinktech.cn',
+				baseURL: 'https://show.blinktech.cn',
 				method: 'post',
 				url: `app-api/member/auth/refresh-token?refreshToken=${store.getters.userInfo['refreshToken']}`
 			 }).then(res => {

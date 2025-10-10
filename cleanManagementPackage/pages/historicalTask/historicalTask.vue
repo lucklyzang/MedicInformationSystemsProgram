@@ -268,7 +268,6 @@
 		computed: {
 			...mapGetters([
 				'userInfo',
-				'userBasicInfo',
 				'statusBarHeight',
 				'navigationBarHeight',
 				'templateType',
@@ -297,15 +296,16 @@
 			  }
 		},
 		mounted() {
-			// this.queryCompleteDispatchTask(
-			// 	{
-			// 	    proId : this.proId, // 所属项目id
-							// queryDate: '', // 查询时间
-							// managerId: this.workerId,// 保洁主管id 
-							// taskType: 0 // 0-即时，1-专项
-			//		  startDate: this.dateStart, endDate: this.dateEnd,
-			// 	}
-			// )
+			this.queryCompleteDispatchTask(
+				{
+				    state:5,
+						proId : this.proId, // 所属项目id
+						managerId: this.workerId,// 保洁主管id 
+						taskType: 0, // 0-即时，1-专项
+					  startDate: this.dateStart,
+						endDate: this.dateEnd,
+				}
+			)
 		},
 		methods: {
 			...mapMutations([
@@ -320,7 +320,6 @@
 			
 			// 开始日期弹框显示事件
 			showActionStart () {
-				console.log(1);
 				this.dateStartShow = true
 			},
 			
@@ -344,22 +343,24 @@
 				this.current = index['index'];
 				if (this.current == 0) {
 				  this.queryCompleteDispatchTask(
-					{
-					   proId : this.proId, // 所属项目id
-					   queryDate: '', // 查询时间
-					   managerId: this.workerId,// 保洁主管id 
-					   taskType: 0, // 0-即时，1-专项
-						 startDate: this.dateStart, endDate: this.dateEnd,
-					}
+						{
+							 state:5,
+							 proId : this.proId, // 所属项目id
+							 managerId: this.workerId,// 保洁主管id 
+							 taskType: 0, // 0-即时，1-专项
+							 startDate: this.dateStart,
+							 endDate: this.dateEnd
+						}
 				  )
 				} else {
 				  this.queryCompleteDispatchTask(
 					{
+					  state:6,
 					  proId : this.proId, // 所属项目id
-					  queryDate: '', // 查询时间
 					  managerId: this.workerId,// 保洁主管id 
 					  taskType: 0, // 0-即时，1-专项
-						startDate: this.dateStart, endDate: this.dateEnd
+					  startDate: this.dateStart,
+					  endDate: this.dateEnd,
 					}
 				  )
 				}
@@ -445,14 +446,14 @@
 				if (this.current == 0) {
 				  this.queryCompleteDispatchTask(
 						{
-							 proId:this.proId, createId:this.workerId,state:5,
+							 proId:this.proId, managerId:this.workerId,state:5,taskType: 0, // 0-即时，1-专项
 							 startDate: this.dateStart, endDate: this.dateEnd
 						}
 				  )
 				} else {
 				  this.queryCompleteDispatchTask(
 						{
-							 proId:this.proId, createId:this.workerId,state:6,
+							 proId:this.proId, managerId:this.workerId,state:6,taskType: 0, // 0-即时，1-专项
 							 startDate: this.dateStart, endDate: this.dateEnd
 						}
 				  )
@@ -488,7 +489,7 @@
 								priority: item.priority,
 								number: item.taskNumber,
 								id: item.id,
-								taskDesc: item.taskDesc,
+								taskDesc: item.taskRemark,
 								workerName: item.workerName
 							})
 						}
@@ -580,6 +581,7 @@
 		};
 		.content {
 			 flex: 1;
+			 overflow: auto;
 			 padding: 6px 4px;
 			 box-sizing: border-box;
 			 position: relative;
@@ -705,20 +707,26 @@
 						    };
 						    &:first-child {
 						      flex: 1;
-									display: flex;
-									align-items: center;
-									>text {
-										display: inline-block;
-										&:last-child {
-											margin-left: 4px;
-											flex: 1
-										}
-									}
+						      display: flex;
+						      align-items: center;
+						      >text {
+						      	display: inline-block;
+						      	&:first-child {
+						      		width: 180px;
+						      		height: 16px;
+						      		overflow: auto;
+						      	};
+						      	&:last-child {
+						      		margin-left: 4px;
+						      		flex: 1
+						      	}
+						      }
 						    };
 								&:nth-child(2) {
 									width: 60px;
 									display: flex;
 									align-items: center;
+									justify-content: center;
 									>image {
 										width: 22px;
 										height: 22px

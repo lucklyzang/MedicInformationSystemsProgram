@@ -5,11 +5,12 @@
 				<u-loading-icon :show="showLoadingHint" :text="infoText" size="18" textSize="16"></u-loading-icon>
 			</view>
 		</u-transition>
+		<light-hint ref="alertToast"></light-hint>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast" />
 		<!-- 取消订单原因弹框 -->
 		<view class="transport-rice-box" v-if="showCancelReason">
-			<ScrollSelection buttonLocation='top' v-model="showCancelReason" :pickerValues="canCelReasonDefaultIndex" :isShowSearch="false" :columns="CancelReasonOption" @sure="cancelReasonSureEvent" @cancel="cancelReasonCancelEvent" @close="cancelReasonCloseEvent" />
+			<ScrollSelection buttonLocation='top' v-model="showCancelReason" :pickerValues="canCelReasonDefaultIndex" :isShowSearch="false" :columns="cancelReasonOption" @sure="cancelReasonSureEvent" @cancel="cancelReasonCancelEvent" @close="cancelReasonCloseEvent" />
 		</view>
 		<view class="nav">
 			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="保洁管理" @backClick="backTo">
@@ -205,17 +206,19 @@
 		setCache,
 		removeAllLocalStorage
 	} from '@/common/js/utils'
-	import { queryCleaningManageTaskList, cancelTask, cancelTaskReason } from "@/api/environment.js";
+	import { queryCleaningManageTaskList, cancelTask, cancelTaskReason, cleanTaskReminder } from "@/api/environment.js";
 	import navBar from "@/components/zhouWei-navBar"
 	import ScrollSelection from "@/components/scrollSelection/scrollSelection";
+	import LightHint from "@/components/light-hint/light-hint.vue";
 	export default {
 		components: {
 			navBar,
-			ScrollSelection
+			ScrollSelection,
+			LightHint
 		},
 		data() {
 			return {
-				infoText: '开启中···',
+				infoText: '加载中···',
 				showLoadingHint: false,
 				valueName: 1,
 				list: [{name: '待办任务'}, {name: '进行中'}],
@@ -226,33 +229,12 @@
 				cancelReasonOption: [],
 				showCancelReason: false,
 				currentCancelReason: '请选择',
-				stateCompleteList: [
-					{
-						createTime: '2025-05-15　22：11',
-						planUseTime: '2025-05-15　22：11',
-						planStartTime: '2025-05-15　22：11',
-						patientInfoList: [],
-						state: 2,
-						setOutPlaceName: 'hi的撒旦',
-						destinationName: '既生克',
-						taskTypeName: 'Djakarta',
-						toolName: '平板车',
-						priority: 1,
-						number: 'd12',
-						quarantine: 1,
-						distName: '的急啊卡的',
-						destinations: '的急啊卡的',
-						patientName: '的急啊卡的',
-						bedNumber: 'b12',
-						workerName: '飒飒'
-					}
-				]
+				stateCompleteList: []
 			}
 		},
 		computed: {
 			...mapGetters([
 				'userInfo',
-				'userBasicInfo',
 				'statusBarHeight',
 				'navigationBarHeight',
 				'templateType',
@@ -281,14 +263,15 @@
 				}
 		},
 		mounted() {
-			// this.queryCompleteDispatchTask(
-			// 	{
-			// 	  	proId : this.proId, // 所属项目id
-							// queryDate: '', // 查询时间
-							// managerId: this.workerId,// 保洁主管id 
-							// taskType: 0 // 0-即时，1-专项
-			// 	},'待办'
-			// )
+			this.getEnvironmentOrderCancelReason();
+			this.queryCompleteDispatchTask(
+				{
+				  proId : this.proId, // 所属项目id
+					queryDate: '', // 查询时间
+					managerId: this.workerId,// 保洁主管id 
+					taskType: 0 // 0-即时，1-专项
+				},'待办任务'
+			)
 		},
 		methods: {
 			...mapMutations([
@@ -312,7 +295,7 @@
 					   queryDate: '', // 查询时间
 					   managerId: this.workerId,// 保洁主管id 
 					   taskType: 0 // 0-即时，1-专项
-					},'待办'
+					},'待办任务'
 				  )
 				} else {
 				  this.queryCompleteDispatchTask(
@@ -332,7 +315,7 @@
 				.then((res) => {
 					if (res && res.data.code == 200) {
 						for (let i = 0, len = res.data.data.length; i < len; i++) {
-							this.CancelReasonOption.push({
+							this.cancelReasonOption.push({
 								text: res.data.data[i]['cancelName'],
 								value: res.data.data[i]['id'],
 								id: i
@@ -359,7 +342,7 @@
 					this.cancelEnvironmentWorkerOrderMessageTask({
 						id: this.taskId, //当前任务ID
 						state: 7, //取消后的状态
-						cancelReason: this.this.currentCancelReason//取消原因
+						cancelReason: this.currentCancelReason//取消原因
 					})
 				} else {
 					this.currentCancelReason = '请选择'
@@ -437,16 +420,17 @@
 			queryCompleteDispatchTask (data,text) {
 			  this.noDataShow = false;
 			  this.showLoadingHint = true;
+				this.infoText = '查询中···';
 			  queryCleaningManageTaskList(data).then((res) => {
 				this.showLoadingHint = false;
 				if (res && res.data.code == 200) {
 				  this.stateCompleteList = [];
 					let temporaryDataList = [];
 				  if (res.data.data.length > 0) {
-						if (text == '待办') {
-							temporaryDataList = res.data.data.filter((item) => { return item.state != 7 && item.state != 0});
+						if (text == '待办任务') {
+							temporaryDataList = res.data.data.filter((item) => { return item.state == 0 || item.state == 1 || item.state == 2 });
 						} else {
-							temporaryDataList = res.data.data
+							temporaryDataList = res.data.data.filter((item) => { return item.state == 3 });
 						};
 						if (temporaryDataList.length > 0) {
 							this.noDataShow = false;
@@ -465,7 +449,7 @@
 								priority: item.priority,
 								number: item.taskNumber,
 								id: item.id,
-								taskDesc: item.taskDesc,
+								taskDesc: item.taskRemark,
 								workerName: item.workerName
 							})
 						}
@@ -490,10 +474,7 @@
 			 
 			// 取消事件
 			cancel (item) {
-				this.sureCancelShow = true;
-				this.cancelIndex = null;
-				this.taskCancelReason = '';
-				this.getEnvironmentOrderCancelReason();
+				this.showCancelReason = true;
 				this.taskId = item.id
 			},
 			
@@ -501,13 +482,13 @@
 			cancelEnvironmentWorkerOrderMessageTask (data) {
 				this.showLoadingHint = true;
 				this.infoText = '取消中···';
-			  cancelTask(data)
-			  .then((res) => {
+			  cancelTask(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
-						this.$refs.uToast.show({
-							message: `${res.data.msg}`,
-							type: 'success'
+						this.$refs.alertToast.show({
+							type: 'success',
+							message: '取消成功!',
+							isShow: true
 						});
 						this.queryCompleteDispatchTask({
 							proId : this.proId, // 所属项目id
@@ -516,42 +497,50 @@
 							taskType: 0 // 0-即时，1-专项
 						})
 					} else {
-					 this.$refs.uToast.show({
-						message: `${res.data.msg}`,
-						type: 'error'
-					 })
+						this.$refs.alertToast.show({
+							type: 'error',
+							message: `${res.data.msg}`,
+							isShow: true
+						})
 					}
 			  })
 			  .catch((err) => {
 					this.showLoadingHint = false;
-					this.$refs['environmentCancelOption'].clearSelectValue();
-					this.$refs.uToast.show({
+					this.$refs.alertToast.show({
+						type: 'error',
 						message: `${err}`,
-						type: 'error'
+						isShow: true
 					})
 			  })
 			},
 			  
 			// 保洁任务催单
 			reminder(item) {
-			  projectTaskReminder(this.proId,item.id).then((res) => {
+				this.showLoadingHint = true;
+				this.infoText = '催单中···';
+			  cleanTaskReminder(this.proId,item.id).then((res) => {
+					this.showLoadingHint = false;
 			    if (res && res.data.code == 200) {
-			      this.$refs.uToast.show({
-			        title: `${res.data.data}`,
-			        type: 'success'
+			      this.$refs.alertToast.show({
+			      	type: 'success',
+			      	message: '催单成功!',
+			      	isShow: true
 			      })
 			    } else {
-			      this.$refs.uToast.show({
-			        title: `${res.data.msg}`,
-			        type: 'warning'
-			      })
+						this.$refs.alertToast.show({
+							type: 'error',
+							message: `${res.data.msg}`,
+							isShow: true
+						})
 			    }
 			  })
 			  .catch((err) => {
-			    this.$refs.uToast.show({
-			      title: `${err.message}`,
-			      type: 'error'
-			    })
+					this.showLoadingHint = false;
+					this.$refs.alertToast.show({
+						type: 'success',
+						message: `${err.message}`,
+						isShow: true
+					})
 			  })
 			},
 			
@@ -631,6 +620,7 @@
 		};
 		.content {
 			 flex: 1;
+			 overflow: auto;
 			 padding: 6px 4px;
 			 box-sizing: border-box;
 			 position: relative;
@@ -717,6 +707,11 @@
 						      align-items: center;
 						      >text {
 						      	display: inline-block;
+						    		&:first-child {
+						    			width: 180px;
+						    			height: 16px;
+						    			overflow: auto;
+						    		};
 						      	&:last-child {
 						      		margin-left: 4px;
 						      		flex: 1
@@ -727,6 +722,7 @@
 									width: 60px;
 									display: flex;
 									align-items: center;
+									justify-content: center;
 									>image {
 										width: 22px;
 										height: 22px

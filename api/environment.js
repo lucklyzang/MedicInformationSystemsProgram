@@ -114,3 +114,11 @@ export function queryCleaningManageTaskList(data) {
         params: data
     })
 };
+
+// 保洁任务催单
+export function cleanTaskReminder(proId,taskId) {
+  return request({
+    url: `clean/bxTask/reminder/${proId}/${taskId}`,
+    method: 'get'
+  })
+};

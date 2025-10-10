@@ -39,7 +39,7 @@ export function reportProblem(data) {
 // 查询工程任务列表
 export function getMaintainTask(data) {
   return request({
-    url: 'bxTask/queryTask',
+    url: 'project/bxTask/queryTask',
     method: 'get',
     params: data
   })
@@ -48,7 +48,7 @@ export function getMaintainTask(data) {
 // 任务取消
 export function projectTaskCancel(data) {
   return request({
-    url: 'bxTask/cancelTask',
+    url: 'project/bxTask/cancelTask',
     method: 'put',
     data
   })
@@ -57,7 +57,7 @@ export function projectTaskCancel(data) {
 // 工程任务催单
 export function projectTaskReminder(proId,taskId) {
   return request({
-    url: `bxTask/reminder/${proId}/${taskId}`,
+    url: `project/bxTask/reminder/${proId}/${taskId}`,
     method: 'get'
   })
 };
@@ -65,7 +65,7 @@ export function projectTaskReminder(proId,taskId) {
 // 任务取消原因
 export function projectTaskCancelReason(data) {
   return request({
-    url: 'cancel/queryAll',
+    url: 'project/cancel/queryAll',
     method: 'get',
     params: data
   })

@@ -5,6 +5,7 @@
 				<u-loading-icon :show="showLoadingHint" :text="infoText" size="18" textSize="16"></u-loading-icon>
 			</view>
 		</u-transition>
+		<light-hint ref="alertToast"></light-hint>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast"></u-toast>
 		<view class="nav">
@@ -139,12 +140,14 @@
 		setCache,
 		removeAllLocalStorage
 	} from '@/common/js/utils'
-	import { addForthwithCleanTask, getAliyunSign } from '@/api/environment.js'
+	import { addForthwithCleanTask } from '@/api/environment.js'
 	import axios from 'axios-miniprogram'
 	import navBar from "@/components/zhouWei-navBar"
+	import LightHint from "@/components/light-hint/light-hint.vue"
 	export default {
 		components: {
-			navBar
+			navBar,
+			LightHint
 		},
 		data() {
 			return {
@@ -159,7 +162,7 @@
 				enterRemark: "",
 				locationValue: '请选择位置',
 				
-				priorityRadioValue: 1,
+				priorityRadioValue: '1',
 				resultimageList: [],
 				imageOnlinePathArr: [],
 				fileList: []
@@ -215,7 +218,13 @@
 			
 			// 重置事件
 			resetEvent () {
-			  this.backTo()
+				this.storeLocationMessage([]);
+			  this.enterRemark = "";
+			  this.locationValue = '请选择位置';
+			  this.priorityRadioValue = '1';
+			  this.resultimageList = [];
+			  this.imageOnlinePathArr = [];
+			  this.fileList = []
 			},
 		// 回显位置信息
 		echoLoactionMessage () {
@@ -317,13 +326,12 @@
 			this.showLoadingHint = true;
 			return new Promise((resolve, reject) => {
 				uni.uploadFile({
-				 url: 'https://blink.blinktech.cn/clean/oss/upload',
+				 url: 'https://show.blinktech.cn/clean/oss/upload',
 				 filePath: imgI,
 				 name: 'files',
 				 header: {
 					'content-type': 'multipart/form-data',
-					'Authorization': `${store.getters.token}`,
-					'HTTP_REQUEST_TYPE': 'new'
+					'Authorization': `${store.getters.token}`
 				 },
 				 success: (res) => {
 					if (res.statusCode == 200) {
@@ -414,11 +422,11 @@
 				id: this.locationMessage[3]['id'],
 				name: this.locationMessage[3]['name']
 			});
-			this.addForthwithCleanTask(paramsData) 
+			this.addForthwithCleanTaskEvent(paramsData) 
 		},
 
 		// 添加环境任务
-		addForthwithCleanTask (data) {
+		addForthwithCleanTaskEvent (data) {
 		 this.infoText = '创建中···';
 		 this.showLoadingHint = true;
 			addForthwithCleanTask(data).then((res) => {
@@ -426,107 +434,34 @@
 					this.imageOnlinePathArr = [];
 					this.fileList = [];
 					if (res && res.data.code == 200) {
-						this.$refs.uToast.show({
-							message: '任务创建成功',
+						this.$refs.alertToast.show({
 							type: 'success',
-							position: 'center'
+							message: '提交成功!',
+							isShow: true
 						});
-						this.resultimageList = [];
-						this.storeLocationMessage([]);
-						this.enterRemark = '';
-						this.priorityRadioValue = 1;
-						this.locationValue = '';
-						this.storeCurrentIndex(1);
-						uni.navigateTo({
-							url: '/cleanManagementPackage/pages/realtimeTask/realtimeTask'
-						})
+						this.resetEvent();
+						setTimeout(() => {
+							this.backTo();
+						},2000);
 					} else {
-						this.$refs.uToast.show({
-							message: res.data.msg,
+						this.$refs.alertToast.show({
 							type: 'error',
+							message: res.data.msg,
+							isShow: true
 						})
 					}
 				}).
 				catch((err) => {
-					this.$refs.uToast.show({
-						message: `${err}`,
-						type: 'error'
+					this.$refs.alertToast.show({
+						type: 'error',
+						message: err,
+						isShow: true
 					});
 					this.imageOnlinePathArr = [];
 					this.fileList = [];
 					this.showLoadingHint = false;
 			})
 		},
-		
-		// 获取阿里云签名接口
-			getSign (filePath = '') {
-				return new Promise((resolve, reject) => {
-					getAliyunSign().then((res) => {
-						if (res && res.data.code == 200) {
-							// 存储签名信息
-							this.changeOssMessage(res.data.data);
-							let temporaryTimeInfo = {};
-							temporaryTimeInfo['expire'] = Number(res.data.data.expire);
-							// 存储过期时间信息
-							this.changeTimeMessage(temporaryTimeInfo);
-							if (this.isExpire) {
-								this.uploadImageToOss(filePath)
-							};
-							this.isExpire = false;
-							resolve()
-						} else {
-							this.$refs.uToast.show({
-								message: res.data.data.msg,
-								type: 'error',
-							});
-							reject()
-						}
-					})
-					.catch((err) => {
-						this.$refs.uToast.show({
-							message: `${err}`,
-							type: 'error'
-						});
-						reject()
-					})
-				})	
-			},
-			
-			// 上传图片到阿里云服务器
-			uploadImageToOss (filePath) {
-				return new Promise((resolve, reject) => {
-					// OSS地址
-					const aliyunServerURL = this.ossMessage.host;
-					// 存储路径(后台固定位置+随即数+文件格式)
-					const aliyunFileKey = this.ossMessage.dir + new Date().getTime() + Math.floor(Math.random() * 100) + filePath.name;
-					// 临时AccessKeyID0
-					const OSSAccessKeyId = this.ossMessage.accessId;
-					// 加密策略
-					const policy = this.ossMessage.policy;
-					// 签名
-					const signature = this.ossMessage.signature;
-					let formData = new FormData();
-					formData.append('key',aliyunFileKey);
-					formData.append('policy',policy);
-					formData.append('OSSAccessKeyId',OSSAccessKeyId);
-					formData.append('success_action_status','200');
-					formData.append('Signature',signature);
-					formData.append('file',filePath);
-					axios({
-						url: aliyunServerURL,
-						method: 'post',
-						data: formData,
-						headers: {'Content-Type': 'multipart/form-data'}
-					}).then((res) => {
-						this.imageOnlinePathArr.push(`${aliyunServerURL}/${aliyunFileKey}`);
-						resolve();
-						console.log('阿里云图片',this.imageOnlinePathArr);
-					})
-					.catch((err) => {
-						reject()
-					})
-					})
-			},
 			
 			// 结果照片删除
 			issueDelete(index) {

@@ -5,6 +5,7 @@
 				<u-loading-icon :show="showLoadingHint" :text="infoText" size="18" textSize="16"></u-loading-icon>
 			</view>
 		</u-transition>
+		<u-modal :show="modalShow" title="确定退出登录?" :showCancelButton="true" @confirm="sureCancel" @cancel="cancelSure"></u-modal>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast" />
 		<view class="nav">
@@ -48,7 +49,7 @@
 			</view>
 		</view>
 		<view class="bottom-area">
-			<view class="quit-area">退出登录</view>
+			<view class="quit-area" @click="signOutEvent">退出登录</view>
 			<view class="version-area">当前版本 1.0.0</view>
 		</view>
 	</view>
@@ -60,13 +61,13 @@
 		mapMutations
 	} from 'vuex'
 	import _ from 'lodash'
-	
+	import store from '@/store'
 	import {
 		setCache,
 		removeAllLocalStorage,
 		fenToYuan
 	} from '@/common/js/utils'
-	import { } from '@/api/user.js'
+	import { userSignOut } from '@/api/login.js'
 	import navBar from "@/components/zhouWei-navBar"
 	export default {
 		components: {
@@ -76,6 +77,7 @@
 			return {
 				infoText: '开启中···',
 				showLoadingHint: false,
+				modalShow: false
 			}
 		},
 		computed: {
@@ -122,20 +124,34 @@
 				})
 			},
 			
-			// 获取用户基本信息
-			queryUserBasicMessage (flag) {
-				if (flag) {
-					this.showLoadingHint = true;
-					this.infoText = '加载中...';
-				};
-				getUserMessage().then((res) => {
-					if ( res && res.data.code == 0) {
-						this.changeUserBasicInfo(res.data.data);
-						this.personPhotoSource = !this.userBasicInfo.avatar ? this.defaultPersonPhotoIconPng :  this.userBasicInfo.avatar;
-						this.niceNameValue = !this.userBasicInfo.nickname ? this.niceNameValue : this.userBasicInfo.nickname;
-						this.isSendOrdersValue = this.userBasicInfo.receive;
-						this.isAuth = this.userBasicInfo.auth;
-						this.cashOut = this.userBasicInfo.cashOut;
+			// 退出登录事件
+			signOutEvent () {
+				this.modalShow = true;
+			},
+			
+			// 退出登录弹框确定事件
+			sureCancel () {
+				this.modalShow = false;
+				this.userSignOutEvent();
+			},
+			
+			// 弹框取消事件
+			cancelSure () {
+				this.modalShow = false;
+			},
+			
+			// 退出登录
+			userSignOutEvent () {
+				this.showLoadingHint = true;
+				this.infoText = '退出登录中...';
+				userSignOut(this.proId,this.workerId).then((res) => {
+					if ( res && res.data.code == 200) {
+						uni.redirectTo({
+							url: '/pages/login/login'
+						});
+						// 清空store和localStorage
+						removeAllLocalStorage();
+						store.dispatch('resetLoginState');
 					} else {
 						this.$refs.uToast.show({
 							message: res.data.msg,
@@ -143,14 +159,10 @@
 							position: 'bottom'
 						})
 					};
-					if (flag) {
-						this.showLoadingHint = false
-					}
+					this.showLoadingHint = false;
 				})
 				.catch((err) => {
-					if (flag) {
-						this.showLoadingHint = false
-					};
+					this.showLoadingHint = false;
 					this.$refs.uToast.show({
 						message: err.message,
 						type: 'error',

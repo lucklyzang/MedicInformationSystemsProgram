@@ -17,7 +17,7 @@
 		</view>
 		<!-- 目的房间 -->
 		<view class="transport-rice-box" v-if="showGoalSpaces">
-			<BottomSelect v-model="showGoalSpaces" :columns="goalSpacesOption" title="目的房间" :currentSelectData="currentGoalSpaces" @sure="goalSpacesSureEvent" @cancel="goalSpacesCancelEvent" @close="goalSpacesCloseEvent" />
+			<ScrollSelection v-model="showGoalSpaces" :pickerValues="goalSpacesDefaultIndex" :columns="goalSpacesOption" title="目的房间" :currentSelectData="currentGoalSpaces" @sure="goalSpacesSureEvent" @cancel="goalSpacesCancelEvent" @close="goalSpacesCloseEvent" :isShowSearch="true" />
 		</view>
 		<!-- 任务类型 -->
 		<view class="transport-rice-box" v-if="showTaskType">
@@ -172,11 +172,13 @@
 	import _ from 'lodash'
 	import ScrollSelection from "@/components/scrollSelection/scrollSelection";
 	import BottomSelect from "@/components/bottomSelect/bottomSelect";
+	import LightHint from "@/components/light-hint/light-hint.vue";
 	export default {
 		components: {
 			navBar,
 			ScrollSelection,
-			BottomSelect
+			BottomSelect,
+			LightHint
 		},
 		data() {
 			return {
@@ -204,7 +206,8 @@
 	
 				goalSpacesOption: [],
 				showGoalSpaces: false,
-				currentGoalSpaces: [],
+				goalSpacesDefaultIndex: [0],
+				currentGoalSpaces: '请选择',
 	
 				taskTypeOption: [],
 				taskTypeDefaultIndex: [0],
@@ -249,8 +252,10 @@
 			this.parallelFunction();
 		},
 		mounted () {
-			this.goalDepartmentDefaultIndex = [this.goalDepartmentOption.findIndex((item) => { return item.text == this.depName })];
-			this.currentGoalDepartment = this.depName;
+			if (this.depName) {
+				this.goalDepartmentDefaultIndex = [this.goalDepartmentOption.findIndex((item) => { return item.text == this.depName })];
+			};
+			this.currentGoalDepartment = this.depName == '' ? '请选择' :  this.depName;
 			// 登陆人员为医务人员时，根据默认科室id查询目的房间列表
 			if (this.isMedicalMan) {
 				this.getSpacesByDepartmentId(this.depId);
@@ -370,6 +375,17 @@
 				};
 				currentdate = currentDate.getFullYear() + seperator1 + month + seperator1 + strDate + ' ' + hour + seperator2 + minutes
 				return currentdate
+				},
+				
+				// 处理维修任务参与者
+				disposeTaskPresent (item) {
+					if (!item) { return '请选择'};
+					if (item.length == 0) { return '请选择'};
+					let temporaryArray = [];
+					for (let innerItem of item) {
+						temporaryArray.push(innerItem.text)
+					};
+					return temporaryArray.join('、')
 				},
 
 				// 根据科室查询房间信息
@@ -532,7 +548,7 @@
 
 				// 目的房间下拉选择框取消事件
 				goalSpacesCancelEvent () {
-				this.showGoalSpaces = false
+					this.showGoalSpaces = false
 				},
 				
 				// 确认事件
@@ -556,8 +572,8 @@
 					priority: this.priorityRadioValue,
 					taskRemark: this.taskDescribe, //任务描述
 					proId: this.proId,
-					workerId: this.currentTransporter == '请选择' ? '' : this.getCurrentTransporterIdByName(this.currentTransporter),
-					workerName: this.currentTransporter == '请选择' ? '' : this.currentTransporter,
+					workerId: this.workerId,
+					workerName: this.userAccount,
 					images: this.imgArr, // 问题图片信息 非必输
 					flag: this.isMedicalMan ? 1 : 0 // 上报人类型，0-维修人员，1-医护人员
 				};
@@ -576,10 +592,10 @@
 							message: '提交成功!',
 							isShow: true
 						});
-						this.storeCurrentIndex(2);
-						uni.navigateTo({
-							url: '/projectManagementPackage/pages/realtimeTask/realtimeTask'
-						})
+						setTimeout(() => {
+							this.backTo();
+						},2000);
+						this.resetEvent();
 					} else {
 						this.$refs.alertToast.show({
 							type: 'error',

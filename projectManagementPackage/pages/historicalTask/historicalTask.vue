@@ -279,7 +279,7 @@
 		},
 		data() {
 			return {
-				infoText: '开启中···',
+				infoText: '加载中···',
 				showLoadingHint: false,
 				valueName: 2,
 				noDataShow: false,
@@ -292,33 +292,12 @@
 				dateEndShow: false,
 				dateStartShow: false,
 				contactIsolationPng: require("@/static/img/contact-isolation.png"),
-				stateCompleteList: [
-					{
-						createTime: '2025-05-15　22：11',
-						finishTime: '2025-05-15　22：11',
-						finalFinishTime: '2025-05-15　22：11',
-						patientInfoList: [],
-						state: 2,
-						setOutPlaceName: 'hi的撒旦',
-						destinationName: '既生克',
-						taskTypeName: 'Djakarta',
-						toolName: '平板车',
-						priority: 1,
-						number: 'd12',
-						quarantine: 1,
-						distName: '的急啊卡的',
-						destinations: '的急啊卡的',
-						patientName: '的急啊卡的',
-						bedNumber: 'b12',
-						workerName: '飒飒'
-					}
-				]
+				stateCompleteList: []
 			}
 		},
 		computed: {
 			...mapGetters([
 				'userInfo',
-				'userBasicInfo',
 				'statusBarHeight',
 				'navigationBarHeight',
 				'templateType',
@@ -347,13 +326,13 @@
 			}
 		},
 		mounted() {
-			// this.queryCompleteDispatchTask(
-			// 	{
-			// 	   proId:this.proId, workerId:'',state: 7,
-			//		 startDate: this.dateStart, endDate: this.dateEnd,
-			// 	   departmentId: this.userInfo.depId
-			// 	}
-			// )
+			this.queryCompleteDispatchTask(
+				{
+				   proId:this.proId, workerId:'',state: 5,
+					 startDate: this.dateStart, endDate: this.dateEnd,
+				   departmentId: this.userInfo.depId
+				}
+			)
 		},
 		methods: {
 			...mapMutations([
@@ -368,7 +347,6 @@
 			
 			// 开始日期弹框显示事件
 			showActionStart () {
-				console.log(1);
 				this.dateStartShow = true
 			},
 			
@@ -499,12 +477,9 @@
 			queryCompleteDispatchTask (data) {
 			  this.noDataShow = false;
 			  this.showLoadingHint = true;
+				this.infoText = '查询中···';
 			  getDispatchTaskComplete(data).then((res) => {
 				this.showLoadingHint = false;
-				if (this.isFresh) {
-					uni.stopPullDownRefresh();
-					this.isFresh = false
-				};
 				if (res && res.data.code == 200) {
 				  this.stateCompleteList = [];
 					let temporaryDataList = [];
@@ -544,10 +519,6 @@
 				});
 				this.showLoadingHint = false;
 				this.noDataShow = true;
-				if (this.isFresh) {
-					uni.stopPullDownRefresh();
-					this.isFresh = false
-				}
 			  })
 			},
 			
@@ -620,6 +591,7 @@
 		};
 		.content {
 			 flex: 1;
+			 overflow: auto;
 			 padding: 6px 4px;
 			 box-sizing: border-box;
 			 position: relative;
@@ -745,20 +717,26 @@
 						    };
 						    &:first-child {
 						      flex: 1;
-									display: flex;
-									align-items: center;
-									>text {
-										display: inline-block;
-										&:last-child {
-											margin-left: 4px;
-											flex: 1
-										}
-									}
+						      display: flex;
+						      align-items: center;
+						      >text {
+						      	display: inline-block;
+						    		&:first-child {
+						    			width: 180px;
+						    			height: 16px;
+						    			overflow: auto;
+						    		};
+						      	&:last-child {
+						      		margin-left: 4px;
+						      		flex: 1
+						      	}
+						      }
 						    };
 								&:nth-child(2) {
 									width: 60px;
 									display: flex;
 									align-items: center;
+									justify-content: center;
 									>image {
 										width: 22px;
 										height: 22px

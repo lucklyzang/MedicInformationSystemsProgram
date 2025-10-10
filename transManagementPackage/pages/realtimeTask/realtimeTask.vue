@@ -5,11 +5,12 @@
 				<u-loading-icon :show="showLoadingHint" :text="infoText" size="18" textSize="16"></u-loading-icon>
 			</view>
 		</u-transition>
+		<light-hint ref="alertToast"></light-hint>
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast" />
 		<!-- 取消订单原因弹框 -->
 		<view class="transport-rice-box" v-if="showCancelReason">
-			<ScrollSelection buttonLocation='top' v-model="showCancelReason" :pickerValues="canCelReasonDefaultIndex" :isShowSearch="false" :columns="CancelReasonOption" @sure="cancelReasonSureEvent" @cancel="cancelReasonCancelEvent" @close="cancelReasonCloseEvent" />
+			<ScrollSelection buttonLocation='top' v-model="showCancelReason" :pickerValues="canCelReasonDefaultIndex" :isShowSearch="false" :columns="cancelReasonOption" @sure="cancelReasonSureEvent" @cancel="cancelReasonCancelEvent" @close="cancelReasonCloseEvent" />
 		</view>
 		<view class="nav">
 			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="运送" @backClick="backTo">
@@ -109,12 +110,16 @@
 						</view>
 						<view class="item-top-four">
 						  <view class="bed-number" v-if="templateType === 'template_one'">
-						  	<text>目的地: </text>
-						  	<text class="destina-list">{{ !item.destinationName  ? '无' : item.destinationName }}</text>
+						  	<view>目的地: </view>
+								<view>
+									<text class="destina-list">{{ !item.destinationName  ? '无' : item.destinationName }}</text>
+								</view>
 						  </view>
 						  <view class="bed-number" v-if="templateType === 'template_two'">
-						  	<text>目的地: </text>
-						  	<text class="destina-list" v-for="(innerItem,innerIndex) in item.destinations" :key="innerIndex">{{ item.destinations.length > 0 ? innerItem.destinationName : '无' }}</text>
+						  	<view>目的地: </view>
+								<view>
+									<text class="destina-list" v-for="(innerItem,innerIndex) in item.destinations" :key="innerIndex">{{ item.destinations.length > 0 ? innerItem.destinationName : '无' }}</text>
+									</view>
 						  </view>
 						</view>
 					</view>
@@ -199,12 +204,16 @@
 						</view>
 						<view class="item-top-four">
 						  <view class="bed-number" v-if="templateType === 'template_one'">
-						  	<text>目的地: </text>
-						  	<text class="destina-list">{{ !item.destinationName  ? '无' : item.destinationName }}</text>
+						  	<view>目的地: </view>
+						  	<view>
+						  		<text class="destina-list">{{ !item.destinationName  ? '无' : item.destinationName }}</text>
+						  	</view>
 						  </view>
 						  <view class="bed-number" v-if="templateType === 'template_two'">
-						  	<text>目的地: </text>
-						  	<text class="destina-list" v-for="(innerItem,innerIndex) in item.destinations" :key="innerIndex">{{ item.destinations.length > 0 ? innerItem.destinationName : '无' }}</text>
+						  	<view>目的地: </view>
+						  	<view>
+						  		<text class="destina-list" v-for="(innerItem,innerIndex) in item.destinations" :key="innerIndex">{{ item.destinations.length > 0 ? innerItem.destinationName : '无' }}</text>
+						  	</view>
 						  </view>
 						</view>
 					</view>
@@ -291,14 +300,16 @@
 	import {getDispatchTaskComplete, taskReminder, queryDispatchTaskCancelReason,updateDispatchTask} from '@/api/transport.js'
 	import navBar from "@/components/zhouWei-navBar"
 	import ScrollSelection from "@/components/scrollSelection/scrollSelection";
+	import LightHint from "@/components/light-hint/light-hint.vue";
 	export default {
 		components: {
 			navBar,
-			ScrollSelection
+			ScrollSelection,
+			LightHint
 		},
 		data() {
 			return {
-				infoText: '开启中···',
+				infoText: '加载中···',
 				showLoadingHint: false,
 				valueName: 1,
 				list: [{name: '待办任务'}, {name: '进行中'}],
@@ -309,33 +320,12 @@
 				cancelReasonOption: [],
 				showCancelReason: false,
 				currentCancelReason: '请选择',
-				stateCompleteList: [
-					{
-						createTime: '2025-05-15　22：11',
-						planUseTime: '2025-05-15　22：11',
-						planStartTime: '2025-05-15　22：11',
-						patientInfoList: [],
-						state: 2,
-						setOutPlaceName: 'hi的撒旦',
-						destinationName: '既生克',
-						taskTypeName: 'Djakarta',
-						toolName: '平板车',
-						priority: 1,
-						number: 'd12',
-						quarantine: 1,
-						distName: '的急啊卡的',
-						destinations: '的急啊卡的',
-						patientName: '的急啊卡的',
-						bedNumber: 'b12',
-						workerName: '飒飒'
-					}
-				]
+				stateCompleteList: []
 			}
 		},
 		computed: {
 			...mapGetters([
 				'userInfo',
-				'userBasicInfo',
 				'statusBarHeight',
 				'navigationBarHeight',
 				'templateType',
@@ -363,13 +353,14 @@
 				return this.userInfo['userName']
 			}
 		},
-		mounted() {  
-			// this.queryCompleteDispatchTask(
-			// 	{
-			// 	   proId:this.proId, workerId:'',state: -1,
-			// 	   departmentId: this.userInfo.depId
-			// 	},'待办'
-			// )
+		mounted() {
+			this.getDispatchTaskCancelReason();
+			this.queryCompleteDispatchTask(
+				{
+				   proId:this.proId, workerId:'',state: -1,
+				   departmentId: this.userInfo.depId
+				},'待办任务'
+			)
 		},
 		methods: {
 			...mapMutations([
@@ -390,7 +381,7 @@
 					{
 					   proId:this.proId, workerId:'',state: -1,
 					   departmentId: this.userInfo.depId
-					},'待办'
+					},'待办任务'
 				  )
 				} else {
 				  this.queryCompleteDispatchTask(
@@ -490,17 +481,14 @@
 			queryCompleteDispatchTask (data,text) {
 			  this.noDataShow = false;
 			  this.showLoadingHint = true;
+				this.infoText = '查询中···';
 			  getDispatchTaskComplete(data).then((res) => {
 				this.showLoadingHint = false;
-				if (this.isFresh) {
-					uni.stopPullDownRefresh();
-					this.isFresh = false
-				};
 				if (res && res.data.code == 200) {
 				  this.stateCompleteList = [];
 					let temporaryDataList = [];
 				  if (res.data.data.length > 0) {
-						if (text == '待办') {
+						if (text == '待办任务') {
 							temporaryDataList = res.data.data.filter((item) => { return item.state == 0 || item.state == 1 || item.state == 2});
 						} else {
 							temporaryDataList = res.data.data
@@ -542,24 +530,23 @@
 				}
 			  })
 			  .catch((err) => {
-				this.$refs.uToast.show({
-					title: `${err.message}`,
-					type: 'error'
-				});
-				this.showLoadingHint = false;
-				this.noDataShow = true;
-				if (this.isFresh) {
-					uni.stopPullDownRefresh();
-					this.isFresh = false
-				}
+					this.$refs.uToast.show({
+						title: `${err.message}`,
+						type: 'error'
+					});
+					this.showLoadingHint = false;
+					this.noDataShow = true;
 			  })
 			},
 			
 			// 获取取消原因列表
 			getDispatchTaskCancelReason (data) {
+				this.showLoadingHint = true;
+				this.infoText = '查询中···';
 				queryDispatchTaskCancelReason(data).then((res) => {
+					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
-					this.cancelReasonLlist = [];
+					this.cancelReasonOption = [];
 					for (let item of res.data.data) {
 						let temporaryWorkerMessageArray = [];
 						for (let innerItem in item) {
@@ -570,74 +557,88 @@
 							temporaryWorkerMessageArray.push(item[innerItem])
 						}
 						};
-						this.cancelReasonLlist.push({text: temporaryWorkerMessageArray[1], value: temporaryWorkerMessageArray[1]})
+						this.cancelReasonOption.push({text: temporaryWorkerMessageArray[1], value: temporaryWorkerMessageArray[1]})
 					};
 					}
 				})
 				.catch((err) => {
-					console.log(err)
+					this.$refs.uToast.show({
+						title: `${err.message}`,
+						type: 'error'
+					});
+					this.showLoadingHint = false;
 				})
 			},
 			
 			// 取消事件
 			cancel (item) {
-				this.sureCancelShow = true;
-				this.cancelIndex = null;
-				this.taskCancelReason = '';
-				this.getDispatchTaskCancelReason({proId: this.proId, state: 0});
+				this.showCancelReason = true;
 				this.taskId = item.id
 			},
 			
 			// 运送任务取消
 			cancelDispatchTask (data) {
-			  updateDispatchTask(data)
-			  .then((res) => {
-				if (res && res.data.code == 200) {
-				  this.$refs.uToast.show({
-				  	title: `${res.data.msg}`,
-				  	type: 'success'
-				  });
-				  this.queryCompleteDispatchTask(
-					{
-					   proId:this.proId, workerId:'',state: -1,
-					   departmentId: this.userInfo.depId
-					},'待办'
-				  )
-				} else {
-				 this.$refs.uToast.show({
-				 	title: `${res.data.msg}`,
-				 	type: 'success'
-				 })
-				}
+				this.showLoadingHint = true;
+				this.infoText = '取消中···';
+			  updateDispatchTask(data).then((res) => {
+					this.showLoadingHint = false;
+					if (res && res.data.code == 200) {
+						this.$refs.alertToast.show({
+							type: 'success',
+							message: '取消成功!',
+							isShow: true
+						});
+						this.queryCompleteDispatchTask(
+						{
+							 proId:this.proId, workerId:'',state: -1,
+							 departmentId: this.userInfo.depId
+						},'待办任务'
+						)
+					} else {
+						this.$refs.alertToast.show({
+							type: 'error',
+							message: '取消失败!',
+							isShow: true
+						})
+					}
 			  })
 			  .catch((err) => {
-				this.$refs.uToast.show({
-					title: `${err.message}`,
-					type: 'success'
-				})
+					this.showLoadingHint = false;
+					this.$refs.alertToast.show({
+						type: 'error',
+						message: `${err.message}`,
+						isShow: true
+					})
 			  })
 			},
 			  
 			// 运送任务催单
 			reminder(item) {
+				this.showLoadingHint = true;
+				this.infoText = '催单中···';
 			  taskReminder(this.proId,item.id).then((res) => {
+					this.showLoadingHint = false;
 			    if (res && res.data.code == 200) {
-			      this.$refs.uToast.show({
-			        title: `${res.data.data}`,
-			        type: 'success'
-			      })
+						this.$refs.alertToast.show({
+							type: 'success',
+							message: '催单成功!',
+							isShow: true
+						})
 			    } else {
-			      this.$refs.uToast.show({
-			        title: `${res.data.msg}`,
-			        type: 'warning'
+			      this.$refs.alertToast.show({
+			      	type: 'error',
+			      	message: '催单失败!',
+			      	isShow: true
 			      })
 			    }
 			  })
 			  .catch((err) => {
-			    this.$refs.uToast.show({
-			      title: `${err.message}`,
-			      type: 'error'
-			    })
+					this.showLoadingHint = false;
+					this.$refs.alertToast.show({
+						type: 'error',
+						message: `${err.message}`,
+						isShow: true
+					})
 			  })
 			},
 			
@@ -710,6 +711,7 @@
 		};
 		.content {
 			 flex: 1;
+			 overflow: auto;
 			 padding: 6px 4px;
 			 box-sizing: border-box;
 			 position: relative;
@@ -785,7 +787,6 @@
 							align-items: center;
 							border-bottom: 1px solid #BBBBBB;
 						  > view {
-						    word-break: break-all;
 						    font-size: 12px;
 						    text {
 						      color: #ACADAF;
@@ -796,6 +797,11 @@
 						      align-items: center;
 						      >text {
 						      	display: inline-block;
+										&:first-child {
+											width: 110px;
+											height: 16px;
+											overflow: auto;
+										};
 						      	&:last-child {
 						      		margin-left: 4px;
 						      		flex: 1
@@ -806,6 +812,7 @@
 									width: 60px;
 									display: flex;
 									align-items: center;
+									justify-content: center;
 									>image {
 										width: 22px;
 										height: 22px
@@ -948,25 +955,26 @@
 							 box-sizing: border-box;
 			 				 padding: 10px 12px;
 			 				 font-size: 12px;
-			 				 > view {
-								display: flex;
-			 					width: 100%;
-								word-break: break-all;
-			 					.destina-list {
-			 						color: #101010;
-			 						margin-right: 4px;
-			 					};
-			 					text {
-			 						display: inline-block;
-			 						&:first-child {
-			 							color: #101010;
-			 							margin-right: 4px
-			 						};
-									&:last-child {
-										flex: 1;
-									}
-			 					}
-			 				}
+							 .bed-number {
+								 display: flex;
+								 width: 100%;
+								 > view {
+								 	>text {
+								 		font-size: 12px;
+								 		color: #101010;
+								 	};
+								   &:first-child {
+								 		margin-right: 4px;
+								 	};
+								 	&:last-child {
+								 		flex: 1;
+								 		word-break: break-all;
+								 		>text {
+								 			margin-right: 4px;
+								 		}
+								 	}
+								 }
+							 }
 			 		  }
 			 		};
 			 		.item-bottom {

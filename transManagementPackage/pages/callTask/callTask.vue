@@ -5,6 +5,7 @@
    		<u-loading-icon :show="showLoadingHint" :text="infoText" size="18" textSize="16"></u-loading-icon>
    	</view>
    </u-transition>
+	 <light-hint ref="alertToast"></light-hint>
    <view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
    <u-toast ref="uToast" />
    <view class="nav">
@@ -135,8 +136,8 @@
 			<view class="message-one-right">
 				<u-radio-group v-model="priorityRadioValue" direction="horizontal">
 					<u-radio name="1" activeColor="#289E8E" labelColor="#289E8E" label="正常"></u-radio>
-					<u-radio name="2" activeColor="#E8CB51" labelColor="#E8CB51" label="紧急"></u-radio>
-					<u-radio name="3" activeColor="#F2A15F" labelColor="#F2A15F" label="重要"></u-radio>
+					<u-radio name="2" activeColor="#E8CB51" labelColor="#E8CB51" label="重要"></u-radio>
+					<u-radio name="3" activeColor="#F2A15F" labelColor="#F2A15F" label="紧急"></u-radio>
 					<u-radio name="4" activeColor="#E86F50" labelColor="#E86F50" label="紧急重要"></u-radio>
 				</u-radio-group>
 			</view>
@@ -362,12 +363,14 @@ import _ from 'lodash'
 import navBar from "@/components/zhouWei-navBar"
 import ScrollSelection from "@/components/scrollSelection/scrollSelection";
 import BottomSelect from "@/components/bottomSelect/bottomSelect";
+import LightHint from "@/components/light-hint/light-hint.vue";
 export default {
   components: {
     ScrollSelection,
     BottomSelect,
     StepNumberBox,
-		navBar
+		navBar,
+		LightHint
   },
   data() {
     return {
@@ -778,7 +781,7 @@ export default {
 					}
         })
           .catch((err) => {
-            reject({message:err})
+            reject({message:err.message})
           })
       })
     },
@@ -1349,28 +1352,29 @@ export default {
 			this.showLoadingHint = true;
       generateDispatchTask(data).then((res) => {
         if (res && res.data.code == 200) {
-					this.$refs.uToast.show({
-						message: '任务创建成功',
+					this.$refs.alertToast.show({
 						type: 'success',
-						position: 'center'
+						message: '提交成功!',
+						isShow: true
 					});
-					this.storeCurrentIndex(0);
-          uni.redirectTo({
-          	url: '/workerOrderMessagePackage/pages/workerOrderMessage/index/index'
-          });
+					setTimeout(() => {
+						this.backTo();
+					},2000);
         } else {
-          this.$refs.uToast.show({
-          	message: res.data.msg,
+          this.$refs.alertToast.show({
           	type: 'error',
+          	message: res.data.msg,
+          	isShow: true
           })
         };
         this.showLoadingHint = false;
       })
       .catch((err) => {
         this.showLoadingHint = false;
-        this.$refs.uToast.show({
-        	message: `${err}`,
-        	type: 'error'
+        this.$refs.alertToast.show({
+        	type: 'error',
+        	message: err,
+        	isShow: true
         })
       })
     },
@@ -1381,29 +1385,30 @@ export default {
 			this.showLoadingHint = true;
       generateDispatchTaskManyNew(data).then((res) => {
         if (res && res.data.code == 200) {
-					this.$refs.uToast.show({
-						message: '任务创建成功',
+					this.$refs.alertToast.show({
 						type: 'success',
-						position: 'center'
+						message: '提交成功!',
+						isShow: true
 					});
-					this.storeCurrentIndex(0);
-					uni.navigateTo({
-						url: '/transManagementPackage/pages/realtimeTask/realtimeTask'
-					})
+					setTimeout(() => {
+						this.backTo();
+					},2000);
         } else {
-          this.$refs.uToast.show({
-          	message: res.data.msg,
-          	type: 'error',
-          })
+					this.$refs.alertToast.show({
+						type: 'error',
+						message: res.data.msg,
+						isShow: true
+					})
         };
         this.showLoadingHint = false;
       })
       .catch((err) => {
         this.showLoadingHint = false;
-        this.$refs.uToast.show({
-        	message: `${err}`,
-        	type: 'error'
-        })
+				this.$refs.alertToast.show({
+					type: 'error',
+					message: err,
+					isShow: true
+				})
       })
     },
 
