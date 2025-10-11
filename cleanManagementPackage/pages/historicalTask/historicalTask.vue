@@ -218,9 +218,10 @@
 	import {
 		setCache,
 		removeAllLocalStorage,
-		fenToYuan
+		fenToYuan,
+		getDate
 	} from '@/common/js/utils'
-	import { queryCleaningManageTaskList } from "@/api/environment.js";
+	import { queryCleaningManageTaskListHistory } from "@/api/environment.js";
 	import navBar from "@/components/zhouWei-navBar"
 	import SOtime from '@/common/js/utils/SOtime.js'
 	export default {
@@ -229,40 +230,19 @@
 		},
 		data() {
 			return {
-				infoText: '开启中···',
+				infoText: '加载中···',
 				showLoadingHint: false,
 				valueName: 2,
 				noDataShow: false,
 				list: [{name: '已完成'}, {name: '已取消'}],
 				current: 0,
-				dateStart: SOtime.time8(new Date().getTime()),
-				dateEnd: SOtime.time8(new Date().getTime()),
-				dateStartValue: new Date().getTime(),
-				dateEndValue: new Date().getTime(),
+				dateStart: getDate(),
+				dateEnd: getDate(),
+				dateStartValue: Number(new Date(getDate())),
+				dateEndValue: Number(new Date(getDate())),
 				dateEndShow: false,
 				dateStartShow: false,
-				contactIsolationPng: require("@/static/img/contact-isolation.png"),
-				stateCompleteList: [
-					{
-						createTime: '2025-05-15　22：11',
-						finishTime: '2025-05-15　22：11',
-						finalFinishTime: '2025-05-15　22：11',
-						patientInfoList: [],
-						state: 2,
-						setOutPlaceName: 'hi的撒旦',
-						destinationName: '既生克',
-						taskTypeName: 'Djakarta',
-						toolName: '平板车',
-						priority: 1,
-						number: 'd12',
-						quarantine: 1,
-						distName: '的急啊卡的',
-						destinations: '的急啊卡的',
-						patientName: '的急啊卡的',
-						bedNumber: 'b12',
-						workerName: '飒飒'
-					}
-				]
+				stateCompleteList: []
 			}
 		},
 		computed: {
@@ -300,15 +280,16 @@
 				{
 				    state:5,
 						proId : this.proId, // 所属项目id
-						managerId: this.workerId,// 保洁主管id 
+						createId: this.workerId,// 保洁主管id 
 						taskType: 0, // 0-即时，1-专项
-					  startDate: this.dateStart,
-						endDate: this.dateEnd,
+					  beginTime: this.dateStart,
+						endTime: this.dateEnd
 				}
 			)
 		},
 		methods: {
 			...mapMutations([
+				'changeEnvironmentTaskMessage'
 			]),
 			
 			// 顶部导航返回事件
@@ -340,27 +321,34 @@
 			
 			// tab切换改变事件
 			tabChange (index) {
+				if (this.dateEndValue < this.dateStartValue) {
+					this.$refs.uToast.show({
+					  message: `结束日期不能小于开始日期`,
+					  type: 'warning'
+					});
+					return
+				};
 				this.current = index['index'];
 				if (this.current == 0) {
 				  this.queryCompleteDispatchTask(
 						{
 							 state:5,
 							 proId : this.proId, // 所属项目id
-							 managerId: this.workerId,// 保洁主管id 
+							 createId: this.workerId,// 保洁主管id 
 							 taskType: 0, // 0-即时，1-专项
-							 startDate: this.dateStart,
-							 endDate: this.dateEnd
+							 beginTime: this.dateStart,
+							 endTime: this.dateEnd
 						}
 				  )
 				} else {
 				  this.queryCompleteDispatchTask(
 					{
-					  state:6,
+					  state:7,
 					  proId : this.proId, // 所属项目id
-					  managerId: this.workerId,// 保洁主管id 
+					  createId: this.workerId,// 保洁主管id 
 					  taskType: 0, // 0-即时，1-专项
-					  startDate: this.dateStart,
-					  endDate: this.dateEnd,
+					  beginTime: this.dateStart,
+					  endTime: this.dateEnd
 					}
 				  )
 				}
@@ -370,6 +358,7 @@
 			startDateSure(e) {
 				this.dateStartShow = false;
 				this.dateStart = SOtime.time8(e.value);
+				this.dateStartValue = e.value;
 				if (this.dateEndValue < this.dateStartValue){
 					this.$refs.uToast.show({
 					  message: `结束日期不能小于开始日期`,
@@ -383,6 +372,7 @@
 			endDateSure(e) {
 				this.dateEndShow = false;
 				this.dateEnd = SOtime.time8(e.value);
+				this.dateEndValue = e.value;
 				if (this.dateEndValue < this.dateStartValue) {
 					this.$refs.uToast.show({
 					  message: `结束日期不能小于开始日期`,
@@ -413,8 +403,11 @@
 			//任务状态转换
 			stateTransfer (num) {
 				switch(num) {
+						case 0:
+							return '未分配'
+							break;
 						case 1:
-								return '未开始'
+								return '未查阅'
 								break;
 						case 2:
 								return '未开始'
@@ -443,18 +436,33 @@
 			
 			// 筛选事件
 			filtrateEvent () {
+				if (this.dateEndValue < this.dateStartValue) {
+					this.$refs.uToast.show({
+					  message: `结束日期不能小于开始日期`,
+					  type: 'warning'
+					});
+					return
+				};
 				if (this.current == 0) {
 				  this.queryCompleteDispatchTask(
 						{
-							 proId:this.proId, managerId:this.workerId,state:5,taskType: 0, // 0-即时，1-专项
-							 startDate: this.dateStart, endDate: this.dateEnd
+							state:5,
+							proId : this.proId, // 所属项目id
+							createId: this.workerId,// 保洁主管id 
+							taskType: 0, // 0-即时，1-专项
+							beginTime: this.dateStart,
+							endTime: this.dateEnd
 						}
 				  )
 				} else {
 				  this.queryCompleteDispatchTask(
 						{
-							 proId:this.proId, managerId:this.workerId,state:6,taskType: 0, // 0-即时，1-专项
-							 startDate: this.dateStart, endDate: this.dateEnd
+							state:7,
+							proId : this.proId, // 所属项目id
+							createId: this.workerId,// 保洁主管id 
+							taskType: 0, // 0-即时，1-专项
+							beginTime: this.dateStart,
+							endTime: this.dateEnd
 						}
 				  )
 				}
@@ -464,13 +472,14 @@
 			queryCompleteDispatchTask (data) {
 			  this.noDataShow = false;
 			  this.showLoadingHint = true;
-			  queryCleaningManageTaskList(data).then((res) => {
+				this.infoText = '加载中···';
+				this.stateCompleteList = [];
+				let temporaryDataList = [];
+			  queryCleaningManageTaskListHistory(data).then((res) => {
 				this.showLoadingHint = false;
 				if (res && res.data.code == 200) {
-				  this.stateCompleteList = [];
-					let temporaryDataList = [];
 				  if (res.data.data.length > 0) {
-						this.temporaryDataList = res.data.data;
+						temporaryDataList = res.data.data;
 						if (temporaryDataList.length > 0) {
 							this.noDataShow = false;
 						} else {
@@ -496,19 +505,20 @@
 				  } else {
 						this.noDataShow = true
 				  }
+				} else {
+					this.$refs.uToast.show({
+						message: `${res.data.msg}`,
+						type: 'error'
+					})
 				}
 			  })
 			  .catch((err) => {
-				this.$refs.uToast.show({
-					message: `${err.message}`,
-					type: 'error'
-				});
-				this.showLoadingHint = false;
-				this.noDataShow = true;
-				if (this.isFresh) {
-					uni.stopPullDownRefresh();
-					this.isFresh = false
-				}
+					this.$refs.uToast.show({
+						message: `${err.message}`,
+						type: 'error'
+					});
+					this.showLoadingHint = false;
+					this.noDataShow = true;
 			  })
 			},
 			

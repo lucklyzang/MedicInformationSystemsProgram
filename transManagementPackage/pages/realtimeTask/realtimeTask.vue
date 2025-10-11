@@ -90,7 +90,7 @@
 								<text>{{!item.toolName ? '无' : item.toolName}}</text>
 							</view>
 						  <view class="transport-people">
-								<text>运送人:</text>
+								<text>运送员:</text>
 						  	<text>{{!item.workerName ? '无' : item.workerName}}</text>
 						  </view>
 						</view>
@@ -184,7 +184,7 @@
 								<text>{{!item.toolName ? '无' : item.toolName}}</text>
 							</view>
 						  <view class="transport-people">
-								<text>运送人:</text>
+								<text>运送员:</text>
 						  	<text>{{!item.workerName ? '无' : item.workerName}}</text>
 						  </view>
 						</view>
@@ -400,8 +400,9 @@
 					this.currentCancelReason=  val;
 					this.cancelDispatchTask({
 						proId: this.proId,	//当前项目ID
-						taskId: this.taskId, //当前任务ID
-						reason: this.currentCancelReason //取消原因
+						id: this.taskId, //当前任务ID
+						reason: this.currentCancelReason, //取消原因
+						state: 6
 					})
 				} else {
 					this.currentCancelReason = '请选择'
@@ -482,11 +483,11 @@
 			  this.noDataShow = false;
 			  this.showLoadingHint = true;
 				this.infoText = '查询中···';
+				this.stateCompleteList = [];
+				let temporaryDataList = [];
 			  getDispatchTaskComplete(data).then((res) => {
 				this.showLoadingHint = false;
 				if (res && res.data.code == 200) {
-				  this.stateCompleteList = [];
-					let temporaryDataList = [];
 				  if (res.data.data.length > 0) {
 						if (text == '待办任务') {
 							temporaryDataList = res.data.data.filter((item) => { return item.state == 0 || item.state == 1 || item.state == 2});
@@ -527,7 +528,12 @@
 				  } else {
 						this.noDataShow = true
 				  }
-				}
+				} else {
+						this.$refs.uToast.show({
+							message: `${res.data.msg}`,
+							type: 'error'
+						})
+					}
 			  })
 			  .catch((err) => {
 					this.$refs.uToast.show({
@@ -546,19 +552,24 @@
 				queryDispatchTaskCancelReason(data).then((res) => {
 					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
-					this.cancelReasonOption = [];
-					for (let item of res.data.data) {
-						let temporaryWorkerMessageArray = [];
-						for (let innerItem in item) {
-						if (innerItem == 'id') {
-							temporaryWorkerMessageArray.push(item[innerItem])
-						};
-						if (innerItem == 'cancelName') {
-							temporaryWorkerMessageArray.push(item[innerItem])
+						this.cancelReasonOption = [];
+						for (let item of res.data.data) {
+							let temporaryWorkerMessageArray = [];
+							for (let innerItem in item) {
+							if (innerItem == 'id') {
+								temporaryWorkerMessageArray.push(item[innerItem])
+							};
+							if (innerItem == 'cancelName') {
+								temporaryWorkerMessageArray.push(item[innerItem])
+							}
+							};
+							this.cancelReasonOption.push({text: temporaryWorkerMessageArray[1], value: temporaryWorkerMessageArray[1]})
 						}
-						};
-						this.cancelReasonOption.push({text: temporaryWorkerMessageArray[1], value: temporaryWorkerMessageArray[1]})
-					};
+					} else {
+						this.$refs.uToast.show({
+							message: `${res.data.msg}`,
+							type: 'error'
+						})
 					}
 				})
 				.catch((err) => {
@@ -636,7 +647,7 @@
 					this.showLoadingHint = false;
 					this.$refs.alertToast.show({
 						type: 'error',
-						message: `${err.message}`,
+						message: `${err.message}!`,
 						isShow: true
 					})
 			  })
@@ -987,7 +998,7 @@
 			 				height: 60px;
 			 				display: flex;
 			 				align-items: center;
-			 				justify-content: space-between;
+			 				justify-content: flex-end;
 			 				> view {
 								width: 45%;
 								height: 30px;
@@ -1005,6 +1016,7 @@
 			 				.right  {
 								color: #E86F50;
 								background: #fff;
+								margin-left: 14px;
 								border: 1px solid #E86F50;
 								box-sizing: border-box;
 			 				}

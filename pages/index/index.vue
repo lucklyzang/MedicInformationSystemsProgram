@@ -56,14 +56,17 @@
 				serviceList: [
 					{
 						text: '中央运送',
+						value: 'trans',
 						url: '/static/img/trans-icon.png'
 					},
 					{
 						text: '工程维修',
+						value: 'project',
 						url: '/static/img/project-icon.png'
 					},
 					{
 						text: '保洁管理',
+						value: 'clean',
 						url: '/static/img/clean-icon.png'
 					}
 				]
@@ -107,19 +110,7 @@
 		},
 		
 		onShow() {
-		},
-		
-		onLoad(options) {
-			uni.onKeyboardHeightChange(res => {
-				//这里正常来讲代码直接写
-				//this.keyboardHeight=this.rpxTopx(res.height)就行了
-				//但是之前界面ui设计聊天框的高度有点高,为了不让键盘和聊天输入框之间距离差太大所以我改动了一下。
-				this.keyboardHeight = this.rpxTopx(res.height)
-				if(this.keyboardHeight<0)this.keyboardHeight = 0
-			})
-		},
-		
-		onUnload() {
+			this.controlServiceManageModuleShowEvent()
 		},
 		
 		methods: {
@@ -128,6 +119,17 @@
 				'storeCurrentIndex',
 				'storeLocationMessage'
 			]),
+			
+			// 控制服务管理模块显示隐藏
+			controlServiceManageModuleShowEvent () {
+				if (this.userInfo['extendData'].hasOwnProperty('systems')) {
+					this.serviceList.map((value,index,arr) => {
+						if (this.userInfo['extendData']['systems'].indexOf(value['value']) == -1) {
+							arr.splice(index,1)
+						}
+					})
+				}
+			},
 			
 			// 格式化时间
 			getNowFormatDate(currentDate,type) {

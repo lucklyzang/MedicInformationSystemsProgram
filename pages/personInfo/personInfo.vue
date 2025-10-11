@@ -83,7 +83,6 @@
 		computed: {
 			...mapGetters([
 				'userInfo',
-				'userBasicInfo',
 				'statusBarHeight',
 				'navigationBarHeight',
 				'chooseHospitalArea'

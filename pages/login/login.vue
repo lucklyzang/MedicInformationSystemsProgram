@@ -179,7 +179,7 @@
 				let loginMessage = {
 				  username: this.form.username,
 				  password: this.form.password,
-					logType: 1
+					logType: 0
 				};
 				this.showLoadingHint = true;
 				logIn(loginMessage).then((res) => {

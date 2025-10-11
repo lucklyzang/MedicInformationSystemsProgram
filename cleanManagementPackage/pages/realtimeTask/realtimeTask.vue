@@ -224,7 +224,6 @@
 				list: [{name: '待办任务'}, {name: '进行中'}],
 				current: 0,
 				noDataShow: false,
-				contactIsolationPng: require("@/static/img/contact-isolation.png"),
 				cancelReasonDefaultIndex: [0],
 				cancelReasonOption: [],
 				showCancelReason: false,
@@ -381,8 +380,11 @@
 			//任务状态转换
 			stateTransfer (num) {
 				switch(num) {
+						case 0:
+							return '未分配'
+							break;
 						case 1:
-								return '未开始'
+								return '未查阅'
 								break;
 						case 2:
 								return '未开始'
@@ -421,11 +423,11 @@
 			  this.noDataShow = false;
 			  this.showLoadingHint = true;
 				this.infoText = '查询中···';
+				this.stateCompleteList = [];
+				let temporaryDataList = [];
 			  queryCleaningManageTaskList(data).then((res) => {
 				this.showLoadingHint = false;
 				if (res && res.data.code == 200) {
-				  this.stateCompleteList = [];
-					let temporaryDataList = [];
 				  if (res.data.data.length > 0) {
 						if (text == '待办任务') {
 							temporaryDataList = res.data.data.filter((item) => { return item.state == 0 || item.state == 1 || item.state == 2 });
@@ -456,6 +458,11 @@
 				  } else {
 						this.noDataShow = true
 				  }
+				} else {
+					this.$refs.uToast.show({
+						message: `${res.data.msg}`,
+						type: 'error'
+					})
 				}
 			  })
 			  .catch((err) => {
@@ -495,11 +502,11 @@
 							queryDate: '', // 查询时间
 							managerId: this.workerId,// 保洁主管id 
 							taskType: 0 // 0-即时，1-专项
-						})
+						},'待办任务')
 					} else {
 						this.$refs.alertToast.show({
 							type: 'error',
-							message: `${res.data.msg}`,
+							message: `${res.data.msg}!`,
 							isShow: true
 						})
 					}
@@ -508,7 +515,7 @@
 					this.showLoadingHint = false;
 					this.$refs.alertToast.show({
 						type: 'error',
-						message: `${err}`,
+						message: `${err}!`,
 						isShow: true
 					})
 			  })
@@ -529,7 +536,7 @@
 			    } else {
 						this.$refs.alertToast.show({
 							type: 'error',
-							message: `${res.data.msg}`,
+							message: `${res.data.msg}!`,
 							isShow: true
 						})
 			    }
@@ -537,8 +544,8 @@
 			  .catch((err) => {
 					this.showLoadingHint = false;
 					this.$refs.alertToast.show({
-						type: 'success',
-						message: `${err.message}`,
+						type: 'error',
+						message: `${err.message}!`,
 						isShow: true
 					})
 			  })
@@ -807,7 +814,7 @@
 			 				height: 60px;
 			 				display: flex;
 			 				align-items: center;
-			 				justify-content: space-between;
+			 				justify-content: flex-end;
 			 				> view {
 								width: 45%;
 								height: 30px;
@@ -824,6 +831,7 @@
 			 				};
 			 				.right  {
 								color: #E86F50;
+								margin-left: 14px;
 								background: #fff;
 								border: 1px solid #E86F50;
 								box-sizing: border-box;

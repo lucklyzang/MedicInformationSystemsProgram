@@ -391,6 +391,7 @@
 				return
 			};
 			let paramsData = {
+				createId: this.workerId,
 				managerId: this.workerId, // 保洁主管id，当前登陆人员id
 				managerName: this.userName,// 保洁主管姓名，当前登陆人员姓名
 				assignId: this.workerId, // 任务分配人员id，当前登陆人员id

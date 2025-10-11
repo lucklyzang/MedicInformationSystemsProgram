@@ -287,11 +287,10 @@
 				current: 0,
 				dateStart: SOtime.time8(new Date().getTime()),
 				dateEnd: SOtime.time8(new Date().getTime()),
-				dateStartValue: new Date().getTime(),
-				dateEndValue: new Date().getTime(),
+				dateStartValue: Number(new Date()),
+				dateEndValue: Number(new Date()),
 				dateEndShow: false,
 				dateStartShow: false,
-				contactIsolationPng: require("@/static/img/contact-isolation.png"),
 				stateCompleteList: []
 			}
 		},
@@ -328,9 +327,8 @@
 		mounted() {
 			this.queryCompleteDispatchTask(
 				{
-				   proId:this.proId, workerId:'',state: 5,
-					 startDate: this.dateStart, endDate: this.dateEnd,
-				   departmentId: this.userInfo.depId
+				   proId:this.proId, createId:this.workerId,state:5,
+				   startDate: this.dateStart, endDate: this.dateEnd
 				}
 			)
 		},
@@ -341,7 +339,7 @@
 			// 顶部导航返回事件
 			backTo () {
 				uni.redirectTo({
-					url: '/cleanManagementPackage/pages/callTask/callTask'
+					url: '/projectManagementPackage/pages/callTask/callTask'
 				})
 			},
 			
@@ -359,12 +357,19 @@
 			
 			// tab切换改变事件
 			tabChange (index) {
+				if (this.dateEndValue < this.dateStartValue) {
+					this.$refs.uToast.show({
+					  message: `结束日期不能小于开始日期`,
+					  type: 'warning'
+					});
+					return
+				};
 				this.current = index['index'];
 				if (this.current == 0) {
 				  this.queryCompleteDispatchTask(
 					{
 					   proId:this.proId, createId:this.workerId,state:5,
-						 startDate: this.dateStart, endDate: this.dateEnd,
+						 startDate: this.dateStart, endDate: this.dateEnd
 					}
 				  )
 				} else {
@@ -381,6 +386,7 @@
 			startDateSure(e) {
 				this.dateStartShow = false;
 				this.dateStart = SOtime.time8(e.value);
+				this.dateStartValue = e.value;
 				if (this.dateEndValue < this.dateStartValue){
 					this.$refs.uToast.show({
 					  message: `结束日期不能小于开始日期`,
@@ -394,6 +400,7 @@
 			endDateSure(e) {
 				this.dateEndShow = false;
 				this.dateEnd = SOtime.time8(e.value);
+				this.dateEndValue = e.value;
 				if (this.dateEndValue < this.dateStartValue) {
 					this.$refs.uToast.show({
 					  message: `结束日期不能小于开始日期`,
@@ -456,6 +463,13 @@
 			
 			// 筛选事件
 			filtrateEvent () {
+				if (this.dateEndValue < this.dateStartValue) {
+					this.$refs.uToast.show({
+					  message: `结束日期不能小于开始日期`,
+					  type: 'warning'
+					});
+					return
+				};
 				if (this.current == 0) {
 				  this.queryCompleteDispatchTask(
 						{
@@ -473,18 +487,18 @@
 				}
 			},
 			
-			// 查询运送任务
+			// 查询工程任务
 			queryCompleteDispatchTask (data) {
 			  this.noDataShow = false;
 			  this.showLoadingHint = true;
 				this.infoText = '查询中···';
-			  getDispatchTaskComplete(data).then((res) => {
+				this.stateCompleteList = [];
+				let temporaryDataList = [];
+			  getMaintainTask(data).then((res) => {
 				this.showLoadingHint = false;
 				if (res && res.data.code == 200) {
-				  this.stateCompleteList = [];
-					let temporaryDataList = [];
 				  if (res.data.data.length > 0) {
-						this.temporaryDataList = res.data.data;
+						temporaryDataList = res.data.data;
 						if (temporaryDataList.length > 0) {
 							this.noDataShow = false;
 						} else {
@@ -510,7 +524,12 @@
 				  } else {
 						this.noDataShow = true
 				  }
-				}
+				} else {
+						this.$refs.uToast.show({
+							message: `${res.data.msg}`,
+							type: 'error'
+						})
+					}
 			  })
 			  .catch((err) => {
 				this.$refs.uToast.show({

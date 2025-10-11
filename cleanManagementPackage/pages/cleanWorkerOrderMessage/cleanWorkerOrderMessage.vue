@@ -13,7 +13,7 @@
 		</view>
 		<!-- 图片放大弹框  -->
 		<view class="image-dislog-box">
-			 <u-modal :show="imageBoxShow" :closeOnClickOverlay="true" confirmText="关闭" @confirm="imageBoxShow = false">
+			 <u-modal :show="imageBoxShow" :closeOnClickOverlay="true" confirmText="关闭" @confirm="confirmEvent">
 				 <template v-slot:default>
 					<image :src="currentimageUrl" mode="widthFix" style="width:100%"/>
 				 </template>
@@ -44,7 +44,7 @@
       </view>
 			<view class="location">
 			  <text>优先级</text>
-			  <text>{{environmentTaskMessage.createTime }}</text>
+			  <text>{{environmentTaskMessage.priority }}</text>
 			</view>
 			<view class="issue-picture">
 			  <view>图片</view>
@@ -56,33 +56,33 @@
 			  <text>问题描述</text>
 			  <text>{{ environmentTaskMessage.taskRemark}}</text>
 			</view>
-			<view class="location">
-			  <text>开始时间</text>
-			  <text>{{environmentTaskMessage.createTime }}</text>
+			<view class="location" v-if="environmentTaskMessage.state == 7">
+			  <text>取消原因</text>
+			  <text>{{environmentTaskMessage.cancelReason }}</text>
 			</view>
-      <view class="location">
+			<view class="location" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 5">
+			  <text>开始时间</text>
+			  <text>{{environmentTaskMessage.startTime }}</text>
+			</view>
+      <view class="location" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 5">
         <text>保洁主管</text>
         <text>{{ !environmentTaskMessage.managerName ? '未选择' : environmentTaskMessage.managerName }}</text>
       </view>
-      <view class="location-other">
+      <view class="location-other" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 5">
         <view class="location-other-left">
-          <text v-show="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 8" class="sign">*</text>
           <text class="cleaner">保洁员</text>
         </view>
-				<view class="location-other-right" v-if="environmentTaskMessage.state == 2 || environmentTaskMessage.state == 3 || environmentTaskMessage.state == 8">
-					{{ !environmentTaskMessage.workerName ? '未选择' : environmentTaskMessage.workerName }}
-				</view>
-				<view class="location-other-right-other" v-if="environmentTaskMessage.state != 2 && environmentTaskMessage.state != 3 && environmentTaskMessage.state != 8">
+				<view class="location-other-right" >
 					{{ !environmentTaskMessage.workerName ? '未选择' : environmentTaskMessage.workerName }}
 				</view>
       </view>
-      <view class="issue-picture">
+      <view class="issue-picture" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 5">
         <view>结果图片</view>
         <view class="image-list">
           <image :src="item.path" mode="widthFix" alt="" v-for="(item,index) in problemPicturesEchoList" :key="index" @click="enlareEvent(item)">
         </view>
       </view>
-			<view class="location problem-description">
+			<view class="location problem-description" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 5">
 			  <text>备注</text>
 			  <text>{{ environmentTaskMessage.taskRemark}}</text>
 			</view>
@@ -158,13 +158,18 @@ export default {
 			this.tierNum = pages.length;
 		};
 		this.taskId = this.environmentTaskMessage.id;
-		// this.getForthwithCleanTaskDetailsEvent(this.taskId);
+		this.getForthwithCleanTaskDetailsEvent(this.taskId);
 	},
   methods: {
     ...mapMutations([
 			'storeCurrentIndex',
 			'changeEnvironmentTaskMessage'
 		]),
+		
+		// 图片放大弹框关闭事件
+		confirmEvent () {
+			this.imageBoxShow = false
+		},
 		
 		// 提取图片事件
 		getResultimageList () {
@@ -191,8 +196,7 @@ export default {
 		getForthwithCleanTaskDetailsEvent (id) {
 			this.showLoadingHint = true;
 			this.infoText = '加载中···'
-			getForthwithCleanTaskDetails(id)
-			.then((res) => {
+			getForthwithCleanTaskDetails(id).then((res) => {
 				this.showLoadingHint = false;
 				if (res && res.data.code == 200) {
 					this.changeEnvironmentTaskMessage(res.data.data);
@@ -212,69 +216,6 @@ export default {
 				})
 			})
 		},
-	
-    // 环境订单的取消
-    cancelEnvironmentWorkerOrderMessageTask (data) {
-    	this.showLoadingHint = true;
-    	this.infoText = '取消中···'
-      cancelTask(data)
-      .then((res) => {
-    		this.showLoadingHint = false;
-    		this.$refs['environmentCancelOption'].clearSelectValue()
-    		if (res && res.data.code == 200) {
-    			this.$refs.uToast.show({
-    				message: `${res.data.msg}`,
-    				type: 'success'
-    			});
-					this.storeCurrentIndex(1);
-					this.backTo();
-    		} else {
-    		 this.$refs.uToast.show({
-    			message: `${res.data.msg}`,
-    			type: 'error'
-    		 })
-    		}
-      })
-      .catch((err) => {
-    		this.showLoadingHint = false;
-    		this.$refs['environmentCancelOption'].clearSelectValue();
-    		this.$refs.uToast.show({
-    			message: `${err}`,
-    			type: 'error'
-    		})
-      })
-    },
-    
-    // 环境订单取消原因弹框下拉框选值变化事件
-    environmentCancelReasonOptionChange (item) {
-      this.environmentCancelReasonValue = item.value;	
-      this.environmentSelectCancelReason = item;
-    },
-    
-    // 环境订单取消原因弹框确定事件
-    environmentCancelReasonDialogSure () {
-      if (this.environmentSelectCancelReason.value == null) {
-    		this.$refs.uToast.show({
-    			message: '请选择取消原因',
-					position: 'bottom'
-    		});
-    		return 
-    	} else {
-				this.environmentCancelReasonShow = false;
-			};
-      // 环境订单取消
-    	this.cancelEnvironmentWorkerOrderMessageTask({
-    		id: this.taskId, //当前任务ID
-    		state: 7, //取消后的状态
-    		cancelReason: this.environmentSelectCancelReason['text'] //取消原因
-    	})
-    },
-    
-    // 环境订单取消原因弹框取消事件
-    environmentCancelReasonDialogCancel () {
-    	this.environmentCancelReasonShow = false;
-      this.$refs['environmentCancelOption'].clearSelectValue()
-    },
 
     // 提取即时保洁功能区信息
     extractSpaceMessage (spaces) {
@@ -291,51 +232,35 @@ export default {
     // 任务状态转换
     stausTransfer (num) {
       switch(num) {
+        case 0:
+        	return '未分配'
+        	break;
         case 1:
-            return '未开始'
-            break;
+        		return '未查阅'
+        		break;
         case 2:
-            return '未开始'
-            break;
+        		return '未开始'
+        		break;
         case 3:
-            return '进行中'
-            break;
+        		return '进行中'
+        		break;
         case 4:
-            return '待复核'
-            break;
+        		return '待复核'
+        		break;
         case 5:
-            return '已完成'
-            break;
+        		return '已完成'
+        		break;
         case 6:
-            return '已复核'
-            break;
-				case 7:
-				    return '已取消'
-				    break;
+        		return '已复核'
+        		break;
+        case 7:
+        		return '已取消'
+        		break
         case 8:
-            return '复核中'
-            break
+        		return '复核中'
+        		break
       } 
     },
-
-    // 取消订单点击事件
-    cancelTaskEvent () {
-			this.environmentCancelReasonOption = this.allOrderCancelReason['environmentCancelReason'];
-			this.environmentCancelReasonShow = true
-    },
-		
-		// 修改订单事件
-		editEvent () {
-			if (this.tierNum == 10) {
-				uni.redirectTo({
-					url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationEnvironmentWorkerOrder/modificationEnvironmentWorkerOrder'
-				})
-			} else {
-				uni.navigateTo({
-					url: '/modificationWorkerOrderPackage/pages/modificationWorkerOrder/modificationEnvironmentWorkerOrder/modificationEnvironmentWorkerOrder'
-				})
-			}
-		},
 
     // 格式化时间
     getNowFormatDate(currentDate) {   
@@ -439,7 +364,7 @@ page {
         display: inline-block;
         &:first-child {
           flex: 1;
-          color: #289E8E;
+          color: #9C9C9C;
           padding-right: 4px;
           box-sizing: border-box;
           @include no-wrap();
@@ -500,10 +425,10 @@ page {
         font-size: 14px;
         display: inline-block;
         &:first-child {
-          color: #a1a0a0
+          color: #9C9C9C;
         };
         &:last-child {
-          color: #101010;
+          color: #000000;
           flex: 1;
           text-align: right;
           line-height: 24px;
@@ -563,10 +488,14 @@ page {
       }
     };
     .problem-description {
+			flex-direction: column;
       >text {
-        &:last-child {
-        text-align: left !important
-        }
+        width: 100%;
+				display: inline-block;
+				&:last-child {
+					text-align: left;
+					padding-left: 0 !important;
+				}
       }
     };
     .issue-picture {
@@ -574,17 +503,14 @@ page {
       margin-bottom: 6px;
       box-sizing: border-box;
       display: flex;
+			flex-direction: column;
       background: #fff;
-      justify-content: space-between;
       >view {
         font-size: 14px;
         color: #a1a0a0;
         &:first-child {
-
         };
         &:last-child {
-          flex: 1;
-          margin-left: 8px;
           >image {
             width: 31%;
             margin-right: 2%;

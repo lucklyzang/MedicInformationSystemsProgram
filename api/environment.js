@@ -115,6 +115,15 @@ export function queryCleaningManageTaskList(data) {
     })
 };
 
+// 查询保洁管理任务列表(历史任务)
+export function queryCleaningManageTaskListHistory(data) {
+    return request({
+        url: 'clean/cleanTask/app/history',
+        method: 'get',
+        params: data
+    })
+};
+
 // 保洁任务催单
 export function cleanTaskReminder(proId,taskId) {
   return request({
