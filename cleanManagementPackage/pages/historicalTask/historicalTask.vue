@@ -15,7 +15,7 @@
 			<u-datetime-picker mode="date" :show="dateEndShow" v-model="dateEndValue" @cancel="dateEndShow = false" @confirm="endDateSure"></u-datetime-picker>
 		</view>
 		<view class="nav">
-			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="保洁管理" @backClick="backTo">
+			<nav-bar :home="false" :isShowBackText="true" :isHomeText="true" backState='3000' fontColor="#FFF" bgColor="none" title="保洁管理" @backClick="backTo">
 			</nav-bar> 
 		</view>
 		<view class="content">
@@ -218,7 +218,6 @@
 	import {
 		setCache,
 		removeAllLocalStorage,
-		fenToYuan,
 		getDate
 	} from '@/common/js/utils'
 	import { queryCleaningManageTaskListHistory } from "@/api/environment.js";
@@ -238,8 +237,8 @@
 				current: 0,
 				dateStart: getDate(),
 				dateEnd: getDate(),
-				dateStartValue: Number(new Date(getDate())),
-				dateEndValue: Number(new Date(getDate())),
+				dateStartValue: this.normalizeTimestamp(),
+				dateEndValue: this.normalizeTimestamp(),
 				dateEndShow: false,
 				dateStartShow: false,
 				stateCompleteList: []
@@ -294,9 +293,7 @@
 			
 			// 顶部导航返回事件
 			backTo () {
-				uni.redirectTo({
-					url: '/cleanManagementPackage/pages/callTask/callTask'
-				})
+				uni.navigateBack()
 			},
 			
 			// 开始日期弹框显示事件
@@ -317,6 +314,13 @@
 				uni.navigateTo({
 					url: '/cleanManagementPackage/pages/cleanWorkerOrderMessage/cleanWorkerOrderMessage'
 				})
+			},
+			
+			// 将时间戳转换为当天的 00:00:00
+			normalizeTimestamp () {
+			  const date = new Date();
+			  date.setHours(0, 0, 0, 0);
+			  return Number(date)
 			},
 			
 			// tab切换改变事件

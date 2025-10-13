@@ -40,7 +40,7 @@
 			</view>
       <view class="location">
         <text>位置</text>
-        <text>{{ `${environmentTaskMessage.structureName}${environmentTaskMessage.depName}${environmentTaskMessage.areaImmediateName}${extractSpaceMessage(environmentTaskMessage.spaces)}` }}</text>
+        <text>{{ `${environmentTaskMessage.structureName}-${environmentTaskMessage.depName}-${environmentTaskMessage.areaImmediateName}-${extractSpaceMessage(environmentTaskMessage.spaces)}` }}</text>
       </view>
 			<view class="location">
 			  <text>优先级</text>
@@ -60,15 +60,15 @@
 			  <text>取消原因</text>
 			  <text>{{environmentTaskMessage.cancelReason }}</text>
 			</view>
-			<view class="location" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 5">
+			<view class="location" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 4 || environmentTaskMessage.state == 5 || environmentTaskMessage.state == 8">
 			  <text>开始时间</text>
 			  <text>{{environmentTaskMessage.startTime }}</text>
 			</view>
-      <view class="location" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 5">
+      <view class="location" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 4 || environmentTaskMessage.state == 5 || environmentTaskMessage.state == 8">
         <text>保洁主管</text>
         <text>{{ !environmentTaskMessage.managerName ? '未选择' : environmentTaskMessage.managerName }}</text>
       </view>
-      <view class="location-other" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 5">
+      <view class="location-other" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 4 || environmentTaskMessage.state == 5 || environmentTaskMessage.state == 8">
         <view class="location-other-left">
           <text class="cleaner">保洁员</text>
         </view>
@@ -76,13 +76,13 @@
 					{{ !environmentTaskMessage.workerName ? '未选择' : environmentTaskMessage.workerName }}
 				</view>
       </view>
-      <view class="issue-picture" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 5">
+      <view class="issue-picture" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 4 || environmentTaskMessage.state == 5 || environmentTaskMessage.state == 8">
         <view>结果图片</view>
         <view class="image-list">
           <image :src="item.path" mode="widthFix" alt="" v-for="(item,index) in problemPicturesEchoList" :key="index" @click="enlareEvent(item)">
         </view>
       </view>
-			<view class="location problem-description" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 5">
+			<view class="location problem-description" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 4 || environmentTaskMessage.state == 5 || environmentTaskMessage.state == 8">
 			  <text>备注</text>
 			  <text>{{ environmentTaskMessage.taskRemark}}</text>
 			</view>

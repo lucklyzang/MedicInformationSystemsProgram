@@ -13,7 +13,7 @@
 			<ScrollSelection buttonLocation='top' v-model="showCancelReason" :pickerValues="canCelReasonDefaultIndex" :isShowSearch="false" :columns="cancelReasonOption" @sure="cancelReasonSureEvent" @cancel="cancelReasonCancelEvent" @close="cancelReasonCloseEvent" />
 		</view>
 		<view class="nav">
-			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="运送" @backClick="backTo">
+			<nav-bar :home="false" :isShowBackText="true" :isHomeText="true" backState='3000' fontColor="#FFF" bgColor="none" title="运送" @backClick="backTo">
 			</nav-bar> 
 		</view>
 		<view class="content">
@@ -42,7 +42,7 @@
 				<u-empty text="数据为空" mode="list"></u-empty>
 			</view>
 			<view class="task-tail-content" v-show="current == 0">
-				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" :key="index">
+				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" @click="enterTaskMessage(item)" :key="index">
 					<view class="item-title">
 						<view class="item-top-one">
 							<view class="number">
@@ -126,17 +126,17 @@
 					<view class="item-bottom">
 						<view class="item-bottom-right">
 							<view class="left">
-								<text @click="reminder(item)">催单</text>
+								<text @click.stop="reminder(item)">催单</text>
 							</view>
 							<view class="right" v-show="item.state !== 3">
-								<text @click="cancel(item)">取消订单</text>
+								<text @click.stop="cancel(item)">取消订单</text>
 							</view>
 						</view>
 					</view>
 				</view>
 			</view>
 			<view class="task-tail-content task-tail-content-going" v-show="current == 1">
-				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" :key="index">
+				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" @click="enterTaskMessage(item)" :key="index">
 					<view class="item-title">
 						<view class="item-top-one">
 							<view class="number">
@@ -215,16 +215,6 @@
 						  		<text class="destina-list" v-for="(innerItem,innerIndex) in item.destinations" :key="innerIndex">{{ item.destinations.length > 0 ? innerItem.destinationName : '无' }}</text>
 						  	</view>
 						  </view>
-						</view>
-					</view>
-					<view class="item-bottom">
-						<view class="item-bottom-right">
-							<view class="left">
-								<text @click="reminder(item)">催单</text>
-							</view>
-							<view class="right" v-show="item.state !== 3">
-								<text @click="cancel(item)">取消订单</text>
-							</view>
 						</view>
 					</view>
 				</view>
@@ -364,12 +354,19 @@
 		},
 		methods: {
 			...mapMutations([
+				'changeTransTaskMessage'
 			]),
 			
 			// 顶部导航返回事件
 			backTo () {
-				uni.redirectTo({
-					url: '/transManagementPackage/pages/index/index'
+				uni.navigateBack()
+			},
+			
+			// 进入订单详情事件
+			enterTaskMessage (item) {
+				this.changeTransTaskMessage(item);
+				uni.navigateTo({
+					url: '/transManagementPackage/pages/transportWorkerOrderMessage/transportWorkerOrderMessage'
 				})
 			},
 			
@@ -522,6 +519,7 @@
 								endPhoto: item.endPhoto,
 								isBack: item.isBack,
 								isSign: item.isSign,
+								tempFlag: item.tempFlag,
 								workerName: item.workerName
 							})
 						}
@@ -600,10 +598,10 @@
 							isShow: true
 						});
 						this.queryCompleteDispatchTask(
-						{
-							 proId:this.proId, workerId:'',state: -1,
-							 departmentId: this.userInfo.depId
-						},'待办任务'
+							{
+								 proId:this.proId, workerId:'',state: -1,
+								 departmentId: this.userInfo.depId
+							},'待办任务'
 						)
 					} else {
 						this.$refs.alertToast.show({
@@ -634,7 +632,13 @@
 							type: 'success',
 							message: '催单成功!',
 							isShow: true
-						})
+						});
+						this.queryCompleteDispatchTask(
+							{
+								 proId:this.proId, workerId:'',state: -1,
+								 departmentId: this.userInfo.depId
+							},'待办任务'
+						)
 			    } else {
 			      this.$refs.alertToast.show({
 			      	type: 'error',

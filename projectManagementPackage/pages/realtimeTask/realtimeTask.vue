@@ -13,7 +13,7 @@
 			<ScrollSelection buttonLocation='top' v-model="showCancelReason" :pickerValues="canCelReasonDefaultIndex" :isShowSearch="false" :columns="cancelReasonOption" @sure="cancelReasonSureEvent" @cancel="cancelReasonCancelEvent" @close="cancelReasonCloseEvent" />
 		</view>
 		<view class="nav">
-			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="工程维修" @backClick="backTo">
+			<nav-bar :home="false" :isShowBackText="true" :isHomeText="true" backState='3000' fontColor="#FFF" bgColor="none" title="工程维修" @backClick="backTo">
 			</nav-bar> 
 		</view>
 		<view class="content">
@@ -42,7 +42,7 @@
 				<u-empty text="数据为空" mode="list"></u-empty>
 			</view>
 			<view class="task-tail-content" v-show="current == 0">
-				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" :key="index">
+				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" @click="enterTaskMessage(item)" :key="index">
 					<view class="item-title">
 						<view class="item-top-one">
 							<view class="number">
@@ -95,17 +95,17 @@
 					<view class="item-bottom">
 						<view class="item-bottom-right">
 							<view class="left">
-								<text @click="reminder(item)">催单</text>
+								<text @click.stop="reminder(item)">催单</text>
 							</view>
 							<view class="right" v-show="item.state !== 3">
-								<text @click="cancel(item)">取消订单</text>
+								<text @click.stop="cancel(item)">取消订单</text>
 							</view>
 						</view>
 					</view>
 				</view>
 			</view>
 			<view class="task-tail-content task-tail-content-going" v-show="current == 1">
-				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" :key="index">
+				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" @click="enterTaskMessage(item)" :key="index">
 					<view class="item-title">
 						<view class="item-top-one">
 							<view class="number">
@@ -153,16 +153,6 @@
 						<view class="item-top-four">
 						 <text>任务描述:</text>
 						 <text>{{!item.taskDesc ? '无' : item.taskDesc}}</text>
-						</view>
-					</view>
-					<view class="item-bottom">
-						<view class="item-bottom-right">
-							<view class="left">
-								<text @click="reminder(item)">催单</text>
-							</view>
-							<view class="right" v-show="item.state !== 3">
-								<text @click="cancel(item)">取消订单</text>
-							</view>
 						</view>
 					</view>
 				</view>
@@ -300,13 +290,12 @@
 		},
 		methods: {
 			...mapMutations([
+				'changeProjectTaskMessage'
 			]),
 			
 			// 顶部导航返回事件
 			backTo () {
-				uni.redirectTo({
-					url: '/projectManagementPackage/pages/callTask/callTask'
-				})
+				uni.navigateBack()
 			},
 			
 			// tab切换改变事件
@@ -322,7 +311,7 @@
 				} else {
 				  this.queryCompleteDispatchTask(
 					{
-					   proId:this.proId, createId:this.workerId,state: 3,
+					   proId:this.proId, createId:this.workerId,state: -6,
 					   startDate: '', endDate: ''
 					},'进行中'
 				  )
@@ -353,6 +342,14 @@
 			// 取消原因下拉选择框关闭事件
 			cancelReasonCloseEvent () {
 				this.showCancelReason = false
+			},
+			
+			// 进入订单详情事件
+			enterTaskMessage (item) {
+				this.changeProjectTaskMessage(item);
+				uni.navigateTo({
+					url: '/projectManagementPackage/pages/projectWorkerOrderMessage/projectWorkerOrderMessage'
+				})
 			},
 			
 			// 任务优先级转换
@@ -518,12 +515,12 @@
 						message: '取消成功!',
 						isShow: true
 					 });
-						this.queryCompleteDispatchTask(
+					 this.queryCompleteDispatchTask(
 						{
 							 proId:this.proId, createId:this.workerId,state: -5,
 							 startDate: '', endDate: ''
 						},'待办任务'
-						)
+					 )
 					} else {
 						this.$refs.alertToast.show({
 							type: 'error',
@@ -553,7 +550,13 @@
 							type: 'success',
 							message: '催单成功!',
 							isShow: true
-						})
+						});
+						this.queryCompleteDispatchTask(
+							{
+								 proId:this.proId, createId:this.workerId,state: -5,
+								 startDate: '', endDate: ''
+							},'待办任务'
+						)
 			    } else {
 			      this.$refs.alertToast.show({
 			      	type: 'error',

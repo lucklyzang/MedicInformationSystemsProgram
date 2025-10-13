@@ -15,7 +15,7 @@
 			<u-datetime-picker mode="date" :show="dateEndShow" v-model="dateEndValue" @cancel="dateEndShow = false" @confirm="endDateSure"></u-datetime-picker>
 		</view>
 		<view class="nav">
-			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="运送" @backClick="backTo">
+			<nav-bar :home="false" :isShowBackText="true" :isHomeText="true" backState='3000' fontColor="#FFF" bgColor="none" title="运送" @backClick="backTo">
 			</nav-bar> 
 		</view>
 		<view class="content">
@@ -75,7 +75,7 @@
 				<u-empty text="数据为空" mode="list"></u-empty>
 			</view>
 			<view class="task-tail-content" v-show="current == 0">
-				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" :key="index">
+				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" @click="enterTaskMessage(item)" :key="index">
 					<view class="item-title">
 						<view class="item-top-one">
 							<view class="number">
@@ -159,7 +159,7 @@
 				</view>
 			</view>
 			<view class="task-tail-content task-tail-content-going" v-show="current == 1">
-				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" :key="index">
+				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" @click="enterTaskMessage(item)" :key="index">
 					<view class="item-title">
 						<view class="item-top-one">
 							<view class="number">
@@ -308,7 +308,7 @@
 	import {
 		setCache,
 		removeAllLocalStorage,
-		fenToYuan
+		getDate
 	} from '@/common/js/utils'
 	import {getDispatchTaskComplete} from '@/api/transport.js'
 	import navBar from "@/components/zhouWei-navBar"
@@ -325,9 +325,10 @@
 				noDataShow: false,
 				list: [{name: '已完成'}, {name: '已取消'}],
 				current: 0,
-				dateStart: SOtime.time8(new Date().getTime()),
-				dateEnd: SOtime.time8(new Date().getTime()),
-				dateEndValue: Number(new Date()),
+				dateStart: getDate(),
+				dateEnd: getDate(),
+				dateStartValue: this.normalizeTimestamp(),
+				dateEndValue: this.normalizeTimestamp(),
 				dateEndShow: false,
 				dateStartShow: false,
 				contactIsolationPng: require("@/static/img/contact-isolation.png"),
@@ -375,18 +376,32 @@
 		},
 		methods: {
 			...mapMutations([
+				'changeTransTaskMessage'
 			]),
 			
 			// 顶部导航返回事件
 			backTo () {
-				uni.redirectTo({
-					url: '/transManagementPackage/pages/index/index'
-				})
+				uni.navigateBack()
+			},
+			
+			// 将时间戳转换为当天的 00:00:00
+			normalizeTimestamp () {
+			  const date = new Date();
+			  date.setHours(0, 0, 0, 0);
+			  return Number(date)
 			},
 			
 			// 开始日期弹框显示事件
 			showActionStart () {
 				this.dateStartShow = true
+			},
+			
+			// 进入订单详情事件
+			enterTaskMessage (item) {
+				this.changeTransTaskMessage(item);
+				uni.navigateTo({
+					url: '/transManagementPackage/pages/transportWorkerOrderMessage/transportWorkerOrderMessage'
+				})
 			},
 			
 			// tab切换改变事件
@@ -571,6 +586,7 @@
 								startPhoto: item.startPhoto,
 								endPhoto: item.endPhoto,
 								isBack: item.isBack,
+								tempFlag: item.tempFlag,
 								isSign: item.isSign,
 								workerName: item.workerName
 							})

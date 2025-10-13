@@ -570,7 +570,7 @@
 					spaceId: this.goalSpacesOption == '请选择' ? '' : this.goalSpacesOption.filter((item) => { return item['text'] == this.currentGoalSpaces})[0]['value'], //目的房间id
 					space: this.currentGoalSpaces == '请选择' ? '' : this.currentGoalSpaces, //目的房间名称
 					priority: this.priorityRadioValue,
-					taskRemark: this.taskDescribe, //任务描述
+					taskDesc: this.taskDescribe, //任务描述
 					proId: this.proId,
 					workerId: this.workerId,
 					workerName: this.userAccount,

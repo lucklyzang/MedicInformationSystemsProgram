@@ -338,7 +338,7 @@
 	}
  
 	.u-column-item {		
-		color: #101010;
+		color: #ACADAF;
 		font-size: 20px;
 		line-height: 34px;
 		text-align: center;
@@ -346,9 +346,9 @@
 	}
 	
 	.selectStyle {
-		color: #3B9DF9 !important;
+		color: #101010 !important;
 		font-size: 22px !important;
-		background: #f3f3f3 !important;
+		background: #fff !important;
 		
 	}
 </style>

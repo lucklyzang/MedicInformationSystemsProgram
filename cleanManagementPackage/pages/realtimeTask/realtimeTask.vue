@@ -13,7 +13,7 @@
 			<ScrollSelection buttonLocation='top' v-model="showCancelReason" :pickerValues="canCelReasonDefaultIndex" :isShowSearch="false" :columns="cancelReasonOption" @sure="cancelReasonSureEvent" @cancel="cancelReasonCancelEvent" @close="cancelReasonCloseEvent" />
 		</view>
 		<view class="nav">
-			<nav-bar :home="false" :isShowBackText="true" backState='3000' fontColor="#FFF" bgColor="none" title="保洁管理" @backClick="backTo">
+			<nav-bar :home="false" :isShowBackText="true" :isHomeText="true" backState='3000' fontColor="#FFF" bgColor="none" title="保洁管理" @backClick="backTo">
 			</nav-bar> 
 		</view>
 		<view class="content">
@@ -125,16 +125,6 @@
 						<view class="item-top-four">
 						 <text>问题描述:</text>
 						 <text>{{!item.taskDesc ? '无' : item.taskDesc}}</text>
-						</view>
-					</view>
-					<view class="item-bottom">
-						<view class="item-bottom-right">
-							<view class="left">
-								<text @click.stop="reminder(item)">催单</text>
-							</view>
-							<view class="right" v-show="item.state !== 3">
-								<text @click.stop="cancel(item)">取消订单</text>
-							</view>
 						</view>
 					</view>
 				</view>
@@ -279,9 +269,7 @@
 			
 			// 顶部导航返回事件
 			backTo () {
-				uni.redirectTo({
-					url: '/cleanManagementPackage/pages/callTask/callTask'
-				})
+				uni.navigateBack()
 			},
 			
 			// tab切换改变事件
@@ -432,7 +420,7 @@
 						if (text == '待办任务') {
 							temporaryDataList = res.data.data.filter((item) => { return item.state == 0 || item.state == 1 || item.state == 2 });
 						} else {
-							temporaryDataList = res.data.data.filter((item) => { return item.state == 3 });
+							temporaryDataList = res.data.data.filter((item) => { return item.state == 3 || item.state == 4 || item.state == 8 });
 						};
 						if (temporaryDataList.length > 0) {
 							this.noDataShow = false;
@@ -532,7 +520,13 @@
 			      	type: 'success',
 			      	message: '催单成功!',
 			      	isShow: true
-			      })
+			      });
+						this.queryCompleteDispatchTask({
+							proId : this.proId, // 所属项目id
+							queryDate: '', // 查询时间
+							managerId: this.workerId,// 保洁主管id 
+							taskType: 0 // 0-即时，1-专项
+						},'待办任务')
 			    } else {
 						this.$refs.alertToast.show({
 							type: 'error',

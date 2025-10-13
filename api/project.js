@@ -97,13 +97,22 @@ export function projectTaskCancelReason(data) {
 //   })
 // };
 
-// // 维修任务详情查询
-// export function repairsDetails (id) {
-//   return request({
-//     url: `project/bxTask/query/${id}`,
-//     method: 'get'
-//   })
-// };
+// 维修任务详情查询
+export function repairsDetails (id) {
+  return request({
+    url: `project/bxTask/query/${id}`,
+    method: 'get'
+  })
+};
+
+// 维修任务图片查询
+export function repairsImage (data) {
+  return request({
+    url: 'project/bxRepairTaskImage/queryAll',
+    method: 'get',
+		params: data
+  })
+};
 
 // // 维修任务任务类型查询
 // export function getRepairsTaskType (proId) {
