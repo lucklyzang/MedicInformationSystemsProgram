@@ -119,8 +119,6 @@
 				return this.userInfo['depName'] === null ? '' : this.userInfo['depName']
 			}
 		},
-		onShow() {
-		},
 		methods: {
 			...mapMutations([
 			]),

@@ -212,7 +212,7 @@
 				return this.userInfo['userName']
 			}
 		},
-		onShow() {
+		onLoad() {
 			const pages = getCurrentPages(); //获取当前页面栈的实例数组
 			if (pages.length == 1) {
 				this.tierNum = 1

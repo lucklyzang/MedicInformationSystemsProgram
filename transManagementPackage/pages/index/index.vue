@@ -103,7 +103,8 @@ export default {
     }
   },
 
-  onShow() {
+  onLoad() {
+		this.parallelFunctionTwo();
 		this.valueName = 0;
 		const pages = getCurrentPages(); //获取当前页面栈的实例数组
 		if (pages.length == 1) {
@@ -112,10 +113,6 @@ export default {
 			this.tierNum = pages.length;
 		}
   },
-	
-	onLoad() {
-		this.parallelFunctionTwo()
-	},
 
   watch: {},
 

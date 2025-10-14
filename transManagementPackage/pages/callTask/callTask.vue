@@ -480,13 +480,10 @@ export default {
 		this.currentTransportRice = JSON.parse(option.msg)['text'];
 		this.currentTransportRiceValue = JSON.parse(option.msg)['value'];
 		this.titleText =this.currentTransportRice;
+		this.parallelFunction();
 		// 根据运送大类查询运送类型小类
 		this.querytransportChildByTransportParent('',this.currentTransportRiceValue,this.templateType);
 	},
-
-  mounted() {
-    this.parallelFunction();
-  },
 
   watch: {
     // 监听每个病人对应的运送类型数量

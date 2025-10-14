@@ -274,7 +274,7 @@
 			  	return this.userInfo['userName']
 			  }
 		},
-		mounted() {
+		onLoad() {
 			this.queryCompleteDispatchTask(
 				{
 				    state:5,

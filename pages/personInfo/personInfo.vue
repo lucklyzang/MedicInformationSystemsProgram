@@ -109,8 +109,6 @@
 				return this.userInfo['userName']
 			}
 		},
-		onShow() {
-		},
 		methods: {
 			...mapMutations([
 				'changeUserBasicInfo'

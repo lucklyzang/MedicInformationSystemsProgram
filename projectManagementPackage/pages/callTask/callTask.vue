@@ -248,10 +248,8 @@
 				return this.userInfo['userName']
 			}
 		},
-		onLoad() {
+		onLoad () {
 			this.parallelFunction();
-		},
-		mounted () {
 			if (this.depName) {
 				this.goalDepartmentDefaultIndex = [this.goalDepartmentOption.findIndex((item) => { return item.text == this.depName })];
 			};

@@ -324,7 +324,7 @@
 				return this.userInfo['userName']
 			}
 		},
-		mounted() {
+		onLoad() {
 			this.queryCompleteDispatchTask(
 				{
 				   proId:this.proId, createId:this.workerId,state:5,

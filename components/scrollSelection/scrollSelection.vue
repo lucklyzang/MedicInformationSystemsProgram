@@ -107,8 +107,6 @@
 				list: this.columns,
 			}
 		},
-		mounted () {
-		},
 		watch: {
 			columns: {
 				handler(newValue, oldValue) {

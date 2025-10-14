@@ -117,7 +117,7 @@
 				'chooseHospitalArea'
 			])
 		},
-		mounted () {
+		onShow () {
 			 this.form.username = getCache('userName') ? getCache('userName') : '';
 			 this.form.password = getCache('userPassword') ? getCache('userPassword') : '';
 		},

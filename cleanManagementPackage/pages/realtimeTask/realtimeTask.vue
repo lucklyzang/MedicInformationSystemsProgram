@@ -80,11 +80,11 @@
 					</view>
 					<view class="item-bottom">
 						<view class="item-bottom-right">
-							<view class="left">
-								<text @click.stop="reminder(item)">催单</text>
+							<view class="left" @click.stop="reminder(item)" :class="{'reminderStyle':item.reminder == 1 }">
+								<text>催单</text>
 							</view>
-							<view class="right" v-show="item.state !== 3">
-								<text @click.stop="cancel(item)">取消订单</text>
+							<view class="right" @click.stop="cancel(item)" v-if="item.state !== 3">
+								<text>取消订单</text>
 							</view>
 						</view>
 					</view>
@@ -251,7 +251,7 @@
 					return this.userInfo['userName']
 				}
 		},
-		mounted() {
+		onLoad() {
 			this.getEnvironmentOrderCancelReason();
 			this.queryCompleteDispatchTask(
 				{
@@ -440,7 +440,8 @@
 								number: item.taskNumber,
 								id: item.id,
 								taskDesc: item.taskRemark,
-								workerName: item.workerName
+								workerName: item.workerName,
+								reminder: item.reminder
 							})
 						}
 				  } else {
@@ -511,6 +512,9 @@
 			  
 			// 保洁任务催单
 			reminder(item) {
+				if (item.reminder == 1) {
+					return
+				};
 				this.showLoadingHint = true;
 				this.infoText = '催单中···';
 			  cleanTaskReminder(this.proId,item.id).then((res) => {
@@ -819,6 +823,9 @@
 									font-size: 14px;
 								}
 			 				};
+							.reminderStyle {
+								opacity: .4;
+							};
 			 				.left  {
 			 					background: #E8CB51;
 								color: #fff;
