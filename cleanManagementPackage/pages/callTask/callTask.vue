@@ -141,7 +141,6 @@
 		removeAllLocalStorage
 	} from '@/common/js/utils'
 	import { addForthwithCleanTask } from '@/api/environment.js'
-	import axios from 'axios-miniprogram'
 	import navBar from "@/components/zhouWei-navBar"
 	import LightHint from "@/components/light-hint/light-hint.vue"
 	export default {
@@ -200,7 +199,7 @@
 			  	return this.userInfo['userName']
 			  }
 		},
-		onShow(){
+		onShow() {
 		  this.echoLoactionMessage();
 		},
 		methods: {
@@ -213,7 +212,10 @@
 			
 			// 顶部导航返回事件
 			backTo () {
-				uni.navigateBack()
+				this.resetEvent();
+				uni.switchTab({
+					url: '/pages/index/index'
+				})
 			},
 			
 			// 重置事件
@@ -428,7 +430,7 @@
 
 		// 添加环境任务
 		addForthwithCleanTaskEvent (data) {
-		 this.infoText = '创建中···';
+		 this.infoText = '提交中···';
 		 this.showLoadingHint = true;
 			addForthwithCleanTask(data).then((res) => {
 				 this.showLoadingHint = false;

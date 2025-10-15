@@ -127,7 +127,7 @@ export function queryCleaningManageTaskListHistory(data) {
 // 保洁任务催单
 export function cleanTaskReminder(proId,taskId) {
   return request({
-    url: `clean/bxTask/reminder/${proId}/${taskId}`,
+    url: `clean/cleanTask/reminder/${proId}/${taskId}`,
     method: 'get'
   })
 };

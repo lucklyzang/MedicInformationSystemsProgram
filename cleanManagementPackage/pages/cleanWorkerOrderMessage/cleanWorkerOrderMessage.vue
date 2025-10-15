@@ -93,13 +93,11 @@
 import { cancelTask, getForthwithCleanTaskDetails } from "@/api/environment.js";
 import { mapGetters, mapMutations } from "vuex";
 import navBar from "@/components/zhouWei-navBar"
-import SelectSearch from "@/components/selectSearch/selectSearch";
 import { setCache, removeAllLocalStorage } from "@/common/js/utils";
 import _ from 'lodash'
 export default {
   components: {
-    navBar,
-		SelectSearch
+    navBar
   },
   data() {
     return {

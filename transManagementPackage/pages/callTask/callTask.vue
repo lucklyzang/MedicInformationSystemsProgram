@@ -1345,7 +1345,7 @@ export default {
 
     // 生成调度任务(一个病人)
     postGenerateDispatchTask (data) {
-			this.infoText = '创建中...';
+			this.infoText = '提交中...';
 			this.showLoadingHint = true;
       generateDispatchTask(data).then((res) => {
         if (res && res.data.code == 200) {
@@ -1378,7 +1378,7 @@ export default {
 
     //生成调度任务(多个病人)
     postGenerateDispatchTaskMany(data) {
-			this.infoText = '创建中...';
+			this.infoText = '提交中...';
 			this.showLoadingHint = true;
       generateDispatchTaskManyNew(data).then((res) => {
         if (res && res.data.code == 200) {

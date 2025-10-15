@@ -13,7 +13,7 @@
 			</view>
     </view>
 		<view class="home-banner-area">
-			<image src="/static/img/home-banner.png" mode="widthFix"></image>
+			<image src="/static/img/home-banner.png"></image>
 		</view>
 		<view class="content-box">
 			<view class="service-management">
@@ -23,7 +23,7 @@
 				<view class="service-management-content">
 					<view class="service-list" v-for="(item,index) in serviceList" :key="index" @click="serviceManagementEvent(item,index)">
 						<view class="list-top">
-							<image :src="item.url" mode="widthFix"></image>
+							<image :src="item.url"></image>
 						</view>
 						<view class="list-bottom">{{ item.text }}</view>
 					</view>
@@ -186,15 +186,15 @@
 			// 服务管理项点击事件
 			serviceManagementEvent (item,index) {
 				if (item.text == '中央运送') {
-					uni.navigateTo({
+					uni.redirectTo({
 						url: '/transManagementPackage/pages/index/index'
 					})
 				} else if (item.text == '工程维修') {
-					uni.navigateTo({
+					uni.redirectTo({
 						url: '/projectManagementPackage/pages/callTask/callTask'
 					})
 				} else if (item.text == '保洁管理') {
-					uni.navigateTo({
+					uni.redirectTo({
 						url: '/cleanManagementPackage/pages/callTask/callTask'
 					})
 				}
@@ -260,8 +260,10 @@
 		};
 		.home-banner-area {
 			margin-top: 10px;
+			height: 150px;
 			>image {
 				width: 100%;
+				height: 100%;
 			}
 		};
 		.content-box {
@@ -305,6 +307,7 @@
 							border-radius: 12px;
 							>image {
 								width: 32px;
+								height: 32px;
 							}
 						};
 						.list-bottom {

@@ -86,7 +86,6 @@
 </template>
 <script>
 import { mapGetters, mapMutations } from "vuex";
-import { setCache, removeAllLocalStorage } from '@/common/js/utils'
 import { queryTransportTypeClass } from '@/api/transport.js'
 import navBar from "@/components/zhouWei-navBar"
 export default {
@@ -102,7 +101,7 @@ export default {
 			showLoadingHint: false
     }
   },
-
+	
   onLoad() {
 		this.parallelFunctionTwo();
 		this.valueName = 0;
@@ -152,7 +151,9 @@ export default {
 
      // 顶部导航返回事件
      backTo () {
-     	uni.navigateBack()
+     	uni.switchTab({
+     		url: '/pages/index/index'
+     	})
      },
 		 
 		 

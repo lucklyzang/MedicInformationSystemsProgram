@@ -12,7 +12,7 @@
 			</nav-bar> 
 		</view>
 	 <view class="content">
-			<u-empty description="暂无数据" v-if="emptyShow" />
+			<u-empty text="暂无数据" mode="search" v-if="emptyShow"></u-empty>
 			<!-- 建筑 -->
 			<view class="departments-name-list" v-for="(item) in architectureList" :key="item.id" v-if="architectureShow"
 				@click="architectureClickEvent(item)"
@@ -147,18 +147,36 @@
 			
 			// 顶部导航返回事件
 			backTo () {
-				uni.navigateBack()
+				if (this.architectureShow) {
+					uni.navigateBack()
+				} else if (this.departmentShow) {
+					this.emptyShow = false;
+					this.departmentShow = false;
+					this.architectureShow = true;
+				} else if (this.goalAreaShow) {
+					this.emptyShow = false;
+					this.goalAreaShow = false;
+					this.departmentShow = true;
+				} else if (this.functionAreaShow) {
+					this.emptyShow = false;
+					this.functionAreaShow = false;
+					this.goalAreaShow = true;
+				}
 			},
 			
 			// 获取建筑
 			getArchitecture () {
 				this.showLoadingHint = true;
+				this.emptyShow = false;
+				this.architectureShow = true;
+				this.architectureList = [];
 				getArchitectureMessage({proId: this.proId}).then((res) => {
 						this.showLoadingHint = false;
+						this.functionAreaShow = false;
+						this.goalAreaShow = false;
+						this.departmentShow = false;
 						if (res && res.data.code == 200) {
-							this.architectureList = [];
 							if (res.data.data.length > 0) {
-								this.architectureShow = true;
 								this.architectureList = res.data.data;
 							} else {
 								this.emptyShow = true
@@ -183,13 +201,15 @@
 			getDepartment () {
 				this.emptyShow = false;
 				this.showLoadingHint = true;
+				this.functionAreaShow = false;
+				this.goalAreaShow = false;
 				this.architectureShow = false;
+				this.departmentShow = true;
+				this.departmentList = [];
 				getDepartmentMessage({proId: this.proId,structId: this.selectArchitectureValue[0]['id']}).then((res) => {
 						this.showLoadingHint = false;
 						if (res && res.data.code == 200) {
-							this.departmentList = [];
 							if (res.data.data.length > 0) {
-								this.departmentShow = true;
 								this.departmentList = res.data.data
 							} else {
 								this.emptyShow = true
@@ -215,12 +235,14 @@
 				this.emptyShow = false;
 				this.showLoadingHint = true;
 				this.departmentShow = false;
+				this.functionAreaShow = false;
+				this.architectureShow = false;
+				this.goalAreaShow = true;
+				this.goalAreaList = [];
 				getGoalAreaMessage({proId: this.proId,status: 1}).then((res) => {
 						this.showLoadingHint = false;
 						if (res && res.data.code == 200) {
-							this.goalAreaList = [];
 							if (res.data.data.length > 0) {
-								this.goalAreaShow = true;
 								this.goalAreaList = res.data.data
 							} else {
 								this.emptyShow = true
@@ -246,12 +268,14 @@
 				this.emptyShow = false;
 				this.showLoadingHint = true;
 				this.goalAreaShow = false;
+				this.departmentShow = false;
+				this.architectureShow = false;
+				this.functionAreaShow = true;
+				this.functionAreaList = [];
 				getFunctionAreaMessage({hospitalId: this.proId}).then((res) => {
 						this.showLoadingHint = false;
 						if (res && res.data.code == 200) {
-							this.functionAreaList = [];
 							if (res.data.data.length > 0) {
-								this.functionAreaShow = true,
 								this.functionAreaList = res.data.data
 							} else {
 								this.emptyShow = true
@@ -297,7 +321,7 @@
 			functionAreaClickEvent(item) {
 				this.selectFunctionAreaValue = [];
 				this.selectFunctionAreaValue.push(item);
-				this.backTo();
+				uni.navigateBack();
 				let temporary = [];
 				let temporaryMessage = temporary.concat(this.selectArchitectureValue,this.selectDepartmentValue,this.selectgoalAreaValue,this.selectFunctionAreaValue);
 				this.storeLocationMessage(temporaryMessage)
@@ -348,6 +372,7 @@
 			padding-top: 6px;
 			box-sizing: border-box;
 			position: relative;
+			overflow: auto;
 			/deep/ .u-empty {
 				position: absolute;
 				top: 50%;

@@ -171,13 +171,11 @@
 	import { setCache,removeAllLocalStorage } from '@/common/js/utils'
 	import _ from 'lodash'
 	import ScrollSelection from "@/components/scrollSelection/scrollSelection";
-	import BottomSelect from "@/components/bottomSelect/bottomSelect";
 	import LightHint from "@/components/light-hint/light-hint.vue";
 	export default {
 		components: {
 			navBar,
 			ScrollSelection,
-			BottomSelect,
 			LightHint
 		},
 		data() {
@@ -266,7 +264,9 @@
 			
 			// 顶部导航返回事件
 			backTo () {
-				uni.navigateBack()
+				uni.switchTab({
+					url: '/pages/index/index'
+				})
 			},
 			
 			// 弹框确定按钮
@@ -580,7 +580,7 @@
 
 				// 生成工程任务
 				postGenerateRepairsTask (data) {
-				this.infoText = '创建中···';
+				this.infoText = '提交中···';
 				this.showLoadingHint = true;
 				reportProblem(data).then((res) => {
 					this.showLoadingHint = false;

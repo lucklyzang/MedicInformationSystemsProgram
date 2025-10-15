@@ -8,7 +8,7 @@
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast"></u-toast>
 		<view class="nav">
-			<nav-bar :home="false" backState='3000' fontColor="#FFF" bgColor="none" title="任务详情" @backClick="backTo">
+			<nav-bar :home="false" backState='3000' :isShowBackText="true" fontColor="#FFF" bgColor="none" title="任务详情" @backClick="backTo">
 			</nav-bar> 
 		</view>
     <!-- 图片放大弹框  -->

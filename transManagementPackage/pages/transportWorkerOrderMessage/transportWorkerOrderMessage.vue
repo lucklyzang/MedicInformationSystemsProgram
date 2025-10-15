@@ -8,7 +8,7 @@
 		<view class="top-background-area" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }"></view>
 		<u-toast ref="uToast" />
 		<view class="nav">
-			<nav-bar :home="false" backState='3000' fontColor="#FFF" bgColor="none" title="任务详情" @backClick="backTo">
+			<nav-bar :home="false" backState='3000' :isShowBackText="true" fontColor="#FFF" bgColor="none" title="任务详情" @backClick="backTo">
 			</nav-bar> 
 		</view>
 		<view class="content">
@@ -151,8 +151,6 @@
 		mapMutations
 	} from 'vuex'
 	import {
-		setCache,
-		removeAllLocalStorage,
 		mergeMethods
 	} from '@/common/js/utils'
 	import { getDispatchTaskMessageById } from '@/api/transport.js'

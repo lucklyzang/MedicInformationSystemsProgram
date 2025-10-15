@@ -52,4 +52,7 @@
 	src: url('/static/uni.ttf');
 }
 /* #endif */
+page { 
+  min-height: 100%; /* 防止页面高度塌陷 */
+}
 </style>

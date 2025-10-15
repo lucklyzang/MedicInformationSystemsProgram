@@ -74,7 +74,7 @@
 			<view class="empty-info" v-if="noDataShow">
 				<u-empty text="数据为空" mode="list"></u-empty>
 			</view>
-			<view class="task-tail-content" v-show="current == 0">
+			<view class="task-tail-content" v-if="current == 0">
 				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" @click="enterTaskMessage(item)" :key="index">
 					<view class="item-title">
 						<view class="item-top-one">
@@ -158,7 +158,7 @@
 					</view>
 				</view>
 			</view>
-			<view class="task-tail-content task-tail-content-going" v-show="current == 1">
+			<view class="task-tail-content task-tail-content-going" v-if="current == 1">
 				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" @click="enterTaskMessage(item)" :key="index">
 					<view class="item-title">
 						<view class="item-top-one">
@@ -381,7 +381,9 @@
 			
 			// 顶部导航返回事件
 			backTo () {
-				uni.navigateBack()
+				uni.switchTab({
+					url: '/pages/index/index'
+				})
 			},
 			
 			// 将时间戳转换为当天的 00:00:00
@@ -695,7 +697,8 @@
 					left: 0;
 					bottom: 0;
 					right: 0;
-					margin: auto
+					margin: auto;
+					z-index: 100;
 			 };
 			 .task-tail-title {
 				 width: 85%;

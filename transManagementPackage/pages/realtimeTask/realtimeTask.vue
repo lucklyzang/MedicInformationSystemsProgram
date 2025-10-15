@@ -38,10 +38,10 @@
 				</u-tabs>
 				<view class="tab-line" :class="{'tab-left':current == 0,'tab-right':current == 1}"></view>
 			</view>
-			<view class="empty-info" v-show="noDataShow">
+			<view class="empty-info" v-if="noDataShow">
 				<u-empty text="数据为空" mode="list"></u-empty>
 			</view>
-			<view class="task-tail-content" v-show="current == 0">
+			<view class="task-tail-content" v-if="current == 0">
 				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" @click="enterTaskMessage(item)" :key="index">
 					<view class="item-title">
 						<view class="item-top-one">
@@ -135,7 +135,7 @@
 					</view>
 				</view>
 			</view>
-			<view class="task-tail-content task-tail-content-going" v-show="current == 1">
+			<view class="task-tail-content task-tail-content-going" v-if="current == 1">
 				<view class="task-tail-content-item" v-for="(item,index) in stateCompleteList" @click="enterTaskMessage(item)" :key="index">
 					<view class="item-title">
 						<view class="item-top-one">
@@ -280,13 +280,6 @@
 		mapGetters,
 		mapMutations
 	} from 'vuex'
-	import _ from 'lodash'
-	
-	import {
-		setCache,
-		removeAllLocalStorage,
-		fenToYuan
-	} from '@/common/js/utils'
 	import {getDispatchTaskComplete, taskReminder, queryDispatchTaskCancelReason,updateDispatchTask} from '@/api/transport.js'
 	import navBar from "@/components/zhouWei-navBar"
 	import ScrollSelection from "@/components/scrollSelection/scrollSelection";
@@ -359,7 +352,9 @@
 			
 			// 顶部导航返回事件
 			backTo () {
-				uni.navigateBack()
+				uni.switchTab({
+					url: '/pages/index/index'
+				})
 			},
 			
 			// 进入订单详情事件
@@ -745,7 +740,8 @@
 					left: 0;
 					bottom: 0;
 					right: 0;
-					margin: auto
+					margin: auto;
+					z-index: 100;
 			 };
 			 .task-tail-title {
 				 width: 85%;

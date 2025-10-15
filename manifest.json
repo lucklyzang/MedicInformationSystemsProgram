@@ -59,7 +59,11 @@
             "minified" : true
         },
         "usingComponents" : true,
-        "permission" : {}
+				"requiredBackgroundModes": ["record"],
+        "permission" : {
+					"scope.writePhotosAlbum": {"desc": "写入相册权限"}
+				},
+				"lazyCodeLoading": "requiredComponents"
     },
     "mp-alipay" : {
         "usingComponents" : true
