@@ -51,9 +51,10 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 216px;
-		padding: 0 10px;
+    min-width: 180px;
     min-height: 48px;
+    padding: 4px 10px; 
+		box-sizing: border-box;
     position: fixed;
     z-index: 1000;
     bottom: 200px;
@@ -64,12 +65,13 @@ export default {
     font-size: 14px;
 		box-shadow: 0px 2px 6px 0px rgba(0,0,0,0.4);
     text {
-			flex: 1;
       vertical-align: middle;
       margin-left: 10px;
-			text-align: center;
+			text-align: left;
+			word-break: break-all;
     };
     image {
+			flex-shrink: 0;
       vertical-align: middle;
       width: 24px;
       height: 24px

@@ -86,12 +86,13 @@
 					</view>
 					<view class="transport-type-child-box scroll-view-item">
 						<view class="transport-type-child-content" v-for="(innerItem,innerIndex) in patienModalMessage.transportList"
-									:key="innerItem.text">
+									:key="innerItem.id">
 							<view :class="{'transTypeListStyle': innerItem.typerNumber > 0 }">
 								{{innerItem.text}}
 							</view>
 							<view>
-								<stepNumberBox v-model="innerItem.typerNumber"
+								<stepNumberBox
+								  v-model="patienModalMessage.transportList[innerIndex].typerNumber"
 									@plus="plusNum(arguments)"
 									@inputBlur="inputBlurEvent(arguments)"
 									:innerIndex="innerIndex"
@@ -793,11 +794,11 @@ export default {
 
     // 步进器增加或减少事件
     plusNum(msg) {
-      this.patienModalMessage.transportList[msg[2]]['typerNumber'] = msg[1];
-      this.reduceTotal(msg[2]);
+			this.$set(this.patienModalMessage.transportList[msg[2]],'typerNumber',msg[1]);
+      this.reduceTotal(msg[2])
     },
     minusNum(msg) {
-      this.patienModalMessage.transportList[msg[2]]['typerNumber'] = msg[1];
+      this.$set(this.patienModalMessage.transportList[msg[2]],'typerNumber',msg[1]);
       this.reduceTotal(msg[2])
     },
 
