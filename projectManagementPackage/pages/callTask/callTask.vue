@@ -76,7 +76,7 @@
 					</view>
 					<view>
 						<view v-for="(item, index) in imgArr" :key='index'>
-							<image :src="item" mode="aspectFit"></image>
+							<image :src="item"></image>
 							<u-icon name="close" size="20" color="#000000" @click="photoDelete(item,index)"></u-icon>
 						</view>
 						<view>
@@ -248,13 +248,15 @@
 		},
 		onLoad () {
 			this.parallelFunction();
-			if (this.depName) {
-				this.goalDepartmentDefaultIndex = [this.goalDepartmentOption.findIndex((item) => { return item.text == this.depName })];
-			};
-			this.currentGoalDepartment = this.depName == '' ? '请选择' :  this.depName;
-			// 登陆人员为医务人员时，根据默认科室id查询目的房间列表
 			if (this.isMedicalMan) {
-				this.getSpacesByDepartmentId(this.depId);
+				this.currentGoalDepartment = this.depName == '' ? '请选择' :  this.depName;
+				if (this.depName) {
+					this.goalDepartmentDefaultIndex = [this.goalDepartmentOption.findIndex((item) => { return item.text == this.depName })];
+				};
+				// 登陆人员为医务人员时，根据默认科室id查询目的房间列表
+				if (this.depId) {
+					this.getSpacesByDepartmentId(this.depId)
+				}
 			}
 		},
 		methods: {
@@ -439,11 +441,11 @@
 							let [item1,item2] = res;
 							if (item1) {
 								// 科室
-								Object.keys(item1).forEach((item) => {
+								Object.keys(item1).forEach((item,index) => {
 									this.goalDepartmentOption.push({
 										text: item1[item],
 										value: item,
-										id: item
+										id: index
 									})
 								})
 							};
@@ -535,8 +537,9 @@
 				},
 
 				// 目的房间下拉选择框确认事件
-				goalSpacesSureEvent (val) {
+				goalSpacesSureEvent (val,value,id) {
 				if (val.length > 0) {
+					this.goalSpacesDefaultIndex = [id];
 					this.currentGoalSpaces =  val;
 				} else {
 					this.currentGoalSpaces = []
@@ -714,7 +717,7 @@
 					overflow: scroll;
 					.message-one {
 						width: 100%;
-						padding: 10px 6px 10px 16px;
+						padding: 10px 6px 10px 10px;
 						box-sizing: border-box;
 						background: #fff;
 						display: flex;
@@ -743,7 +746,7 @@
 					};
 					.select-box {
 						width: 100%;
-						padding: 8px 6px;
+						padding: 8px 6px 8px 10px;
 						box-sizing: border-box;
 						background: #fff;
 						display: flex;
@@ -781,8 +784,6 @@
 					};
 					.end-select-box {
 						.select-box-left {
-							padding: 0 10px;
-							box-sizing: border-box;
 							>text {
 								&:nth-child(1) {
 									color: #9E9E9A;
@@ -795,7 +796,7 @@
 					.view-photoList {
 						background: #fff;
 						box-sizing: border-box;
-						padding: 10px 6px;
+						padding: 10px 6px 10px 10px;
 						margin-top: 6px;
 						display: flex;
 						>view {
@@ -803,10 +804,10 @@
 							&:first-child {
 								font-size: 14px;
 								color: #9E9E9A;
-								width: 80px;
+								padding-right: 10px;
+								box-sizing: border-box;
 								vertical-align: top;
 								height: 100px;
-								padding-left: 4px;
 								line-height: 100px;
 							};
 							&:nth-child(2) {
@@ -847,7 +848,7 @@
 					};
 					.transport-type {
 						width: 100%;
-						padding: 10px 6px;
+						padding: 10px 6px 10px 10px;
 						box-sizing: border-box;
 						background: #fff;
 						display: flex;
@@ -856,7 +857,7 @@
 						font-size: 14px;
 						margin-top: 6px;
 						.transport-type-left {
-							padding: 0 10px;
+							padding: 10px 10px 0 0;
 							box-sizing: border-box;
 							>text {
 								&:nth-child(1) {

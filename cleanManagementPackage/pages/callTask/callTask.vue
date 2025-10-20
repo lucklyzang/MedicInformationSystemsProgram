@@ -19,7 +19,7 @@
 				</view>
 				<view class="image-list">
 					<view v-for="(item, index) in resultimageList" :key="index">
-						<image :src="item" mode="widthFix" />
+						<image :src="item" />
 						<view class="icon-box"  @click="issueDelete(index)">
 								<u-icon name="trash" color="#d70000"></u-icon>
 						</view>    
@@ -396,11 +396,11 @@
 				createId: this.workerId,
 				managerId: this.workerId, // 保洁主管id，当前登陆人员id
 				managerName: this.userName,// 保洁主管姓名，当前登陆人员姓名
-				assignId: this.workerId, // 任务分配人员id，当前登陆人员id
-				assignName: this.userName,// 任务分配人员姓名，当前登陆人员姓名
-				workerId: this.workerValue == 0 ? '' :  this.workerValue,//保洁员id
+				assignId: '', // 任务分配人员id，当前登陆人员id
+				assignName: '',// 任务分配人员姓名，当前登陆人员姓名
+				workerId: '',//保洁员id
 				priority: this.priorityRadioValue, //优先级
-				workerName: this.workerText == '请选择保洁员' ? '' : this.workerText,//保洁员姓名
+				workerName: '',//保洁员姓名
 				path: [], // 上传的问题图片，集合,
 				taskType: 0,// 任务类型，即时保洁为 0
 				structureId: this.locationMessage[0]['id'], // 建筑id
@@ -699,6 +699,7 @@
 		            };
 		            image {
 		              width: 100%;
+									height: 80px;
 		            }
 		            &:last-child {
 		             display: flex;

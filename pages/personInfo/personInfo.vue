@@ -22,7 +22,7 @@
 						{{ userAccount }}
 					</view>
 				</view>
-				<view class="account-area">
+				<view class="account-area account-area-bottom-border">
 					<view class="account-area-left">
 						姓名
 					</view>
@@ -30,7 +30,7 @@
 						{{ userName }}
 					</view>
 				</view>
-				<view class="account-area">
+				<view class="account-area account-area-bottom-border">
 					<view class="account-area-left">
 						所属科室
 					</view>
@@ -237,7 +237,7 @@
 			 }
 		};
 		.bottom-area {
-			height: 120px;
+			height: 110px;
 			display: flex;
 			flex-direction: column;
 			justify-content: space-between;
@@ -253,7 +253,7 @@
 				color: #fff;
 				line-height: 44px;
 				text-align: center;
-				width: 70%;
+				width: 60%;
 			};
 			.version-area {
 				font-size: 14px;

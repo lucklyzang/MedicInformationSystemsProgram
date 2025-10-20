@@ -309,7 +309,7 @@
 			 }
 		};
 		.bottom-area {
-			height: 120px;
+			height: 110px;
 			display: flex;
 			flex-direction: column;
 			justify-content: space-between;
@@ -325,7 +325,7 @@
 				color: #fff;
 				line-height: 44px;
 				text-align: center;
-				width: 70%;
+				width: 60%;
 			}
 		}
 	}

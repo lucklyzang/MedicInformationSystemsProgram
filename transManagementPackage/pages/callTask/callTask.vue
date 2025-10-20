@@ -1702,7 +1702,7 @@ export default {
 			flex-direction: column;
 			.message-one {
 				width: 100%;
-				padding: 10px 6px 10px 16px;
+				padding: 10px 6px 10px 10px;
 				box-sizing: border-box;
 				background: #fff;
 				display: flex;
@@ -1739,7 +1739,7 @@ export default {
 			};
 			.select-box {
 				width: 100%;
-				padding: 8px 6px;
+				padding: 10px 6px 10px 10px;
 				box-sizing: border-box;
 				background: #fff;
 				display: flex;
@@ -1780,7 +1780,7 @@ export default {
 			};
 			.end-select-box {
 				.select-box-left {
-					padding: 0 10px;
+					padding: 0 6px 0 0;
 					box-sizing: border-box;
 					>text {
 						&:nth-child(1) {
@@ -1793,7 +1793,7 @@ export default {
 			};
 			.transport-type {
 				width: 100%;
-				padding: 10px 6px;
+				padding: 10px 6px 10px 10px;
 				box-sizing: border-box;
 				background: #fff;
 				display: flex;
@@ -1801,7 +1801,7 @@ export default {
 				font-size: 14px;
 				margin-top: 6px;
 				.transport-type-left {
-					padding: 0 10px;
+					padding-right: 10px;
 					box-sizing: border-box;
 					>text {
 						&:nth-child(1) {
@@ -1980,13 +1980,11 @@ export default {
 				}
 			};
 			.task-total {
-				padding: 8px 6px !important;
-				box-sizing: border-box;
 				.trans-total-title {
 					float: left;
 					width: 40%;
 					color: #9E9E9A;
-					padding: 0 10px 0 6px;
+					padding: 0 6px 0 0;
 					box-sizing: border-box;
 					line-height: 28px !important;
 					height: 28px !important;
@@ -2025,7 +2023,7 @@ export default {
 				background: #fff;
 				.field-box-two {
 					width: 100%;
-					padding: 0 12px;
+					padding: 0 10px;
 					box-sizing: border-box;
 					.field-title {
 						font-size: 18px;
@@ -2253,7 +2251,7 @@ export default {
 					}
 				};
 				.add-message {
-					width: 96%;
+					width: 95%;
 					height: 41px;
 					margin-top: 8px;
 					margin-bottom: 8px;
@@ -2273,13 +2271,12 @@ export default {
 			.task-describe {
 				background: #fff;
 				height: 120px;
-				padding: 8px 6px;
+				padding: 10px 6px 10px 10px;
 				box-sizing: border-box;
 				border-top: 12px solid #f6f6f6;
 				display: flex;
 				> text {
 					padding-top: 10px;
-					padding-left: 10px;
 					box-sizing: border-box;
 					color: #9E9E9A;
 					font-size: 14px;
