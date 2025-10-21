@@ -812,19 +812,20 @@
 							    align-items: center;
 							    >text {
 							    	display: inline-block;
+										word-break: break-all;
 										&:first-child {
 											width: 110px;
 											height: 16px;
 											overflow: auto;
 										};
 							    	&:last-child {
-							    		margin-left: 4px;
+							    		margin: 0 4px;
 							    		flex: 1
 							    	}
 							    }
 							  };
 								&:nth-child(2) {
-									width: 60px;
+									width: 40px;
 									display: flex;
 									align-items: center;
 									justify-content: center;

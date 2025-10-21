@@ -739,12 +739,12 @@
 						     >text {
 						     	display: inline-block;
 						   		&:first-child {
-						   			width: 180px;
+						   			width: 160px;
 						   			height: 16px;
 						   			overflow: auto;
 						   		};
 						     	&:last-child {
-						     		margin-left: 4px;
+						     		margin: 0 4px;
 						     		flex: 1
 						     	}
 						     }

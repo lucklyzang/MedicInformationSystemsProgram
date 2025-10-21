@@ -8,7 +8,7 @@
 					  {{ title }}
 					  <u-icon name="close" size="25" @click="close"></u-icon>
 					</view>
-					<view class="button-box-top" v-if="buttonLocation == 'top'">
+					<view class="button-box-top" v-if="list.length > 0 && buttonLocation == 'top'">
 						<text class="cancel-text" @click="cancel" v-if="list.length > 0">取消</text>
 						<text class="title-text"> {{ title }}</text>
 						<text class="sure-text" @click="confirm" v-if="list.length > 0">确定</text>
