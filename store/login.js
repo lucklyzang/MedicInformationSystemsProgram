@@ -8,11 +8,11 @@ export default {
 			return state.userInfo
 		},
 		isMedicalMan:(state) => {
-			state.userInfo = getCache('isMedicalMan') ? getCache('isMedicalMan') === 'false' ? false : true : false;
+			state.isMedicalMan = getCache('isMedicalMan') ? getCache('isMedicalMan') === 'false' ? false : true : false;
 			return state.isMedicalMan
 		},
 		chooseHospitalArea:(state) => {
-			state.userInfo = getCache('chooseHospitalArea') ? getCache('chooseHospitalArea') : {};
+			state.chooseHospitalArea = getCache('chooseHospitalArea') ? getCache('chooseHospitalArea') : {};
 			return state.chooseHospitalArea
 		},
 		isLogin: (state) => {

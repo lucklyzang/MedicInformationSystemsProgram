@@ -86,7 +86,7 @@
 		},
 		data() {
 			return {
-				infoText: '开启中···',
+				infoText: '修改中···',
 				showLoadingHint: false,
 				formerPasswordValue: '',
 				newPasswordValue: '',
@@ -96,12 +96,14 @@
 		computed: {
 			...mapGetters([
 				'userInfo',
-				'userBasicInfo',
 				'statusBarHeight',
 				'navigationBarHeight'
 			]),
 			userName() {
 				return this.userInfo['name']
+			},
+			userAccount() {
+				return this.userInfo['userName']
 			},
 			proName () {
 			  return this.userInfo['proName']
@@ -195,7 +197,7 @@
 				};
 				this.showLoadingHint = true;
 				modificationPassword({
-					username: this.userName,
+					username: this.userAccount,
 					password: this.formerPasswordValue,
 					newPassword: this.newPasswordValue
 				}).then((res) => {
