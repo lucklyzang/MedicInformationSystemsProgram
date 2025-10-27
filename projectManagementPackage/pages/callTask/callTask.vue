@@ -495,7 +495,7 @@
 				goalDepartmentSureEvent (val,value,id) {
 				if (val) {
 					this.currentGoalDepartment =  val;
-					this.currentGoalSpaces = [];
+					this.currentGoalSpaces = '请选择';
 					this.goalDepartmentDefaultIndex = [id];
 					this.getSpacesByDepartmentId(this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'],false)
 				} else {
@@ -542,7 +542,7 @@
 					this.goalSpacesDefaultIndex = [id];
 					this.currentGoalSpaces =  val;
 				} else {
-					this.currentGoalSpaces = []
+					this.currentGoalSpaces = '请选择'
 				};
 				this.showGoalSpaces = false
 				},
@@ -568,7 +568,7 @@
 					typeName: this.currentTaskType, // 任务类型名称
 					depName: this.currentGoalDepartment == '请选择' ? '' : this.currentGoalDepartment, //科室名称
 					depId: this.currentGoalDepartment == '请选择' ? '' : this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'], // 目的科室id
-					spaceId: this.goalSpacesOption == '请选择' ? '' : this.goalSpacesOption.filter((item) => { return item['text'] == this.currentGoalSpaces})[0]['value'], //目的房间id
+					spaceId: this.currentGoalSpaces == '请选择' ? '' : this.goalSpacesOption.filter((item) => { return item['text'] == this.currentGoalSpaces})[0]['value'], //目的房间id
 					space: this.currentGoalSpaces == '请选择' ? '' : this.currentGoalSpaces, //目的房间名称
 					priority: this.priorityRadioValue,
 					taskDesc: this.taskDescribe, //任务描述

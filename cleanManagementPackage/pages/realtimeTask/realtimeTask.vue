@@ -463,10 +463,6 @@
 				});
 				this.showLoadingHint = false;
 				this.noDataShow = true;
-				if (this.isFresh) {
-					uni.stopPullDownRefresh();
-					this.isFresh = false
-				}
 			  })
 			},
 			 

@@ -502,7 +502,7 @@
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 	@import "~@/common/stylus/variable.scss";
 	page {
 		width: 100%;

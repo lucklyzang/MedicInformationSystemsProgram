@@ -364,14 +364,6 @@
 			  }
 			},
 			
-			// 进入订单详情事件
-			enterTaskMessage (item) {
-				this.changeEnvironmentTaskMessage(item);
-				uni.navigateTo({
-					url: '/cleanManagementPackage/pages/projectWorkerOrderMessage/projectWorkerOrderMessage'
-				})
-			},
-			
 			// tab切换改变事件
 			tabChange (index) {
 				if (this.dateEndValue < this.dateStartValue) {
