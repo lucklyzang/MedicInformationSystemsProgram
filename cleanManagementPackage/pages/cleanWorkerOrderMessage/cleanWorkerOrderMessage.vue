@@ -44,7 +44,7 @@
       </view>
 			<view class="location">
 			  <text>优先级</text>
-			  <text>{{environmentTaskMessage.priority }}</text>
+			  <text>{{ taskPriotityTransition(environmentTaskMessage.priority) }}</text>
 			</view>
 			<view class="issue-picture">
 			  <view>图片</view>
@@ -182,6 +182,24 @@ export default {
 		// 顶部导航返回事件
 		backTo () {
 			uni.navigateBack()
+		},
+		
+		// 优先级转换
+		taskPriotityTransition (state) {
+			switch(state) {
+				case 1 :
+					return '正常'
+					break;
+				case 2 :
+					return '重要'
+					break;
+				case 3 :
+					return '紧急'
+					break;
+				case 4 :
+					return '紧急重要'
+					break
+			}
 		},
 		
 		// 图片放大事件

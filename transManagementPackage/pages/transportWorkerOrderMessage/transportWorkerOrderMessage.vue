@@ -99,7 +99,7 @@
 							<view class="describe-line-wrapper">
 								<view class="message-tit">语音备注 :&nbsp;</view>
 								<view class="message-tit-real-audio" v-if="showChildrenComponent">
-									<MyAudio v-if="!transTaskMessage.recordTime != true" :src="`http://show.blinktech.cn/trans/${transTaskMessage.taskNumber}.mp3`"></MyAudio>
+									<MyAudio v-if="!transTaskMessage.recordTime != true" :src="`http://ver.blinktech.cn/trans/${transTaskMessage.taskNumber}.mp3`"></MyAudio>
 								</view>
 								<view class="message-tit-real" v-show="!transTaskMessage.recordTime">
 									无语音信息

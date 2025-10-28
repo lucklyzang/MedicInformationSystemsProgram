@@ -135,7 +135,7 @@
 				// 旧密码不能为空
 				if (this.formerPasswordValue == '') {
 					this.$refs.uToast.show({
-						title: '请输入旧密码',
+						message: '请输入旧密码',
 						position: 'center',
 						type: 'warning'
 					});
@@ -144,7 +144,7 @@
 				// 新密码不能为空
 				if (this.newPasswordValue == '') {
 					this.$refs.uToast.show({
-						title: '请输入新密码',
+						message: '请输入新密码',
 						position: 'center',
 						type: 'warning'
 					});
@@ -153,7 +153,7 @@
 				// 新旧密码不能相同
 				if (this.newPasswordValue == this.formerPasswordValue) {
 					this.$refs.uToast.show({
-						title: '修改失败！旧密码与新密码一致，请重新输入',
+						message: '修改失败！旧密码与新密码一致，请重新输入',
 						position: 'center',
 						type: 'warning'
 					});
@@ -162,7 +162,7 @@
 				// 确认新密码不能为空
 				if (this.surePasswordValue == '') {
 					this.$refs.uToast.show({
-						title: '请确认新密码',
+						message: '请确认新密码',
 						position: 'center',
 						type: 'warning'
 					});
@@ -171,7 +171,7 @@
 				// 两次密码输入不一致
 				if (this.newPasswordValue != this.surePasswordValue) {
 					this.$refs.uToast.show({
-						title: '两次密码输入不一致',
+						message: '两次密码输入不一致',
 						position: 'center',
 						type: 'warning'
 					});
@@ -180,7 +180,7 @@
 				// 新密码不能少于8位
 				if (this.newPasswordValue.length < 8) {
 					this.$refs.uToast.show({
-						title: '修改失败，新密码不得少于8位!',
+						message: '修改失败，新密码不得少于8位!',
 						position: 'center',
 						type: 'warning'
 					});
@@ -189,7 +189,7 @@
 				// 新密码只能包含数字和字母
 				if (!(/^[a-zA-Z0-9]+$/.test(this.newPasswordValue))) {
 					this.$refs.uToast.show({
-						title: '修改失败，新密码只能包含数字和字母',
+						message: '修改失败，新密码只能包含数字和字母',
 						position: 'center',
 						type: 'warning'
 					});
@@ -227,7 +227,7 @@
 				.catch((err) => {
 					this.showLoadingHint = false;
 				  this.$refs.uToast.show({
-				    title: `${err.message}`,
+				    message: `${err.message}`,
 				    type: 'error'
 				  })
 				})

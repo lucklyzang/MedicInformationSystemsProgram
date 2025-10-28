@@ -128,6 +128,8 @@
 							arr.splice(index,1)
 						}
 					})
+				} else {
+					this.serviceList = []
 				}
 			},
 			
