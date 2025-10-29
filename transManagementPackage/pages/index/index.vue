@@ -176,13 +176,16 @@ export default {
 		 				if (item1) {
 		 					this.transTypeList = [];
 		 					for (let item of item1) {
-								if (item.typeName == '标本' || item.typeName == '检查' || item.typeName == '药物文书') {
+								if (item.typeName == '标本' || item.typeName == '检查' || item.typeName == '药、物、文书') {
 									this.transTypeList.push({
 										value: item.id,
-										text: item.typeName
+										text: item.typeName == '药、物、文书' ?  item.typeName.replace(/、/g,'') : item.typeName
 									})
 								}	
-		 					}
+		 					};
+							let needList = this.transTypeList.filter((item) => { return item.text == '药物文书' })[0];
+							this.transTypeList = this.transTypeList.filter((item) => { return item.text != '药物文书' });
+							this.transTypeList.push(needList)
 		 				}
 		 			}
 		 		})
@@ -338,7 +341,7 @@ page {
 						width: 35% !important;
 						align-items: center;
 					};
-					&:nth-child(3) {
+					&:last-child {
 						width: 40% !important;
 						align-items: center;
 						.list-bottom {

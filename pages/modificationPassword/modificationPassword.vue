@@ -219,7 +219,7 @@
 				  } else {
 						this.$refs.alertToast.show({
 							type: 'error',
-							message: '修改失败!',
+							message: `${res.data.msg}!`,
 							isShow: true
 						})
 				  }

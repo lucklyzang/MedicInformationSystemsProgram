@@ -126,7 +126,7 @@
 					<view class="item-bottom">
 						<view class="item-bottom-right">
 							<view class="left"  @click.stop="reminder(item)" :class="{'reminderStyle':item.reminder == 1 }">
-								<text>催单</text>
+								<text>{{ item.reminder == 0 ? '催单' : '已催单' }}</text>
 							</view>
 							<view class="right" @click.stop="cancel(item)" v-if="item.state !== 3">
 								<text>取消订单</text>
@@ -1015,7 +1015,7 @@
 								}
 			 				};
 							.reminderStyle {
-								opacity: .4;
+								background: #9C9C9C !important;
 							};
 			 				.left  {
 			 					background: #E8CB51;

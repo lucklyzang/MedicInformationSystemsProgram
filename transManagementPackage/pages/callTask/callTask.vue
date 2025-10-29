@@ -66,13 +66,13 @@
 					<view class="bedNumberBox scroll-view-item transport-number">
 						<view>运送数量</view>
 						<view>
-							<u-input v-model="patienModalMessage.actualData" disabled border="none" type="number" />
+							<u-input v-model="patienModalMessage.actualData" disabled border="none" type="digit" />
 						</view>
 					</view>
 					<view class="bedNumberBox scroll-view-item transport-number">
 						<view>年龄</view>
 						<view>
-							<u-input v-model="patienModalMessage.patientAgeValue" type="digit" placeholder="请输入年龄" />
+							<u-input @input="checkAgetemplateTwo" v-model="patienModalMessage.patientAgeValue" type="digit" placeholder="请输入年龄" />
 						</view>
 					</view>
 					<view class="transportBox scroll-view-item">
@@ -159,7 +159,6 @@
 		</view>
 		<view class="select-box">
 			<view class="select-box-left">
-				<text>*</text>
 				<text>起点科室</text>
 			</view>
 			<view class="select-box-right" @click="showStartDepartment = true">
@@ -184,7 +183,7 @@
 				<u-icon name="arrow-right" color="#989999" size="20"></u-icon>
 			</view>
 		</view>
-		<view class="select-box end-select-box">
+	<!-- 	<view class="select-box end-select-box">
 			<view class="select-box-left">
 				<text>运送员</text>
 			</view>
@@ -192,7 +191,7 @@
 				<text>{{ currentTransporter }}</text>
 				<u-icon name="arrow-right" color="#989999" size="20"></u-icon>
 			</view>
-		</view>
+		</view> -->
 		<view class="select-box end-select-box">
 			<view class="select-box-left">
 				<text>转运工具</text>
@@ -220,13 +219,13 @@
 				</view>
 				<view class="creat-form-field">
 					<text>年龄</text>
-					<u-input v-model="patientAgeValue" type="digit" border="bottom" placeholder="请输入" />
+					<u-input @input="checkAgetemplateOne" v-model="patientAgeValue" type="digit" border="bottom" placeholder="请输入" />
 				</view>
 			</view>
 			<view class="patient-message-bottom-age">
 				<view class="patient-message-bottom-right">
 					<text>运送数量</text>
-					<u-input v-model="transportNumberValue" border="bottom" type="digit" placeholder="请输入运输数量" />
+					<u-input @input="checkTransNumTemplateOne" v-model="transportNumberValue" border="bottom" type="digit" placeholder="请输入运输数量" />
 				</view>
 				<view class="contact-isolation-box">
 					<view>接触隔离</view>
@@ -282,12 +281,12 @@
 						</view>
 						<view class="creat-form-field">
 							<text>运送数量</text>
-							<u-input disabled v-model="item.actualData" type="text" border="none" disabled :clearable="false">
+							<u-input disabled v-model="item.actualData" type="digit" border="none" disabled :clearable="false">
 							</u-input>
 						</view>
 						<view class="creat-form-field">
 							<text>年龄</text>
-							<u-input v-model="item.patientAgeValue" border="none" disabled :clearable="false" type="number">
+							<u-input v-model="item.patientAgeValue" border="none" disabled :clearable="false" type="digit">
 							</u-input>
 						</view>
 					</view>
@@ -462,7 +461,6 @@ export default {
         patientName: '',
         patientNumber: '',
         patientAgeValue: '',
-				patientAgeValue: '',
         actualData: 0,
         genderValue: '0',
         isContactisolationValue: null,
@@ -477,13 +475,16 @@ export default {
     }
   },
 	
-	onLoad: function (option) {
-		this.currentTransportRice = JSON.parse(option.msg)['text'];
-		this.currentTransportRiceValue = JSON.parse(option.msg)['value'];
-		this.titleText =this.currentTransportRice;
+	onLoad(option) {
 		this.parallelFunction();
 		// 根据运送大类查询运送类型小类
 		this.querytransportChildByTransportParent('',this.currentTransportRiceValue,this.templateType);
+		// 为当前页面运送大类赋值
+		this.currentTransportRice = JSON.parse(option.msg)['text'];
+		this.currentTransportRiceValue = JSON.parse(option.msg)['value'];
+		this.titleText = this.currentTransportRice;
+		// 为起点科室赋默认值
+		this.currentStartDepartment = this.depName == '' ? '请选择' : this.depName;
 	},
 
   watch: {
@@ -540,6 +541,36 @@ export default {
 		// 顶部导航返回事件
 		backTo () {
 			uni.navigateBack()
+		},
+		
+		// 模板二年龄输入框校验事件
+		checkAgetemplateTwo (value) {
+			const regex = /^[1-9]\d*$/;
+			if (!regex.test(value) && value !== '') {
+				this.$nextTick(() => {
+					this.$set(this.patienModalMessage, 'patientAgeValue', '')
+				})
+			}
+		},
+		
+		// 模板一年龄输入框校验事件
+		checkAgetemplateOne (value) {
+			const regex = /^[1-9]\d*$/;
+			if (!regex.test(value) && value !== '') {
+				this.$nextTick(() => {
+					this.patientAgeValue = '';
+				})
+			}
+		},
+		
+		// 模板一运送数量输入框校验事件
+		checkTransNumTemplateOne (value) {
+			const regex = /^[1-9]\d*$/;
+			if (!regex.test(value) && value !== '') {
+				this.$nextTick(() => {
+					this.transportNumberValue = '';
+				})
+			}
 		},
 		
     // 添加病人信息事件
@@ -851,7 +882,10 @@ export default {
                     selected: false
                   })
                 }
-              })
+              });
+							if (this.currentStartDepartment && this.currentStartDepartment != '请选择') {
+								this.startDepartmentDefaultIndex = this.startDepartmentList.filter((item) => { return item.text == this.currentStartDepartment })[0]['id']
+							}
             };
             if (item2) {
               // 转运工具
@@ -878,7 +912,7 @@ export default {
                   value: item3[i].typeName
                 });
                 this.transportRiceList.push({
-                  text: item3[i].typeName,
+                  text: item3[i].typeName == '药、物、文书' ?  item3[i].typeName.replace(/、/g,'') : item3[i].typeName,
                   value: item3[i].id,
                   id: i
                 })
@@ -1135,12 +1169,6 @@ export default {
           });
           return
         };
-        if (this.currentStartDepartment == '请选择' || !this.currentStartDepartment) {
-					this.$refs.uToast.show({
-						message: '请选择起点科室',
-					});
-          return
-        };
         // 起始地与目的地不能相同
         if (this.currentStartDepartment == this.currentEndDepartment) {
 					this.$refs.uToast.show({
@@ -1155,12 +1183,6 @@ export default {
 					});
           return
         };
-        if (this.currentStartDepartment == '请选择' || !this.currentStartDepartment) {
-					this.$refs.uToast.show({
-						message: '请选择起点科室',
-					});
-          return
-        }
         // 终点科室不能包含起点科室
         if (this.currentGoalSpaces.length > 0) {
           if (this.currentGoalSpaces.filter((item) => { return item.text == this.currentStartDepartment}).length > 0) {
@@ -1245,23 +1267,20 @@ export default {
           bedNumber: this.patientNumberValue,  //床号
           taskRemark: this.taskDescribe,   //备注
           quarantine: this.isContactisolationValue === null ? -1 : this.isContactisolationValue,// 接触隔离
-          assignId: this.workerId,   //分配者ID  当前登录者
-          assignName: this.userName,   //分配者名称  当前登陆者
           createId: this.workerId,   //创建者ID  当前登录者
           createName: this.userName,   //创建者名称  当前登陆者
           proId: this.proId,   //项目ID
-          workerId: this.currentTransporter == '请选择' ? '' : this.currentTransporterValue, // 运送员ID
-          workerName: this.currentTransporter == '请选择' ? '' : this.currentTransporter, // 运送员姓名
           proName: this.proName,   //项目名称
           isBack: this.isBackRadioValue,  //是否返回出发地  0-不返回，1-返回
-          createType: 3 //创建类型   0-web端,1-手机端(医护),3-手机端(任务调度)
+					createType: 2 ,//创建类型   0-调度员,1-医务人员(平板创建),2-医务人员(小程序)
+					startTerminal: 2 // 发起客户端类型 1-安卓APP，2-微信小程序
         };
         // 创建调度任务
         this.postGenerateDispatchTask(taskMessage);
       } else if (this.templateType === 'template_two') {
         let taskMessageTwo = {
-          setOutPlaceId: this.getDepartmentIdByName(this.currentStartDepartment), //出发地ID
-          setOutPlaceName: this.currentStartDepartment, //出发地名称
+					setOutPlaceId: this.currentStartDepartment == '请选择' ? '' : this.getDepartmentIdByName(this.currentStartDepartment), //出发地ID
+					setOutPlaceName: this.currentStartDepartment == '请选择' ? '' : this.currentStartDepartment,//出发地名称
           destinations: [],//多个目的地列表
           patientInfoList: [], //多个病人信息列表
           priority: this.priorityRadioValue, //优先级   1-正常, 2-重要,3-紧急, 4-紧急重要
@@ -1273,12 +1292,11 @@ export default {
           parentTypeName: this.currentTransportRice,//运送父类型名称
           createId: this.workerId,   //创建者ID  当前登录者
           createName: this.userName,   //创建者名称  当前登陆者
-          workerId: this.currentTransporter == '请选择' ? '' : this.currentTransporterValue, // 运送员id
-          workerName: this.currentTransporter == '请选择' ? '' : this.currentTransporter, // 运送员姓名
           proId: this.proId, //项目ID
           proName: this.proName, //项目名称
           isBack: this.isBackRadioValue, //是否返回出发地  0-不返回，1-返回
-          createType: 1 //创建类型   0-web端,1-手机端(医护),3-手机端(任务调度)
+					createType: 2 ,//创建类型   0-调度员,1-医务人员(平板创建),2-医务人员(小程序)
+					startTerminal: 2 // 发起客户端类型 1-安卓APP，2-微信小程序
         };
         // 处理多个终点科室信息
         if (this.currentGoalSpaces.length > 0) {
@@ -1751,14 +1769,9 @@ export default {
 					padding-right: 10px;
 					box-sizing: border-box;
 					>text {
-						&:nth-child(1) {
-							color: red
-						};
-						&:nth-child(2) {
-							color: #9E9E9A;
-							padding-right: 6px;
-							box-sizing: border-box
-						};
+						color: #9E9E9A;
+						padding-right: 6px;
+						box-sizing: border-box
 					}
 				};
 				.select-box-right {
@@ -1835,7 +1848,7 @@ export default {
 			};
 			.patient-message-box {
 				width: 100%;
-				padding: 10px 6px;
+				padding: 10px 6px 10px 10px;
 				box-sizing: border-box;
 				background: #fff;
 				font-size: 14px;
@@ -1850,7 +1863,7 @@ export default {
 					margin: 4px 0;
 					.creat-form-field {
 						&:first-child {
-							margin: 0 6px 0 10px;
+							margin: 0 6px 0 0;
 						};
 						flex: 1;
 						display: flex;
@@ -1886,7 +1899,7 @@ export default {
 						width: 50%;
 						flex: none;
 						&:first-child {
-							margin: 0 6px 0 10px;
+							margin: 0 6px 0 0;
 						};
 						flex: 1;
 						display: flex;

@@ -30,7 +30,15 @@
 				</view>
 			</view>
 			<view class="department-box">
-				{{ depName }} - {{ depNum }}
+				<text>
+					{{ depName }}
+				</text>
+				<text v-if="depName != '' && depNum != ''">
+					-
+				</text>
+				<text>
+					{{ depNum }}
+				</text>
 			</view>
 		</view>
 		<u-transition :show="showLoadingHint" mode="fade-down">
@@ -273,11 +281,13 @@
 			flex: 1;
 			margin-top: 10px;
 			.department-box {
+				max-width: 90%;
 				position: absolute;
-				bottom: 10px;
+				bottom: 6px;
 				right: 10px;
 				font-size: 16px;
 				color: #ACADAF;
+				@include no-wrap;
 			};
 			.service-management {
 				padding: 10px 10px 20px 10px;
