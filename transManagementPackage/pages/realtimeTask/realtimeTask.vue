@@ -337,7 +337,7 @@
 			}
 		},
 		onLoad() {
-			this.getDispatchTaskCancelReason();
+			this.getDispatchTaskCancelReason({type:1,state:0,proId:this.proId});
 			this.queryCompleteDispatchTask(
 				{
 				   proId:this.proId, workerId:'',state: -1,

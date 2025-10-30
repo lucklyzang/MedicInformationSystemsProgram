@@ -8,7 +8,7 @@ export default {
 			return state.userInfo
 		},
 		isMedicalMan:(state) => {
-			state.isMedicalMan = getCache('isMedicalMan') ? getCache('isMedicalMan') === 'false' ? false : true : false;
+			state.isMedicalMan = getCache('isMedicalMan') ? getCache('isMedicalMan') === 'false' ? false : true : true;
 			return state.isMedicalMan
 		},
 		chooseHospitalArea:(state) => {
@@ -39,6 +39,7 @@ export default {
 	},
 	mutations: {
 		changeIsMedicalMan (state, playLoad) {
+			setCache('isMedicalMan', playLoad);
 		  state.isMedicalMan = playLoad
 		},
 		storeUserInfo(state, playLoad) {

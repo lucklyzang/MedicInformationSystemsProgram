@@ -8,10 +8,10 @@
 					  {{ title }}
 					  <u-icon name="close" size="25" @click="close"></u-icon>
 					</view>
-					<view class="button-box-top" v-if="list.length > 0 && buttonLocation == 'top'">
-						<text class="cancel-text" @click="cancel" v-if="list.length > 0">取消</text>
+					<view class="button-box-top" v-if="buttonLocation == 'top'">
+						<text class="cancel-text" @click="cancel">取消</text>
 						<text class="title-text"> {{ title }}</text>
-						<text class="sure-text" @click="confirm" v-if="list.length > 0">确定</text>
+						<text class="sure-text" @click="confirm">确定</text>
 					</view>
 					<view class="search-box" v-if="isShowSearch" ref="searchBox">
 						<u-search

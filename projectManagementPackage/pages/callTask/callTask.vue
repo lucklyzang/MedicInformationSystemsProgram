@@ -250,9 +250,6 @@
 			this.parallelFunction();
 			if (this.isMedicalMan) {
 				this.currentGoalDepartment = this.depName == '' ? '请选择' :  this.depName;
-				if (this.depName) {
-					this.goalDepartmentDefaultIndex = [this.goalDepartmentOption.findIndex((item) => { return item.text == this.depName })];
-				};
 				// 登陆人员为医务人员时，根据默认科室id查询目的房间列表
 				if (this.depId) {
 					this.getSpacesByDepartmentId(this.depId)
@@ -447,7 +444,12 @@
 										value: item,
 										id: index
 									})
-								})
+								});
+								if (this.isMedicalMan) {
+									if (this.depName) {
+										this.goalDepartmentDefaultIndex = [this.goalDepartmentOption.findIndex((item) =>{ return item.text == this.depName })];
+									}
+								}
 							};
 							if (item2) {
 								// 任务类型
@@ -576,6 +578,7 @@
 					workerId: this.workerId,
 					workerName: this.userAccount,
 					images: this.imgArr, // 问题图片信息 非必输
+					createType: 3,
 					flag: this.isMedicalMan ? 1 : 0 // 上报人类型，0-维修人员，1-医护人员
 				};
 				this.postGenerateRepairsTask(temporaryMessage)

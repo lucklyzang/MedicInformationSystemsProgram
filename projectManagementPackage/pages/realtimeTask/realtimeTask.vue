@@ -284,7 +284,7 @@
 			this.queryCompleteDispatchTask(
 				{
 				   proId:this.proId, createId:this.workerId,state: -5,
-						 startDate: '', endDate: ''
+					startDate: '', endDate: ''
 				},'待办任务'
 			)
 		},

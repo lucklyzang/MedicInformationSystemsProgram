@@ -223,18 +223,18 @@
 				</view>
 			</view>
 			<view class="patient-message-bottom-age">
+				<view class="patient-message-bottom-left">
+					<view class="select-box-left">
+						<text>性别</text>
+					</view>
+					<view class="select-box-right" @click="showGender = true">
+						<text :class="{'selectBoxRightStyle' : currentGender == '请选择'}">{{ currentGender }}</text>
+						<u-icon name="arrow-right" color="#989999" size="20"></u-icon>
+					</view>
+				</view>
 				<view class="patient-message-bottom-right">
 					<text>运送数量</text>
 					<u-input @input="checkTransNumTemplateOne" v-model="transportNumberValue" border="bottom" type="digit" placeholder="请输入运输数量" />
-				</view>
-				<view class="contact-isolation-box">
-					<view>接触隔离</view>
-					<view>
-						<u-radio-group v-model="isContactisolationValue">
-							<u-radio name="1" activeColor="#3B9DF9" label="是"></u-radio>
-							<u-radio name="0" activeColor="#3B9DF9" label="否"></u-radio>
-						</u-radio-group>
-					</view>
 				</view>
 			</view>
 		</view>
@@ -308,13 +308,13 @@
 					添加病人信息
 			</view>
 		</view>
-		<view class="select-box end-select-box" v-if="templateType === 'template_one'">
-			<view class="select-box-left">
-				<text>性别</text>
-			</view>
-			<view class="select-box-right" @click="showGender = true">
-				<text>{{ currentGender }}</text>
-				<u-icon name="arrow-right" color="#989999" size="20"></u-icon>
+		<view class="message-one is-back">
+			<view class="message-one-left">接触隔离</view>
+			<view class="transport-isBack">
+				<u-radio-group v-model="isContactisolationValue">
+					<u-radio name="0" activeColor="#95e195" labelColor="#95e195" label="否"></u-radio>
+					<u-radio name="1" activeColor="orange" labelColor="orange" label="是"></u-radio>
+				</u-radio-group>
 			</view>
 		</view>
 		<view class="message-one is-back">
@@ -323,8 +323,8 @@
 			</view>
 			<view class="transport-isBack">
 				<u-radio-group v-model="isBackRadioValue">
-					<u-radio name="0" activeColor="#2c9af1" label="否"></u-radio>
-					<u-radio name="1" activeColor="#2c9af1" label="是"></u-radio>
+					<u-radio name="0" activeColor="#95e195" labelColor="#95e195" label="否"></u-radio>
+					<u-radio name="1" activeColor="orange" labelColor="orange" label="是"></u-radio>
 				</u-radio-group>
 			</view>
 		</view>
@@ -477,12 +477,12 @@ export default {
 	
 	onLoad(option) {
 		this.parallelFunction();
-		// 根据运送大类查询运送类型小类
-		this.querytransportChildByTransportParent('',this.currentTransportRiceValue,this.templateType);
 		// 为当前页面运送大类赋值
 		this.currentTransportRice = JSON.parse(option.msg)['text'];
 		this.currentTransportRiceValue = JSON.parse(option.msg)['value'];
 		this.titleText = this.currentTransportRice;
+		// 根据运送大类查询运送类型小类
+		this.querytransportChildByTransportParent('',this.currentTransportRiceValue,this.templateType);
 		// 为起点科室赋默认值
 		this.currentStartDepartment = this.depName == '' ? '请选择' : this.depName;
 	},
@@ -884,7 +884,7 @@ export default {
                 }
               });
 							if (this.currentStartDepartment && this.currentStartDepartment != '请选择') {
-								this.startDepartmentDefaultIndex = this.startDepartmentList.filter((item) => { return item.text == this.currentStartDepartment })[0]['id']
+								this.startDepartmentDefaultIndex = [this.startDepartmentList.filter((item) => { return item.text == this.currentStartDepartment })[0]['id']];
 							}
             };
             if (item2) {
@@ -1895,8 +1895,40 @@ export default {
 				.patient-message-bottom-age {
 					display: flex;
 					align-items: center;
+					.patient-message-bottom-left {
+						width: 40%;
+						display: flex;
+						align-items: center;
+						justify-content: space-between;
+						margin-right: 15px;
+						.select-box-left {
+							padding-right: 10px;
+							box-sizing: border-box;
+							>text {
+								color: #9E9E9A;
+								padding-right: 6px;
+								box-sizing: border-box
+							}
+						};
+						.select-box-right {
+							flex: 1;
+							justify-content: flex-end;
+							align-items: center;
+							display: flex;
+							width: 0;
+							>text {
+								color: #101010;
+								text-align: right;
+								flex: 1;
+								@include no-wrap();
+							};
+							.selectBoxRightStyle {
+								color: #bbbdc3 !important 
+							}
+						}
+					};
 					.patient-message-bottom-right {
-						width: 50%;
+						width: 60%;
 						flex: none;
 						&:first-child {
 							margin: 0 6px 0 0;

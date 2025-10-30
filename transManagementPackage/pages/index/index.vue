@@ -305,17 +305,17 @@ page {
 		 		display: flex;
 		 		flex-wrap: wrap;
 		 		.trans-list {
-		 			width: 25%;
+					width: 25%;
 		 			display: flex;
 		 			flex-direction: column;
 		 			.list-top {
-		 				width: 50px;
-		 				height: 50px;
+		 				width: 55px;
+		 				height: 55px;
 						position: relative;
 		 				>image {
 							&:nth-child(1) {
-								width: 50px;
-								height: 50px;
+								width: 55px;
+								height: 55px;
 								position: absolute;
 								top: 0;
 								left: 0
@@ -331,18 +331,18 @@ page {
 		 				}
 		 			};
 		 			.list-bottom {
-						width: 50px;
+						width: 55px;
 						text-align: center;
 		 				margin-top: 10px;
 		 				font-size: 16px;
 		 				color: #101010;
 		 			};
 					&:nth-child(2) {
-						width: 35% !important;
+						width: 38% !important;
 						align-items: center;
 					};
 					&:last-child {
-						width: 40% !important;
+						width: 37% !important;
 						align-items: center;
 						.list-bottom {
 							width: 70px !important

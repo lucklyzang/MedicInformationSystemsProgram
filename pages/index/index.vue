@@ -21,8 +21,8 @@
 					服务管理
 				</view>
 				<view class="service-management-content">
-					<view class="service-list" v-for="(item,index) in serviceList" :key="index" @click="serviceManagementEvent(item,index)">
-						<view class="list-top">
+					<view class="service-list" v-for="(item,index) in hasAuthSystemsList" :key="index" @click="serviceManagementEvent(item,index)">
+						<view class="list-top" :class="{'projectStyle':item.value == 'project','cleanStyle':item.value == 'clean' }">
 							<image :src="item.url"></image>
 						</view>
 						<view class="list-bottom">{{ item.text }}</view>
@@ -61,6 +61,7 @@
 				triangleRectListInfoShow: false,
 				infoText: '加载中···',
 				loadingText: '加载中···',
+				hasAuthSystemsList: [],
 				serviceList: [
 					{
 						text: '中央运送',
@@ -130,14 +131,13 @@
 			
 			// 控制服务管理模块显示隐藏
 			controlServiceManageModuleShowEvent () {
+				this.hasAuthSystemsList = [];
 				if (this.userInfo['extendData'].hasOwnProperty('systems')) {
 					this.serviceList.map((value,index,arr) => {
-						if (this.userInfo['extendData']['systems'].indexOf(value['value']) == -1) {
-							arr.splice(index,1)
+						if (this.userInfo['extendData']['systems'].indexOf(value['value']) != -1) {
+							this.hasAuthSystemsList.push(value)
 						}
 					})
-				} else {
-					this.serviceList = []
 				}
 			},
 			
@@ -279,6 +279,9 @@
 		.content-box {
 			position: relative;
 			flex: 1;
+			height: 0;
+			display: flex;
+			flex-direction: column;
 			margin-top: 10px;
 			.department-box {
 				max-width: 90%;
@@ -293,7 +296,9 @@
 				padding: 10px 10px 20px 10px;
 				box-sizing: border-box;
 				width: 98%;
+				max-height: 350px;
 				margin: 0 auto;
+				overflow: auto;
 				background: #fff;
 				border-radius: 10px;
 				.service-management-title {
@@ -309,6 +314,7 @@
 						width: 25%;
 						display: flex;
 						flex-direction: column;
+						margin-bottom: 20px;
 						.list-top {
 							width: 50px;
 							height: 50px;
@@ -322,22 +328,16 @@
 								height: 32px;
 							}
 						};
+						.projectStyle {
+							background: #FC8F66 !important;
+						};
+						.cleanStyle {
+							background: #4CC9E4 !important;
+						};
 						.list-bottom {
 							margin-top: 10px;
 							font-size: 12px;
 							color: #101010;
-						}
-					};
-					>view {
-						&:nth-child(2) {
-							.list-top {
-								background: #FC8F66 !important;
-							} 
-						};
-						&:nth-child(3) {
-							.list-top {
-								background: #4CC9E4 !important;
-							} 
 						}
 					}
 				}
