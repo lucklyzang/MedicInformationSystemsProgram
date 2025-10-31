@@ -44,7 +44,15 @@
       </view>
 			<view class="location">
 			  <text>优先级</text>
-			  <text>{{ taskPriotityTransition(environmentTaskMessage.priority) }}</text>
+			  <text
+				:class="{
+						'priorityNormalStyle' : environmentTaskMessage.priority == 1,
+						'priorityUrgencyStyle' : environmentTaskMessage.priority == 2,
+						'priorityImportanceStyle' : environmentTaskMessage.priority == 3,
+						'priorityUrgentImportanceStyle' : environmentTaskMessage.priority == 4,
+				 
+				 }"
+				>{{ taskPriotityTransition(environmentTaskMessage.priority) }}</text>
 			</view>
 			<view class="issue-picture">
 			  <view>图片</view>
@@ -452,7 +460,19 @@ page {
           box-sizing: border-box;
           word-break: break-all
         }
-      }
+      };
+			.priorityNormalStyle {
+					color: #289E8E !important
+			};
+			.priorityUrgencyStyle {
+					color: #E8CB51 !important
+			};
+			.priorityImportanceStyle { 
+					color: #F2A15F !important
+			};
+			.priorityUrgentImportanceStyle { 
+					color: #E86F50 !important
+			}
     };
     .location-other {
       padding: 10px 8px;

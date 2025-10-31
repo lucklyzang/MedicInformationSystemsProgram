@@ -38,7 +38,7 @@ export function attendanceWorkerList(proId) {
 // 获取违反标准信息
 export function getViolateStandardMessage(data) {
     return request({
-        url: 'clean//cleanArea/standards',
+        url: 'clean/cleanArea/standards',
         method: 'get',
         params: data
     })

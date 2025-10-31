@@ -516,7 +516,7 @@
 								isSign: item.isSign,
 								tempFlag: item.tempFlag,
 								workerName: item.workerName,
-								reminder: item.reminder
+								reminder: item.reminder == null ? '' : item.reminder
 							})
 						}
 				  } else {

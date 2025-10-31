@@ -104,7 +104,7 @@
 						</view>
 						<view class="item-top-three">
 						 <text>位置:</text>
-						 <text>{{!item.taskDesc ? '无' : item.taskDesc}}</text>
+						 <text>{{ `${item.structureName}-${item.depName}-${item.areaImmediateName}-${extractSpaceMessage(item.spaces)}` }}</text>
 						</view>
 						<view class="item-top-four">
 						 <text>问题描述:</text>
@@ -143,7 +143,7 @@
 						</view>
 						<view class="item-top-three">
 						 <text>位置:</text>
-						 <text>{{!item.taskDesc ? '无' : item.taskDesc}}</text>
+						 <text>{{ `${item.structureName}-${item.depName}-${item.areaImmediateName}-${extractSpaceMessage(item.spaces)}` }}</text>
 						</view>
 						<view class="item-top-four">
 						 <text>问题描述:</text>
@@ -308,6 +308,18 @@
 			  if (t1 && t2) {
 			    return SOtime.time5(t1,t2)
 			  }
+			},
+			
+			// 提取即时保洁功能区信息
+			extractSpaceMessage (spaces) {
+			  if (spaces.length == 0) {
+			      return ''
+			  };
+			  let temporaryArray = [];
+			  for (let item of spaces) {
+			      temporaryArray.push(item.name);
+			  };
+			  return temporaryArray.join("、")
 			},
 			
 			// 进入订单详情事件
@@ -499,13 +511,16 @@
 								finalFinishTime: item.finalFinishTime,
 								finishTime: item.finishTime,
 								state: item.state,
-								destinationName: item.depName,
 								taskTypeName: item.typeName,
 								priority: item.priority,
 								number: item.taskNumber,
 								id: item.id,
 								taskDesc: item.taskRemark,
-								workerName: item.workerName
+								workerName: item.workerName,
+								structureName: item.structureName,
+								depName: item.depName,
+								areaImmediateName: item.areaImmediateName,
+								spaces: item.spaces
 							})
 						}
 				  } else {
@@ -816,6 +831,8 @@
 			 				margin: 10px 0;
 			 		  };
 			 		  .item-top-four {
+							max-height: 100px;
+							overflow: auto;
 			 		  }
 			 		}
 			 	}

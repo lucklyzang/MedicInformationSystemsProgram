@@ -450,7 +450,7 @@
 								id: item.id,
 								taskDesc: item.taskDesc,
 								workerName: item.workerName,
-								reminder: item.reminder
+								reminder: item.reminder == null ? '' : item.reminder
 							})
 						}
 				  } else {
@@ -896,28 +896,24 @@
 			 		    }
 			 		  };
 			 		  .item-top-four {
-							 box-sizing: border-box;
-			 				 padding: 10px 12px;
-			 				 font-size: 12px;
-			 				 > view {
-								display: flex;
-			 					width: 100%;
-								word-break: break-all;
-			 					.destina-list {
-			 						color: #101010;
-			 						margin-right: 4px;
-			 					};
-			 					text {
-			 						display: inline-block;
-			 						&:first-child {
-			 							color: #101010;
-			 							margin-right: 4px
-			 						};
-									&:last-child {
-										flex: 1;
-									}
-			 					}
-			 				}
+							box-sizing: border-box;
+			 				padding: 10px 12px;
+			 				font-size: 12px;
+							display: flex;
+							width: 100%;
+							word-break: break-all;
+							>text {
+								display: inline-block;
+								&:first-child {
+									color: #101010;
+									margin-right: 4px
+								};
+								&:last-child {
+									max-height: 100px;
+									overflow: auto;
+									flex: 1;
+								}
+							}
 			 		  }
 			 		};
 			 		.item-bottom {

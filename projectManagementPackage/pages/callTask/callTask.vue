@@ -498,6 +498,7 @@
 				if (val) {
 					this.currentGoalDepartment =  val;
 					this.currentGoalSpaces = '请选择';
+					this.goalSpacesDefaultIndex = [0];
 					this.goalDepartmentDefaultIndex = [id];
 					this.getSpacesByDepartmentId(this.goalDepartmentOption.filter((item) => { return item['text'] == this.currentGoalDepartment})[0]['value'],false)
 				} else {
@@ -577,6 +578,7 @@
 					proId: this.proId,
 					workerId: this.workerId,
 					workerName: this.userAccount,
+					flag: 1,
 					images: this.imgArr, // 问题图片信息 非必输
 					createType: 3,
 					flag: this.isMedicalMan ? 1 : 0 // 上报人类型，0-维修人员，1-医护人员
@@ -623,7 +625,8 @@
 					this.priorityRadioValue = '1';
 					this.goalDepartmentDefaultIndex = [0];
 					this.currentGoalDepartment = '请选择';
-					this.currentGoalSpaces = [];
+					this.currentGoalSpaces = '请选择';
+					this.goalSpacesDefaultIndex = [0];
 					this.taskTypeDefaultIndex = [0];
 					this.currentTaskType = '请选择';
 					this.imgArr = [];

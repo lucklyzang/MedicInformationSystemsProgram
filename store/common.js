@@ -27,6 +27,9 @@ export default {
 		currentIndex:(state) => {
 			state.currentIndex = getCache('currentIndex') ? getCache('currentIndex') : 0;
 			return state.currentIndex
+		},
+		baseURL:(state) => {
+			return state.baseURL
 		}
 	},
 	mutations: {

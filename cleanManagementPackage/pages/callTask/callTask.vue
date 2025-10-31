@@ -175,7 +175,8 @@
 				"timeMessage",
 				"ossMessage",
 				"locationMessage",
-			  'chooseHospitalArea'
+			  'chooseHospitalArea',
+				'baseURL'
 			  ]),
 			  userName() {
 			  	return this.userInfo['name']
@@ -328,7 +329,7 @@
 			this.showLoadingHint = true;
 			return new Promise((resolve, reject) => {
 				uni.uploadFile({
-				 url: 'https://show.blinktech.cn/clean/oss/upload',
+				 url: `${this.baseURL}/clean/oss/upload`,
 				 filePath: imgI,
 				 name: 'files',
 				 header: {
@@ -394,8 +395,8 @@
 			};
 			let paramsData = {
 				createId: this.workerId,
-				managerId: this.workerId, // 保洁主管id，当前登陆人员id
-				managerName: this.userName,// 保洁主管姓名，当前登陆人员姓名
+				managerId: '', // 保洁主管id，当前登陆人员id
+				managerName: '',// 保洁主管姓名，当前登陆人员姓名
 				assignId: '', // 任务分配人员id，当前登陆人员id
 				assignName: '',// 任务分配人员姓名，当前登陆人员姓名
 				workerId: '',//保洁员id
@@ -410,6 +411,7 @@
 				areaImmediateId: this.locationMessage[2]['id'], // 目的区域id
 				areaImmediateName: this.locationMessage[2]['itemName'], // 目的区域名称
 				spaces: [],
+				source: '医护人员',
 				taskRemark: this.enterRemark, // 任务备注信息
 				proId: this.proId, // 所属项目id
 				proName: this.proName // 所属项目名称
@@ -729,10 +731,12 @@
 							margin-bottom: 10px;
 		        };
 		        &:nth-child(2) {
-		          /deep/ .u-cell {
-		            padding: 4px !important;
-		            border: 1px solid #cacaca;
-		          }
+		         ::v-deep .u-textarea {
+							 padding: 10px 10px 20px 10px !important;
+							 .u-textarea__count {
+								 bottom: 0 !important
+							 }
+						 }
 		        }
 		      }
 		    }

@@ -196,7 +196,7 @@
 							</view>
 							<view class="bed-number">
 								<text>取消原因:</text>
-								<text>{{ item.taskDesc }}</text>
+								<text>{{ item.cancelReason }}</text>
 							</view>
 						</view>
 					</view>
@@ -421,7 +421,7 @@
 			
 			// 进入订单详情事件
 			enterTaskMessage (item) {
-				this.changeEnvironmentTaskMessage(item);
+				this.changeProjectTaskMessage(item);
 				uni.navigateTo({
 					url: '/projectManagementPackage/pages/projectWorkerOrderMessage/projectWorkerOrderMessage'
 				})
@@ -535,6 +535,7 @@
 								number: item.taskNumber,
 								id: item.id,
 								taskDesc: item.taskDesc,
+								cancelReason: item.cancelReason,
 								workerName: item.workerName
 							})
 						}
@@ -917,33 +918,23 @@
 			 		  };
 			 		  .item-top-four {
 							 box-sizing: border-box;
-			 				 padding: 10px 12px;
-			 				 font-size: 12px;
-			 				 > view {
-								display: flex;
-			 					width: 100%;
-								word-break: break-all;
-								&:first-child {
-									width: 60%;
-								};
-								&:last-child {
-									width: 40%;
-								};
-			 					.destina-list {
-			 						color: #101010;
-			 						margin-right: 4px;
-			 					};
-			 					text {
-			 						display: inline-block;
-			 						&:first-child {
-			 							color: #101010;
-			 							margin-right: 4px
-			 						};
-									&:last-child {
-										flex: 1;
-									}
-			 					}
-			 				}
+							 padding: 10px 12px;
+							 font-size: 12px;
+							 display: flex;
+							 width: 100%;
+							 word-break: break-all;
+							 >text {
+							 	display: inline-block;
+							 	&:first-child {
+							 		color: #101010;
+							 		margin-right: 4px
+							 	};
+							 	&:last-child {
+							 		max-height: 100px;
+							 		overflow: auto;
+							 		flex: 1;
+							 	}
+							}
 			 		  }
 			 		}
 			 	}
