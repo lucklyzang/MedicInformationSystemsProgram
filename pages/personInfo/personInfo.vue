@@ -50,7 +50,7 @@
 		</view>
 		<view class="bottom-area">
 			<view class="quit-area" @click="signOutEvent">退出登录</view>
-			<view class="version-area">当前版本 1.1.0</view>
+			<view class="version-area">当前版本 1.1.1</view>
 		</view>
 	</view>
 </template>

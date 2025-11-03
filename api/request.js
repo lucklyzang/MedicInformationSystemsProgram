@@ -71,7 +71,7 @@ instance.interceptors.request.use(function (config) {
 				headers: {
 					'tenant-id': 1
 				},
-				baseURL: 'https://show.blinktech.cn',
+				baseURL: `${store.getters.baseURL}`,
 				method: 'post',
 				url: `app-api/member/auth/refresh-token?refreshToken=${store.getters.userInfo['refreshToken']}`
 			 }).then(res => {

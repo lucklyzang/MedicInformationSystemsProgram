@@ -87,12 +87,12 @@
       <view class="issue-picture" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 4 || environmentTaskMessage.state == 5 || environmentTaskMessage.state == 8">
         <view>结果图片</view>
         <view class="image-list">
-          <image :src="item.path" mode="widthFix" alt="" v-for="(item,index) in problemPicturesEchoList" :key="index" @click="enlareEvent(item)">
+          <image :src="item.path" mode="widthFix" alt="" v-for="(item,index) in resultPicturesEchoList" :key="index" @click="enlareEvent(item)">
         </view>
       </view>
 			<view class="location problem-description" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 4 || environmentTaskMessage.state == 5 || environmentTaskMessage.state == 8">
 			  <text>备注</text>
-			  <text>{{ environmentTaskMessage.taskRemark}}</text>
+			  <text>{{ environmentTaskMessage.completeRemark}}</text>
 			</view>
     </view>
   </view>
@@ -119,7 +119,8 @@ export default {
       environmentCancelReasonShow: false,
       environmentCancelReasonValue: null,
       environmentCancelReasonOption: [{text: "请选择取消原因",value: null}],
-			problemPicturesEchoList: []
+			problemPicturesEchoList: [],
+			resultPicturesEchoList: []
     }
   },
 
@@ -183,6 +184,7 @@ export default {
 			if (this.environmentTaskMessage.hasOwnProperty('images')) {
 				if (this.environmentTaskMessage['images'].length > 0) {
 					this.problemPicturesEchoList = this.environmentTaskMessage['images'].filter((item) => { return item.imgType == 0});
+					this.resultPicturesEchoList = this.environmentTaskMessage['images'].filter((item) => { return item.imgType == 1});
 				}
 			}	
 		},
