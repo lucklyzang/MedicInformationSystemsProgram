@@ -62,7 +62,7 @@
 			</view>
 			<view class="location problem-description">
 			  <text>问题描述</text>
-			  <text>{{ environmentTaskMessage.taskRemark}}</text>
+			  <text>{{ environmentTaskMessage.taskRemark ? environmentTaskMessage.taskRemark : '' }}</text>
 			</view>
 			<view class="location" v-if="environmentTaskMessage.state == 7">
 			  <text>取消原因</text>
@@ -70,7 +70,7 @@
 			</view>
 			<view class="location" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 4 || environmentTaskMessage.state == 5 || environmentTaskMessage.state == 8">
 			  <text>开始时间</text>
-			  <text>{{environmentTaskMessage.startTime }}</text>
+			  <text>{{ environmentTaskMessage.startTime ? environmentTaskMessage.startTime : '' }}</text>
 			</view>
       <view class="location" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 4 || environmentTaskMessage.state == 5 || environmentTaskMessage.state == 8">
         <text>保洁主管</text>
@@ -92,7 +92,7 @@
       </view>
 			<view class="location problem-description" v-if="environmentTaskMessage.state == 3 || environmentTaskMessage.state == 4 || environmentTaskMessage.state == 5 || environmentTaskMessage.state == 8">
 			  <text>备注</text>
-			  <text>{{ environmentTaskMessage.completeRemark}}</text>
+			  <text>{{ environmentTaskMessage.completeRemark ? environmentTaskMessage.completeRemark : '' }}</text>
 			</view>
     </view>
   </view>

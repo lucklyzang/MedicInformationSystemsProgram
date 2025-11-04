@@ -132,7 +132,7 @@
 									<text>问题描述</text>
 							</view>
 							<view class="message-two-right task-remark">
-									{{ projectTaskMessage.taskDesc }}
+									{{ projectTaskMessage.taskDesc ? projectTaskMessage.taskDesc : '' }}
 							</view>
 					</view>
 			</view>

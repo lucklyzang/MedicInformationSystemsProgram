@@ -272,7 +272,7 @@
 				this.architectureShow = false;
 				this.functionAreaShow = true;
 				this.functionAreaList = [];
-				getFunctionAreaMessage({hospitalId: this.proId}).then((res) => {
+				getFunctionAreaMessage({proId: this.proId}).then((res) => {
 						this.showLoadingHint = false;
 						if (res && res.data.code == 200) {
 							if (res.data.data.length > 0) {

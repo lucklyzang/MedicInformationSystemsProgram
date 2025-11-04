@@ -135,7 +135,7 @@
 						<view class="handle-message-line-wrapper">
 						 <view class="describe-line-wrapper">
 							 <view class="message-tit">任务描述 :&nbsp;</view>
-							 <view class="message-tit-real">{{transTaskMessage.taskRemark ? transTaskMessage.taskRemark : '无'}}</view>
+							 <view class="message-tit-real">{{transTaskMessage.taskRemark ? transTaskMessage.taskRemark : ''}}</view>
 						 </view>
 						</view>
 				 </view>

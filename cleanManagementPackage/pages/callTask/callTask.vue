@@ -300,10 +300,10 @@
 							});
 							continue
 						};
-						let isLt2M = res.tempFiles[imgI].size/1024/1024 < 10;
+						let isLt2M = res.tempFiles[imgI].size/1024/1024 <= 1;
 						if (!isLt2M) {
 							that.$refs.uToast.show({
-								message: '图片必须小于10MB!',
+								message: '图片必须小于1MB!',
 								type: 'error',
 								position: 'center'
 							});

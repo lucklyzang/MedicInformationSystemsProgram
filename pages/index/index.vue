@@ -296,7 +296,7 @@
 				padding: 10px 10px 20px 10px;
 				box-sizing: border-box;
 				width: 98%;
-				max-height: 350px;
+				max-height: 60vh;
 				margin: 0 auto;
 				overflow: auto;
 				background: #fff;
