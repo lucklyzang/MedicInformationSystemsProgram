@@ -312,7 +312,7 @@
 			
 			// 查询环境订单取消原因
 			getEnvironmentOrderCancelReason () {
-				cancelTaskReason({proId: this.proId})
+				cancelTaskReason({proId: this.proId,state: 0})
 				.then((res) => {
 					if (res && res.data.code == 200) {
 						for (let i = 0, len = res.data.data.length; i < len; i++) {

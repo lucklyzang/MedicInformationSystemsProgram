@@ -168,13 +168,13 @@
 			getArchitecture () {
 				this.showLoadingHint = true;
 				this.emptyShow = false;
+				this.functionAreaShow = false;
+				this.goalAreaShow = false;
+				this.departmentShow = false;
 				this.architectureShow = true;
 				this.architectureList = [];
 				getArchitectureMessage({proId: this.proId}).then((res) => {
 						this.showLoadingHint = false;
-						this.functionAreaShow = false;
-						this.goalAreaShow = false;
-						this.departmentShow = false;
 						if (res && res.data.code == 200) {
 							if (res.data.data.length > 0) {
 								this.architectureList = res.data.data;

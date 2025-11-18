@@ -194,8 +194,8 @@
                 setCache('userName', this.form.username);
                 setCache('userPassword', this.form.password);
               } else {
-                removeCache('userName', this.form.username);
-                removeCache('userPassword', this.form.password);
+                removeCache('userName');
+                removeCache('userPassword');
               };
 							// 登录用户信息存入store
 							this.changeIsLogin(true);
