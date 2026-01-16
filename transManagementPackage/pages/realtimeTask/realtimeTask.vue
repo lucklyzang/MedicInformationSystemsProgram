@@ -624,7 +624,7 @@
 				};
 				this.showLoadingHint = true;
 				this.infoText = '催单中···';
-			  taskReminder(this.proId,item.id).then((res) => {
+			  taskReminder(this.proId,item.id).then((res) => { 
 					this.showLoadingHint = false;
 			    if (res && res.data.code == 200) {
 						this.$refs.alertToast.show({

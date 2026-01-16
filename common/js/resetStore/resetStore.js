@@ -31,11 +31,11 @@ export function getDefaultCommonState() {
 		},
 		// 订单列表点击索引
 		currentIndex: 0,
-		// 生产域名 https://blinktech.cn
-		// 开发域名 https://blink.blinktech.cn
-		// 准生产域名 https://ver.blinktech.cn
-		// 测试域名 https://show.blinktech.cn
-		baseURL: 'https://ver.blinktech.cn'
+		// 生产域名 https://blinktech.cn/nblink
+		// 开发域名 https://blink.blinktech.cn/nblink
+		// 准生产域名 https://ver.blinktech.cn/nblink
+		// 测试域名 https://show.blinktech.cn/nblink
+		baseURL: 'https://show.blinktech.cn/nblink'
 	}	
 }
 
