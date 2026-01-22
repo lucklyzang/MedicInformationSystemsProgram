@@ -298,7 +298,8 @@
 					 }
 				 };
 				 .former-password-right {
-					 flex: 1
+					 flex: 1;
+					 background: #fff;
 				 }
 			 };
 			 .new-password-area {

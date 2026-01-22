@@ -38,9 +38,17 @@
 						{{ depName }}
 					</view>
 				</view>
-				<view class="account-area" @click="modificationPasswordEvent">
+				<view class="account-area account-area-bottom-border" @click="modificationPasswordEvent">
 					<view class="account-area-left">
 						修改密码
+					</view>
+					<view class="account-area-right">
+						<u-icon name="arrow-right" color="#101010" size="24"></u-icon>
+					</view>
+				</view>
+				<view class="account-area" @click="feedbackEvent">
+					<view class="account-area-left">
+						意见反馈
 					</view>
 					<view class="account-area-right">
 						<u-icon name="arrow-right" color="#101010" size="24"></u-icon>
@@ -118,6 +126,13 @@
 			modificationPasswordEvent () {
 				uni.navigateTo({
 					url: '/pages/modificationPassword/modificationPassword'
+				})
+			},
+			
+			// 意见反馈事件
+			feedbackEvent() {
+				uni.navigateTo({
+					url: '/pages/feedbackEvent/feedbackEvent'
 				})
 			},
 			
