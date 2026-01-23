@@ -122,37 +122,68 @@
 								<text>转运工具:</text>
 								<text>{{!item.toolName ? '无' : item.toolName}}</text>
 							</view>
-						  <view class="transport-people">
-								<text>运送人:</text>
-						  	<text>{{!item.workerName ? '无' : item.workerName}}</text>
-						  </view>
-						</view>
-						<view class="item-top-three">
 							<view class="start-point">
 								<text>出发地:</text>
 								<text>{{item.setOutPlaceName}}</text>
 							</view>
+						</view>
+						<view class="item-top-three">
+							<view class="bed-number" v-if="templateType === 'template_one'">
+								<text>目的地: </text>
+								<text class="destina-list">{{ !item.destinationName  ? '无' : item.destinationName }}</text>
+							</view>
+							<view class="bed-number" v-if="templateType === 'template_two'">
+								<text>目的地: </text>
+								<text class="destina-list" v-for="(innerItem,innerIndex) in item.destinations" :key="innerIndex">{{ item.destinations.length > 0 ? innerItem.destinationName : '无' }}</text>
+							</view>
 							<view class="bed-number" v-if="templateType === 'template_one'">
 								<text>床号:</text>
-								<text>{{item.bedNumber}}</text>
+								<text>{{ item.bedNumber ? item.bedNumber : '无' }}</text>
 							</view>
 							<view class="bed-number" v-else-if="templateType === 'template_two'">
 								<text>床号:</text>
 								<text>{{ extractBedNumber(item.patientInfoList) }}</text>
 							</view>
 						</view>
-						<view class="item-top-four">
-							<view class="bed-number" v-if="templateType === 'template_one'">
-								<view>目的地: </view>
-								<view>
-									<text class="destina-list">{{ !item.destinationName  ? '无' : item.destinationName }}</text>
+					</view>
+					<view class="item-bottom">
+						<!-- 反馈区域 -->
+						<view class="feedback-area" @click.stop="feedbackAreaStopEvent">
+							<view class="feedback-top">
+								<view class="left">
+									<image src="/static/img/task-feedback-icon.png"></image>
+									<text>运送人:</text>
+									<text>{{ !item.workerName ? '' : item.workerName }}</text>
+								</view>
+								<view class="right" v-if="!item.isShowGiveLikeIconStyle && !item.isIssueFeedback && templateType === 'template_one' && item.feedbackFlag == 0">
+									<view class="left-feedback-icon"  @click.stop="feedBackEvent(item,index,1)">
+										<u-icon name="arrow-down-fill" size="20" :color="item.isShowFeedBackIconStyle ? 'orange' : '#a59f9f'" />
+									</view>
+									<view class="right-like-icon" @click.stop="giveLikeEvent(item,index,1,'点赞')">
+										<u-icon name="arrow-up-fill" size="20" :color="item.isShowGiveLikeIconStyle ? 'orange' : '#a59f9f'" />
+										<text :class="{'give-like-text-style':item.isShowGiveLikeIconStyle}">
+											点赞
+										</text>
+									</view>
+								</view>
+								<view class="thank-feedback" v-if="(item.isShowGiveLikeIconStyle || item.isIssueFeedback || item.feedbackFlag == 1) && templateType === 'template_one'">
+									感谢您的反馈!
 								</view>
 							</view>
-							<view class="bed-number" v-if="templateType === 'template_two'">
-								<view>目的地: </view>
-								<view>
-									<text class="destina-list" v-for="(innerItem,innerIndex) in item.destinations" :key="innerIndex">{{ item.destinations.length > 0 ? innerItem.destinationName : '无' }}</text>
-									</view>
+							<view class="feedback-bottom" v-if="item.isShowFeedBack">
+								<view class="idea-feedback">
+									请输入您的反馈意见：
+								</view>
+								<u--textarea v-model="item.deedbackContent" @click.native.stop="textareaStopEvent" maxlength="500" @input="inputChange($event,item,index,1)" count placeholder="请输入您的反馈意见" :key="item.id"></u--textarea>
+								<view class="guess-speak">
+									猜你想说：
+								</view>
+								<view class="guess-speak-list">
+									<text v-for="(innerItem,innerIndex) in guessSpeakList" @click.stop="guessSpeakListEvent(index,innerItem,innerIndex,1)" :key="innerItem.name">{{innerItem.name}}</text>
+								</view>  
+								<view class="submit-feedback" @click.stop="submitTaskFeedBack(item,index,1,'反对')">
+									提交反馈
+								</view> 
 							</view>
 						</view>
 					</view>
@@ -218,7 +249,7 @@
 							</view>
 							<view class="bed-number" v-if="templateType === 'template_one'">
 								<text>床号: </text>
-								<text>{{item.bedNumber}}</text>
+								<text>{{ item.bedNumber ? item.bedNumber : '无' }}</text>
 							</view>
 							<view class="bed-number" v-else-if="templateType === 'template_two'">
 								<text>床号:</text>
@@ -311,6 +342,7 @@
 		getDate
 	} from '@/common/js/utils'
 	import {getDispatchTaskComplete} from '@/api/transport.js'
+	import {queryFeedback,submitTaskFeedback} from '@/api/public.js'
 	import navBar from "@/components/zhouWei-navBar"
 	import SOtime from '@/common/js/utils/SOtime.js'
 	export default {
@@ -332,7 +364,8 @@
 				dateEndShow: false,
 				dateStartShow: false,
 				contactIsolationPng: require("@/static/img/contact-isolation.png"),
-				stateCompleteList: []
+				stateCompleteList: [],
+				guessSpeakList: [],
 			}
 		},
 		computed: {
@@ -573,7 +606,9 @@
 								planStartTime: item.planStartTime,
 								patientInfoList: item.patientInfoList,
 								state: item.state,
+								parentTypeName: item.parentTypeName,
 								setOutPlaceName: item.setOutPlaceName,
+								feedbackFlag: item.feedbackFlag,
 								destinationName: item.destinationName,
 								taskTypeName: item.taskTypeName,
 								toolName: item.toolName,
@@ -590,7 +625,13 @@
 								isBack: item.isBack,
 								tempFlag: item.tempFlag,
 								isSign: item.isSign,
-								workerName: item.workerName
+								workerName: item.workerName,
+								workerId: item.workerId,
+								deedbackContent: '',
+								isShowFeedBack: false,
+								isShowFeedBackIconStyle: false,
+								isShowGiveLikeIconStyle: false,
+								isIssueFeedback: false,
 							})
 						}
 				  } else {
@@ -611,6 +652,238 @@
 					this.showLoadingHint = false;
 					this.noDataShow = true;
 			  })
+			},
+			
+			// 反馈点击事件
+			feedBackEvent(item,index,type) {
+				if (type == 1) {
+					this.stateCompleteList[index]['isShowFeedBackIconStyle'] = !this.stateCompleteList[index]['isShowFeedBackIconStyle'];
+					this.stateCompleteList[index]['isShowFeedBack'] = !this.stateCompleteList[index]['isShowFeedBack'];
+					if (this.stateCompleteList[index]['isShowFeedBack']) {
+						this.$set(this.stateCompleteList[index], 'deedbackContent', '');
+						this.inquireFeedback({
+							proId: this.proId,
+							signFlag: 2,
+							typeFlag: '',
+							state: 1
+						})
+					}
+				}
+			},
+			
+			//提交反馈事件
+			submitTaskFeedBack (item,index,type,text) {
+				if (item.deedbackContent === '') {
+					this.$refs.uToast.show({
+					  message: '请填写反馈意见',
+					  type: 'warning'
+					})
+					return
+				};
+				if (type == 1) {
+					if (this.stateCompleteList[index]['isIssueFeedback']) {
+						this.$refs.uToast.show({message:'该任务已反馈过',type:'waring'})
+						return
+					}
+				};
+				let data = {
+					feedbackId : this.workerId, // 反馈者ID
+					feedbackName : this.userAccount, // 反馈者名称
+					feedbackRole : '', //反馈角色，暂定为医务人员的 role 字段
+					depId : this.depId  , //反馈科室ID，医务人员depId字段
+					depName:  this.depName , //反馈科室名称医务人员depName字段
+					content : '' , //反馈内容，可以为空，点赞默认为空
+					type : 1, //反馈类型(1-意见反馈，2-赞)
+					terminal : 2, //反馈终端(1-客户端，2-小程序)
+					taskType : '', //任务类型-调度任务(1-调度任务，2-预约任务，3-循环任务)
+					proId : this.proId, //所属项目ID，医务人员proId字段
+					taskId : item.id, //任务ID
+					isIssueFeedback: item.isIssueFeedback,
+					feedbackFlag : item.feedbackFlag,
+					taskNumber : item.number, //任务编号
+					taskCreate : item.createTime, //调度任务创建时间
+					taskStart : item.startTime, //调度任务开始时间
+					taskFinish : item.finishTime, //调度任务结束时间
+					taskState : 7, //调度任务状态
+					taskPriority : item.priority, //调度任务优先级
+					taskWorkerId : item.workerId, //运送员ID
+					taskWorkerName : item.workerName //运送员姓名
+				};
+				if (type == 1) {
+					data['taskCreate'] = item.createTime ? item.createTime.slice(0,item.createTime.lastIndexOf(':')) : '';
+					data['taskStart'] = item.planStartTime ? item.planStartTime.slice(0,item.planStartTime.lastIndexOf(':')) : '';
+					data['taskFinish'] = item.finishTime ? item.finishTime.slice(0,item.finishTime.lastIndexOf(':')) : '';
+					data['taskType'] = type;
+					data['content'] = this.stateCompleteList[index]['deedbackContent'];
+					data['taskStartDep'] = '';
+					data['taskCreateDep'] = item['setOutPlaceName'];
+					if (this.templateType == 'template_one') {
+						data['taskTransType'] = `${item.parentTypeName ? item.parentTypeName : ''}-${item.taskTypeName ? item.taskTypeName : ''}`;
+					} else {
+						if (item.patientInfoList.length > 0 && item.patientInfoList[0].typeList.length > 0) {
+							let typeList = this.extractTransportTypeSmallClass(item.patientInfoList).join('、');
+							data['taskTransType'] = `${item.patientInfoList[0].typeList[0].parentTypeName}-${typeList}`
+						} else {
+							data['taskTransType'] = ''
+						}
+					};
+					data['taskTemplate'] = this.templateType == 'template_two' ? 2 : 1;
+					this.submitFeedBackEvent(data,index,type,text)
+				}
+			},
+			
+			// 点赞事件
+			giveLikeEvent(item,index,type,text) {
+				if (type == 1) {
+					if (this.stateCompleteList[index]['isShowGiveLikeIconStyle']) {return}
+				};
+				let data = {
+					feedbackId : this.workerId, // 反馈者ID
+					feedbackName : this.userAccount, // 反馈者名称
+					feedbackRole : '', //反馈角色，暂定为医务人员的 role 字段
+					depId : this.depId  , //反馈科室ID，医务人员depId字段
+					depName:  this.depName , //反馈科室名称医务人员depName字段
+					content : '' , //反馈内容，可以为空，点赞默认为空
+					type : 2, //反馈类型(1-意见反馈，2-赞)
+					isIssueFeedback: item.isIssueFeedback,
+					feedbackFlag : item.feedbackFlag,
+					terminal : 2, //反馈终端(1-客户端，2-小程序)
+					taskType : '', //任务类型-调度任务(1-调度任务，2-预约任务，3-循环任务)
+					proId : this.proId, //所属项目ID，医务人员proId字段
+					taskId : item.id, //任务ID
+					taskNumber : item.number, //任务编号
+					taskCreate : item.createTime, //调度任务创建时间
+					taskStart : item.startTime, //调度任务开始时间
+					taskFinish : item.finishTime, //调度任务结束时间
+					taskState : 7, //调度任务状态
+					taskPriority : item.priority, //调度任务优先级
+					taskWorkerId : item.workerId, //运送员ID
+					taskWorkerName : item.workerName //运送员姓名
+				};
+				if (type == 1) {
+					data['taskCreate'] = item.createTime ? item.createTime.slice(0,item.createTime.lastIndexOf(':')) : '';
+					data['taskStart'] = item.planStartTime ? item.planStartTime.slice(0,item.planStartTime.lastIndexOf(':')) : '';
+					data['taskFinish'] = item.finishTime ? item.finishTime.slice(0,item.finishTime.lastIndexOf(':')) : '';
+					data['taskType'] = type;
+					data['taskStartDep'] = '';
+					data['taskCreateDep'] = item['setOutPlaceName'];
+					if (this.templateType == 'template_one') {
+						data['taskTransType'] = `${item.parentTypeName ? item.parentTypeName : ''}-${item.taskTypeName ? item.taskTypeName : ''}`;
+					} else {
+						if (item.patientInfoList.length > 0 && item.patientInfoList[0].typeList.length > 0) {
+							let typeList = this.extractTransportTypeSmallClass(item.patientInfoList).join('、');
+							data['taskTransType'] = `${item.patientInfoList[0].typeList[0].parentTypeName}-${typeList}`
+						} else {
+							data['taskTransType'] = ''
+						}
+					};
+					data['taskTemplate'] = this.userInfo.pc == 'template_two' ? 2 : 1;
+					this.submitFeedBackEvent(data,index,type,text)
+				}
+			},
+			// 任务猜你想说项点击事件
+			guessSpeakListEvent(index,innerItem,innerIndex,type) {
+				this.$forceUpdate();
+				if (type == 1) {
+					if (this.stateCompleteList[index]['deedbackContent'].length == 0) {
+						this.$set(this.stateCompleteList[index], 'deedbackContent', `${innerItem.name}`);
+					} else {
+						this.$set(this.stateCompleteList[index], 'deedbackContent', `${this.stateCompleteList[index]['deedbackContent']},${innerItem.name}`);
+					}
+				}
+			},
+			
+			// 文本域输入框值改变事件
+			inputChange ($event,item,index,type) {
+				if (type == 1) {
+					this.$set(this.stateCompleteList[index], 'deedbackContent', $event);
+				}
+			},
+			
+			// 查询任务反馈意见
+			inquireFeedback (data) {
+				this.guessSpeakList = [];
+				queryFeedback(data).then((res) => {
+					if (res && res.data.code == 200) {
+						if (res.data.data.length > 0) {
+							for (let item of res.data.data) {
+								this.guessSpeakList.push({
+									name: item.content
+								})
+							}
+						}
+					} else {
+						this.$refs.uToast.show({
+						  message: `${res.data.msg}`,
+						  type: 'warning'
+						})
+					}
+				})
+				.catch((err) => {
+					this.$refs.uToast.show({
+					  message: `${err.message}`,
+					  type: 'warning'
+					})
+				})
+			},
+						
+			// 提交意见反馈
+			submitFeedBackEvent (data,index,type,text) {
+				if (data.feedbackFlag == 1 || data.isIssueFeedback) {
+					this.$refs.uToast.show({title:'该任务已反馈过',type:'waring'})
+					return
+				};
+				submitTaskFeedback(data,type).then((res) => {
+					if (res && res.data.code == 200) {
+						this.$refs.uToast.show({
+						  message: '意见反馈成功',
+						  type: 'success'
+						});
+						if (type == 1) {
+							if (text == '点赞') {
+								this.stateCompleteList[index]['isShowGiveLikeIconStyle'] = !this.stateCompleteList[index]['isShowGiveLikeIconStyle'];
+								this.stateCompleteList[index]['isShowFeedBackIconStyle'] = false;
+								this.stateCompleteList[index]['isShowFeedBack'] = false;
+							} else if (text == '反对') {
+								this.stateCompleteList[index]['isShowFeedBackIconStyle'] = !this.stateCompleteList[index]['isShowFeedBackIconStyle'];
+								this.stateCompleteList[index]['isIssueFeedback'] = true;
+								this.stateCompleteList[index]['isShowFeedBack'] = !this.stateCompleteList[index]['isShowFeedBack'];
+							}
+						};
+					} else {
+						this.$refs.uToast.show({
+						  message: `${res.data.msg}`,
+						  type: 'warning'
+						})
+					}
+				})
+				.catch((err) => {
+					this.$refs.uToast.show({
+					  message: `${err.message}`,
+					  type: 'warning'
+					})
+				})
+			},
+			
+			// 文本域点击事件阻止冒泡
+			textareaStopEvent() {},
+			
+			// 反馈区域点击阻止冒泡事件
+			feedbackAreaStopEvent() {},
+			
+			//提取调度任务运送类型小类
+			extractTransportTypeSmallClass (transportTypeList) {
+				let TransportTypeList = [];
+				if (transportTypeList.length > 0) {
+					for (let item of transportTypeList) {
+						if (item.typeList.length > 0) {
+							for (let innerItem of item.typeList) {
+								TransportTypeList.push(innerItem['taskTypeName'])
+							}
+						}
+					}
+				};
+				return TransportTypeList
 			},
 			
 			// tabBar点击事件
@@ -793,6 +1066,8 @@
 			 		margin-bottom: 6px;
 			 		border-radius: 4px;
 			 		background: #FFFFFF;
+					padding-bottom: 6px;
+					box-sizing: border-box;
 					.item-title {
 						box-sizing: border-box;
 						padding: 0 12px;
@@ -992,7 +1267,150 @@
 							 }
 							}
 			 		  }
-			 		}
+			 		};
+					.item-bottom {
+						width: 100%;
+						display: inline-block;
+						 .feedback-area {
+								display: flex;
+								flex-direction: column;
+								padding: 0 12px;
+								box-sizing: border-box;
+								.feedback-top {
+									display: flex;
+									flex-flow: row nowrap;
+									justify-content: space-between;
+									align-items: center;
+								  padding: 10px 4px;
+									box-sizing: border-box;
+									border-top: 1px solid #BBBBBB;
+									border-bottom: 1px solid #BBBBBB;
+									.left {
+										flex: 1;
+										height: 50px;
+										line-height: 20px;
+										word-break: break-all;
+										display: flex;
+										flex-flow: row nowrap;
+										align-items: center;
+										>image {
+											width: 28px;
+											height: 28px;
+										};
+										text {
+											color: black;
+											display: inline-block;
+											&:nth-child(2) {
+												font-size: 14px;
+												margin: 0 6px 0 4px;
+											};
+											&:nth-child(3) {
+												font-size: 14px;
+												height: 50px;
+												display: flex;
+												flex-flow: row nowrap;
+												align-items: center;
+												overflow: auto;
+												flex: 1;
+											}
+										}
+									};
+									.right {
+										display: flex;
+										flex-flow: row nowrap;
+										justify-content: space-between;
+										align-items: center;
+										height: 50px;
+										width: 160px;
+										padding: 0 8px;
+										box-sizing: border-box;
+										border: 1px solid #e2e2e2;
+										border-radius: 30px;
+										.left-feedback-icon {
+											width: 50px;
+											height: 50px;
+											display: flex;
+											flex-flow: row nowrap;
+											justify-content: center;
+											align-items: center;
+											border-right: 1px solid #a59f9f;
+										};
+										.right-like-icon {
+											flex: 1;
+											display: flex;
+											align-items: center;
+											justify-content: center;
+											text {
+												font-size: 12px;
+												color: #a59f9f;
+												margin-left: 4px
+											};
+											.give-like-text-style {
+												color: orange
+											}
+										}
+									};
+									.thank-feedback {
+										display: flex;
+										flex-flow: row nowrap;
+										justify-content: space-between;
+										align-items: center;
+										height: 50px;
+										padding: 0 8px;
+										box-sizing: border-box;
+										color: orange;
+										font-size: 14px;
+									}
+								};
+							.feedback-bottom {
+								padding-bottom: 10px;
+								box-sizing: border-box;
+								.idea-feedback {
+									color: #101010;
+									font-size: 14px;
+									margin: 12px 0;
+								};
+								::v-deep .u-textarea{
+									padding: 9px 9px 18px 9px !important;
+								};
+								.guess-speak {
+									font-size: 12px;
+									color: #959494;
+									margin: 12px 0;
+								};
+								.guess-speak-list {
+										display: flex;
+										flex-flow: row wrap;
+										justify-content: flex-start;
+										min-height: 80px;
+										text {
+											font-size: 12px;
+											color: #959494;
+											display: inline-block;
+											padding: 0 8px;
+											box-sizing: border-box;
+											height: 20px;
+											line-height: 20px;
+											text-align: center;
+											border: 1px solid #959494;
+											margin: 0 8px 8px 0;
+										}
+								};
+								.submit-feedback {
+									width: 180px;
+									height: 40px;
+									background: orange;
+									font-size: 13px;
+									text-align: center;
+									line-height: 40px;
+									color: #fff;
+									margin: 0 auto;
+									margin-top: 12px;
+									border-radius: 20px;
+								}
+							}
+						}
+					}
 			 	}
 			 }
 		}

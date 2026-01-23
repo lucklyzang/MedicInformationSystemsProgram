@@ -3,7 +3,7 @@ import request from '@/api/request';
 // 查询反馈意见
 export function queryFeedback(data) {
   return request({
-    url: 'feedbackConf/queryAll',
+    url: 'trans/feedbackConf/queryAll',
     method: 'get',
     params: data
   })
@@ -21,7 +21,7 @@ export function submitFeedback(data) {
 // 提交任务反馈意见
 export function submitTaskFeedback(data,type) {
   return request({
-    url: `feedback/feedback/${type}`,
+    url: `trans/feedback/feedback/${type}`,
     method: 'post',
     data
   })
