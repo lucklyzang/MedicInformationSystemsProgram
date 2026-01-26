@@ -25,15 +25,15 @@
 			<view class="feedback-idea">
 				<text>*</text>反馈意见
 			</view>
-			<u--textarea v-model="deedbackContent" maxlength="500" count placeholder="请输入你的反馈意见"></u--textarea>
-		<!-- 	<view class="guess-speak">
+			<u--textarea v-model="deedbackContent" maxlength="500" count placeholder="请输入反馈意见"></u--textarea>
+			<view class="guess-speak">
 				<text>
 					猜你想说 :
 				</text>
 			</view>
 			<view class="guess-speak-list">
-				<text v-for="(innerItem,innerIndex) in totalGuessSpeakList" @click="totalGuessSpeakListEvent(innerItem,innerIndex)" :key="innerIndex">{{innerItem.name}}</text>
-			</view> -->
+				<text v-for="(innerItem,innerIndex) in totalGuessSpeakList" :class="{'guessSpeakListStyle' : guessSpeakListIndex === innerIndex}" @click="totalGuessSpeakListEvent(innerItem,innerIndex)" :key="innerIndex">{{innerItem.name}}</text>
+			</view>
 		</view>
 		<view class="bottom-area">
 			<view class="quit-area" :class="{'quitAreaStyle' : opinionTypeIndex === null || deedbackContent === ''}" @click="submitFeedBackEvent">提交反馈</view>
@@ -54,13 +54,11 @@
 	import store from '@/store'
 	import { queryFeedback, submitFeedback } from '@/api/public.js'
 	import navBar from "@/components/zhouWei-navBar"
-	import faIcon from "@/components/kilvn-fa-icon/fa-icon.vue"
 	import LightHint from "@/components/light-hint/light-hint.vue"
 	export default {
 		components: {
 			navBar,
-			LightHint,
-			faIcon
+			LightHint
 		},
 		data() {
 			return {
@@ -68,6 +66,7 @@
 				showLoadingHint: false,
 				opinionTypeList: ['人员','功能故障','其它意见'],
 				opinionTypeIndex: null,
+				guessSpeakListIndex: null,
 				totalGuessSpeakList: [],
 				deedbackContent: ''
 			}
@@ -113,18 +112,20 @@
 			opinionTypeEvent (item,index) {
 				this.opinionTypeIndex = index;
 				this.deedbackContent = '';
+				this.guessSpeakListIndex = null;
 				// 查询总体反馈意见
-				// this.inquireFeedback({
-				// 	proId: this.proId,
-				// 	signFlag: 1,
-				// 	typeFlag: index + 1,
-				// 	state: 1
-				// })
+				this.inquireFeedback({
+					proId: this.proId,
+					signFlag: 1,
+					typeFlag: index + 1,
+					state: 1
+				})
 			},
 			
 			
 			// 总体反馈猜你想说项点击事件
 			totalGuessSpeakListEvent(innerItem,innerIndex) {
+				this.guessSpeakListIndex = innerIndex;
 				if (this.deedbackContent.length == 0) {
 					this.deedbackContent = `${innerItem.name}`
 				} else {
@@ -299,7 +300,10 @@
 			 			text-align: center;
 			 			border: 1px solid #a59f9f;
 			 			margin: 0 8px 8px 0;
-			 		}
+			 		};
+					.guessSpeakListStyle {
+						border: 1px solid #266FFF;
+					}
 			 };
 			 .idea-type-list {
 					display: flex;
