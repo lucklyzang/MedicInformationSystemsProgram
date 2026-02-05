@@ -308,7 +308,7 @@
 					添加病人信息
 			</view>
 		</view>
-		<view class="message-one is-back">
+		<view class="message-one is-back" v-if="templateType === 'template_one'">
 			<view class="message-one-left">接触隔离</view>
 			<view class="transport-isBack">
 				<u-radio-group v-model="isContactisolationValue">
