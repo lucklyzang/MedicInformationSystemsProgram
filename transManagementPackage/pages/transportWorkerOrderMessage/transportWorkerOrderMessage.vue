@@ -80,19 +80,19 @@
 					 <view class="handle-message-line-wrapper" v-if="templateType === 'template_one'">
 						 <view>
 							 <text class="message-tit">年&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;龄 :&nbsp;</text>
-							 <text class="message-tit-real">{{transTaskMessage.age == "" ? '无' : transTaskMessage.age}}</text>
+							 <text class="message-tit-real">{{!transTaskMessage.age && transTaskMessage.age !== 0 ? '无' : transTaskMessage.age}}</text>
 						 </view>
 					 </view>
 					<view class="handle-message-line-wrapper">
 							<view>
 								<text class="message-tit">数&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;量 :&nbsp;</text>
-								<text class="message-tit-real">{{transTaskMessage.actualCount == "" ? "无" : transTaskMessage.actualCount}}</text>
+								<text class="message-tit-real">{{!transTaskMessage.actualCount && transTaskMessage.actualCount !== 0 ? "无" : transTaskMessage.actualCount}}</text>
 							</view>
 						</view>
 					 <view class="handle-message-line-wrapper">
 						 <view>
 							 <text class="message-tit">转运工具 :&nbsp;</text>
-							 <text class="message-tit-real">{{transTaskMessage.toolName == "" ? '无' : transTaskMessage.toolName}}</text>
+							 <text class="message-tit-real">{{!transTaskMessage.toolName ? '无' : transTaskMessage.toolName}}</text>
 						 </view>
 					 </view>
 						<view class="handle-message-line-wrapper">

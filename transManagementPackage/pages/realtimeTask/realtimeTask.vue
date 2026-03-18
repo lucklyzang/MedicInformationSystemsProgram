@@ -101,7 +101,7 @@
 							</view>
 							<view class="bed-number" v-if="templateType === 'template_one'">
 								<text>床号:</text>
-								<text>{{item.bedNumber}}</text>
+								<text>{{ !item.bedNumber && item.bedNumber !== 0 ? '无' : item.bedNumber }}</text>
 							</view>
 							<view class="bed-number" v-else-if="templateType === 'template_two'">
 								<text>床号:</text>
@@ -195,7 +195,7 @@
 							</view>
 							<view class="bed-number" v-if="templateType === 'template_one'">
 								<text>床号: </text>
-								<text>{{item.bedNumber}}</text>
+								<text>{{ !item.bedNumber && item.bedNumber !== 0 ? '无' : item.bedNumber }}</text>
 							</view>
 							<view class="bed-number" v-else-if="templateType === 'template_two'">
 								<text>床号:</text>
