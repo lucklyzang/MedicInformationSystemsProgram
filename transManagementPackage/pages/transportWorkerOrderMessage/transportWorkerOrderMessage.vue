@@ -67,14 +67,14 @@
 						<view class="handle-message-line-wrapper message-name" v-if="templateType === 'template_one'">
 							<view>
 								<text class="message-tit" :class="{'textStyle' : transTaskMessage.quarantine == 1}">病人姓名 :&nbsp;</text>
-								<text class="message-tit-real" :class="{'textStyle' : transTaskMessage.quarantine == 1}">{{transTaskMessage.patientName == "" ? '无' : transTaskMessage.patientName}}</text>
+								<text class="message-tit-real" :class="{'textStyle' : transTaskMessage.quarantine == 1}">{{!transTaskMessage.patientName ? '无' : transTaskMessage.patientName}}</text>
 								<image :src="contactIsolationPng" v-if="transTaskMessage.quarantine == 1">
 							</view>
 						</view>
 					 <view class="handle-message-line-wrapper" v-if="templateType === 'template_one'">
 						 <view>
 							 <text class="message-tit" :class="{'textStyle' : transTaskMessage.quarantine == 1}">床&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;号 :&nbsp;</text>
-							 <text class="message-tit-real" :class="{'textStyle' : transTaskMessage.quarantine == 1}">{{transTaskMessage.bedNumber == "" ? '无' : transTaskMessage.bedNumber}}</text>
+							 <text class="message-tit-real" :class="{'textStyle' : transTaskMessage.quarantine == 1}">{{!transTaskMessage.bedNumber && transTaskMessage.bedNumber !== 0 ? '无' : transTaskMessage.bedNumber}}</text>
 						 </view>
 					 </view>
 					 <view class="handle-message-line-wrapper" v-if="templateType === 'template_one'">
