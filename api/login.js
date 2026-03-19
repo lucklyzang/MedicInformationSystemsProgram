@@ -46,7 +46,7 @@ export function boundNotExist(proId,code) {
 // 修改密码
 export function modificationPassword(data) {
   return request({
-    url: 'project/user/update-password',
+    url: 'user/password',
     method: 'put',
     data
   })
