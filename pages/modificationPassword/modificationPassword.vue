@@ -227,7 +227,7 @@
 				.catch((err) => {
 					this.showLoadingHint = false;
 				  this.$refs.uToast.show({
-				    message: `${err.message}`,
+				    message: `${err}`,
 				    type: 'error'
 				  })
 				})

@@ -314,6 +314,7 @@
 			getEnvironmentOrderCancelReason () {
 				cancelTaskReason({proId: this.proId,state: 0})
 				.then((res) => {
+					this.showLoadingHint = false;
 					if (res && res.data.code == 200) {
 						for (let i = 0, len = res.data.data.length; i < len; i++) {
 							this.cancelReasonOption.push({
@@ -323,7 +324,6 @@
 							})
 						};
 					} else {
-						this.showLoadingHint = false;
 						this.$refs.uToast.show({
 							message: res.data.msg,
 							type: 'error',
@@ -331,7 +331,11 @@
 					}
 				})
 				.catch((err) => {
-					reject({message:err})
+					this.$refs.uToast.show({
+						message: `${err}`,
+						type: 'error'
+					});
+					this.showLoadingHint = false;
 				})
 			},
 			
@@ -473,7 +477,7 @@
 			  })
 			  .catch((err) => {
 				this.$refs.uToast.show({
-					title: `${err.message}`,
+					message: `${err}`,
 					type: 'error'
 				});
 				this.showLoadingHint = false;
@@ -556,7 +560,7 @@
 					this.showLoadingHint = false;
 					this.$refs.alertToast.show({
 						type: 'error',
-						message: `${err.message}!`,
+						message: `${err}!`,
 						isShow: true
 					})
 			  })

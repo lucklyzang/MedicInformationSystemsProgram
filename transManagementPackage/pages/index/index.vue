@@ -192,7 +192,7 @@ export default {
 		 		.catch((err) => {
 		 			this.showLoadingHint = false;
 		 			this.$refs.uToast.show({
-		 				title: `${err}`,
+		 				message: `${err}`,
 		 				type: 'warning'
 		 			})
 		 		})
@@ -207,10 +207,15 @@ export default {
 		 			}).then((res) => {
 		 				if (res && res.data.code == 200) {
 		 					resolve(res.data.data)
-		 				}
+		 				} else {
+							this.$refs.uToast.show({
+							  message: `${res.data.msg}`,
+							  type: 'warning'
+							})
+						}
 		 			})
 		 			.catch((err) => {
-		 				reject(err.message)
+		 				reject(err)
 		 			})
 		 	})
 		 },

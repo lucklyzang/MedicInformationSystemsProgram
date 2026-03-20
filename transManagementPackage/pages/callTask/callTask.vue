@@ -810,7 +810,7 @@ export default {
 					}
         })
           .catch((err) => {
-            reject({message:err.message})
+            reject({message:err})
           })
       })
     },

@@ -233,7 +233,7 @@ export default {
 		 	.catch((err) => {
 		 		this.showLoadingHint = false;
 		 		this.$refs.uToast.show({
-		 			message: `${err.message}`,
+		 			message: `${err}`,
 		 			type: 'error'
 		 		})
 		 	})
@@ -257,7 +257,7 @@ export default {
 					}
 				})
 				.catch((err) => {
-						reject(err.message)
+						reject(err)
 					})
 				})	
 		  },
@@ -278,7 +278,7 @@ export default {
 						}
 					})
 					.catch((err) => {
-						reject(err.message)
+						reject(err)
 					})
 				})
 			 },

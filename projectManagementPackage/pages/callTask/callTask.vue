@@ -318,13 +318,13 @@
 								resolve(res.data.data)
 							} else {
 								this.$refs.uToast.show({
-									title: `${res.data.data.msg}`,
+									message: `${res.data.msg}`,
 									type: 'warning'
 								})
 							}
 						})
 						.catch((err) => {
-							reject(err.message)
+							reject(err)
 						})
 				})
 			},
@@ -338,13 +338,13 @@
 								resolve(res.data.data)
 							} else {
 								this.$refs.uToast.show({
-									title: `${res.data.data.msg}`,
+									message: `${res.data.msg}`,
 									type: 'warning'
 								})
 							}
 						})
 						.catch((err) => {
-							reject(err.message)
+							reject(err)
 						})
 				})
 			},
@@ -466,7 +466,7 @@
 					.catch((err) => {
 						this.showLoadingHint = false;
 						this.$refs.uToast.show({
-							message: `${err.message}`,
+							message: `${err}`,
 							type: 'error'
 						})
 					})

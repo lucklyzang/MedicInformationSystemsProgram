@@ -465,7 +465,7 @@
 			  })
 			  .catch((err) => {
 					this.$refs.uToast.show({
-						title: `${err.message}`,
+						message: `${err}`,
 						type: 'error'
 					});
 					this.showLoadingHint = false;
@@ -494,7 +494,7 @@
 				.catch((err) => {
 					this.showLoadingHint = false;
 					this.$refs.uToast.show({
-						title: `${err}`,
+						message: `${err}`,
 						type: 'error'
 					});
 				})
@@ -536,7 +536,7 @@
 					this.showLoadingHint = false;
 					this.$refs.alertToast.show({
 						type: 'error',
-						message: `${err.message}!`,
+						message: `${err}!`,
 						isShow: true
 					})
 			  })
@@ -575,7 +575,7 @@
 					this.showLoadingHint = false;
 					this.$refs.alertToast.show({
 						type: 'error',
-						message: `${err.message}!`,
+						message: `${err}!`,
 						isShow: true
 					})
 			  })
