@@ -175,6 +175,7 @@ instance.interceptors.response.use(function (response) {
 				// 清空store和localStorage
 				removeAllLocalStorage();
 				store.dispatch('resetLoginState');
+			} else {
 			}
 		}
 	};		

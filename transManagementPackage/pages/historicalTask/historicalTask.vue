@@ -14,7 +14,7 @@
 		<view>
 			<u-datetime-picker mode="date" :show="dateEndShow" v-model="dateEndValue" @cancel="dateEndShow = false" @confirm="endDateSure"></u-datetime-picker>
 		</view>
-		<view class="nav">
+		<view class="nav" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }">
 			<nav-bar :home="false" :isShowBackText="true" :isHomeText="true" backState='3000' fontColor="#FFF" bgColor="none" title="运送" @backClick="backTo">
 			</nav-bar> 
 		</view>

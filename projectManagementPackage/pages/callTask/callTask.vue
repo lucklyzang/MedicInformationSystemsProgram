@@ -23,7 +23,7 @@
 		<view class="transport-rice-box" v-if="showTaskType">
 			<ScrollSelection v-model="showTaskType" :pickerValues="taskTypeDefaultIndex" :isShowSearch="true" :columns="taskTypeOption" title="任务类型" @sure="taskTypeSureEvent" @cancel="taskTypeCancelEvent" @close="taskTypeCloseEvent" />
 		</view>
-		<view class="nav">
+		<view class="nav" :style="{ 'height': statusBarHeight + navigationBarHeight + 5 + 'px' }">
 			<nav-bar :home="false" :isShowBackText="true" :isHomeText="true" backState='3000' fontColor="#FFF" bgColor="none" title="任务呼叫" @backClick="backTo">
 			</nav-bar>
 		</view>
